@@ -1,0 +1,207 @@
+.menu-categories{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.active{
+    background-color: #179b28;
+}
+
+.menu-container{
+    background-color: #ffffff;
+    border: 0.5px solid #d3d3d3;
+    border-radius: 8px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.CatButton{
+    width: 8em;
+    height: 2.5em;
+    padding: 8px;
+    height: auto;
+    border-radius: 8px;
+    border: 0.5px solid rgb(153, 153, 153);
+    font-weight: bold;
+    font-family: sans-serif;
+    transition: background-color 0.3s ease;
+}
+
+.main-catButton{
+    background-color: #969696;
+    width: 8em;
+    height: 2.5em;
+    height: auto;
+    padding: 8px;
+    border-radius: 8px;
+    border: 0.5px solid rgb(153, 153, 153);
+    font-weight: bold;
+    font-family: sans-serif;
+    transition: background-color 0.3s ease;
+}
+
+.menu-items{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding-left: 30px;
+}
+
+.menu-addCard{
+    background-color: rgb(144, 148, 180);
+    width: 4.3em;
+    padding: 20px;
+    padding-top: 15px;
+    padding-bottom: 20px;
+    margin-top: 20px;
+    border: 0.5px solid grey;
+    border-radius: 8px;
+    text-align: center;
+    font-family: sans-serif;
+    font-weight: bold;
+}
+
+.addMenu{
+    padding: 10px;
+    margin-left: -5px;
+    width: 4em;
+    height: 3.6em;
+    font-weight: bold;
+    font-size: 20px;
+    border: 0.5px solid grey;
+}
+
+.menu-cardIMG{
+    margin-top: -10px;
+    margin-left: -15px;
+    width: 6.2em;
+    height: 5em;
+    border-radius: 8px;
+}
+
+.menu-cardTime{
+    display: flex;
+    gap: 3px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+
+.modal{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    background-color: #FBD9D7;
+    width: 30em;
+    height: 20em;
+    border-radius: 10px;
+    padding: 20px;
+    padding-top: 30px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: bold;
+    font-family: sans-serif;
+}
+
+.modal-overlay{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-input{
+    width: 20em;
+    height: 2.5em;
+    border-radius: 8px;
+    padding: 10px;
+    border: 0.5px solid grey;
+    font-size: 16px;
+}
+
+.modal-input:focus{
+    outline: none;
+    border: 0.5px solid #464646;
+}
+
+.modal-buttons-box{
+    margin-top: -15px;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.modal-buttons1{
+    background-color: #4ec708;
+    width: 6em;
+    height: 2.5em;
+    padding: 8px;
+    border-radius: 8px;
+    border: 0.5px solid grey;
+    font-weight: bold;
+    font-family: sans-serif;
+}
+
+.modal-buttons2{
+    background-color: #ff1515;
+    width: 8em;
+    height: 2.5em;
+    padding: 8px;
+    border-radius: 8px;
+    border: 0.5px solid grey;
+    font-weight: bold;
+    font-family: sans-serif;
+}
+
+.modal-buttons2:hover{
+    background-color: #da0000;
+}
+.modal-buttons1:hover{
+    background-color: #3b9e07;
+}
+.modal-buttons-box:hover{
+    cursor: pointer;
+}
+
+.menu-cardEditButtons{
+    display: flex;
+    gap: 8px;
+    margin-left: -5px;
+    margin-top: 13px;
+    margin-bottom: -5px;
+}
+
+.menu-cardEditButtons1{
+    /* display: flex; */
+    font-size: 20px;
+    align-items: center;
+    background-color: #545c80;
+    width: 2.5em;
+    height: 1.63em;
+    /* padding: 5px; */
+    margin-left: 5px;
+    padding-top: 0px;
+    border-radius: 8px;
+    border: 0.5px solid grey;
+}
+
+.menu-cardEditButtons2{
+    display: flex;
+    align-items: center;
+    background-color: #545c80;
+    width: 2.5em;
+    height: 2.5em;
+    padding: 5px;
+    border-radius: 8px;
+    border: 0.5px solid grey;
+}

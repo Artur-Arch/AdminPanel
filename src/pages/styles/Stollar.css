@@ -1,0 +1,170 @@
+.stollar{
+    background-color: #ffffff;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.stolCat{
+    margin-top: 5px;
+}
+
+.stolAddCard{
+    background-color: rgb(144, 148, 180);
+    width: 4.3em;
+    padding: 20px;
+    padding-top: 15px;
+    padding-bottom: 5px;
+    margin-top: 10px;
+    border: 0.5px solid grey;
+    border-radius: 8px;
+    text-align: center;
+    font-family: sans-serif;
+    font-weight: bold;
+}
+
+.stol-container{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+    padding-right: 0px;
+    padding-left: 12.5px;
+}
+
+.main-stolBtn{
+    width: 10em;
+    height: 2.5em;
+    padding: 8px;
+    border-radius: 8px;
+    border: 0.5px solid rgb(153, 153, 153);
+    font-weight: bold;
+    font-family: sans-serif;
+    transition: background-color 0.3s ease;
+}
+
+.main-text{
+    font-size: 20px;
+    font-weight: bold;
+    font-family: sans-serif;
+    margin: 0;
+    border: 0.5px solid rgb(190, 190, 190);
+    width: 3.5em;
+    height: 2.5em;
+    padding: 5px;
+    border-radius: 8px;
+    text-align: center;
+    padding-top: 30px;
+    padding-bottom: 0px;
+    margin-left: -5.5px;
+    background-color: rgb(124, 132, 190);
+}
+
+.modal-stol{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    background-color: #cde5fc;
+    width: 30em;
+    height: 20em;
+    border-radius: 10px;
+    padding: 20px;
+    padding-top: -10px;
+    border: 0.5px solid rgb(180, 180, 180);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: bold;
+    font-family: sans-serif;
+}
+
+.modal2-input{
+    width: 18em;
+    height: 2em;
+    border-radius: 5px;
+    border: 0.5px solid rgb(189, 188, 188);
+    font-size: 15px;
+}
+
+.modal-stolBtn{
+    display: flex;
+    gap: 20px;
+}
+
+.modal-btn1{
+    width: 8em;
+    height: 2.5em;
+    border-radius: 8px;
+    border: 0.5px solid rgb(153, 153, 153);
+    font-weight: bold;
+    font-family: sans-serif;
+    background-color: rgb(45, 180, 45);
+}
+.modal-btn2{
+    width: 8em;
+    height: 2.5em;
+    border-radius: 8px;
+    border: 0.5px solid rgb(153, 153, 153);
+    font-weight: bold;
+    font-family: sans-serif;
+    background-color: rgb(192, 46, 46);
+}
+
+.modal-btn2:hover{
+    background-color: rgb(218, 20, 20);
+}
+
+.modal-btn1:hover{
+    background-color: rgb(29, 206, 29);
+}
+
+.modal2-input:focus{
+    outline: none;
+    border: 0.5px solid rgb(102, 102, 102);
+}
+
+.status-btn {
+    padding: 8px;
+    margin-top: -5px;
+    margin-left: -15px;
+    width: 7.5em;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    color: white;
+  }
+  
+  .status-btn.free {
+    background-color: #4CAF50;
+  }
+  
+  .status-btn.free:hover {
+    background-color: #45a049;
+  }
+  
+  .status-btn.busy {
+    background-color: #f44336;
+  }
+  
+  .status-btn.busy:hover {
+    background-color: #d32f2f;
+  }
+  
+
+  .deleteBtn {
+    padding: 8px;
+    margin-top: -15px;
+    margin-left: -15px;
+    margin-bottom: 10px;
+    width: 7.5em;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    color: white;
+  }

@@ -1,0 +1,99 @@
+[
+    {
+      "ref": "001",
+      "item": "Pepperoni Pizza",
+      "transType": "Online",
+      "paymentType": "Naxd",
+      "total": "100.000",
+      "tax": "10.500",
+      "totalWithTax": "110.500",
+      "status": "successful",
+      "platform": "Web",
+      "date": "2025-05-01"
+    },
+    {
+      "ref": "002",
+      "item": "Whopper Meal",
+      "transType": "Pickup",
+      "paymentType": "Naxd",
+      "total": "80.000",
+      "tax": "10.20",
+      "totalWithTax": "90.200",
+      "status": "pending",
+      "platform": "Mobile",
+      "date": "2025-04-30"
+    },
+    {
+      "ref": "003",
+      "item": "Zinger Box",
+      "transType": "Delivery",
+      "paymentType": "Karta",
+      "total": "90.500",
+      "tax": "10.400",
+      "totalWithTax": "100.900",
+      "status": "accepted", 
+      "platform": "App",
+      "date": "2025-04-29"
+    },
+    {
+      "ref": "004",
+      "item": "Footlong Sub",
+      "transType": "Online",
+      "paymentType": "Naxd",
+      "total": "50.000",
+      "tax": "5.500",
+      "totalWithTax": "55.500",
+      "status": "successful",
+      "platform": "Web",
+      "date": "2025-04-28"
+    },
+    {
+      "ref": "005",
+      "item": "Caramel Macchiato",
+      "transType": "Pickup",
+      "paymentType": "Karta",
+      "total": "30.000",
+      "tax": "3.000",
+      "totalWithTax": "33.000",
+      "status": "accepted", 
+      "platform": "Mobile",
+      "date": "2025-04-27"
+    },
+    {
+      "ref": "006",
+      "item": "Cheese Burst Pizza",
+      "transType": "Delivery",
+      "paymentType": "Naxd",
+      "total": "120.000",
+      "tax": "12.000",
+      "totalWithTax": "132.000",
+      "status": "successful",
+      "platform": "App",
+      "date": "2025-04-26"
+    },
+    {
+      "ref": "007",
+      "item": "Veggie Supreme Pizza",
+      "transType": "Online",
+      "paymentType": "Karta",
+      "total": "70.000",
+      "tax": "7.000",
+      "totalWithTax": "77.000",
+      "status": "pending",
+      "platform": "Web",
+      "date": "2025-04-25"
+    },
+    {
+      "ref": "008",
+      "item": "Crunchwrap Supreme",
+      "transType": "Pickup",
+      "paymentType": "Naxd",
+      "total": "40.000",
+      "tax": "4.500",
+      "totalWithTax": "44.500",
+      "status": "accepted", 
+      "platform": "Mobile",
+      "date": "2025-04-24"
+    }
+  ]
+  

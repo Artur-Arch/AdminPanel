@@ -1,0 +1,47 @@
+.asboblar-wrapper {
+    padding: 20px;
+  }
+
+  .asboblar{
+    background-color: #ffffff;
+    padding: 2px 20px;
+    border-radius: 8px;
+    padding-bottom: -20px;
+  }
+  
+  .daily-stats,
+  .weekly-stats {
+    margin-bottom: 40px;
+    border: 0.5px solid #777;
+    padding: 10px;
+    padding-top: 0px;
+    border-radius: 8px;
+  }
+  
+  .stats-cards {
+    display: flex;
+    gap: 20px;
+    margin-top: 15px;
+  }
+  
+  .stat-card {
+    background: #c2c2c2;
+    border-radius: 12px;
+    padding: 20px;
+    min-width: 150px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .chart-placeholder {
+    margin-top: 20px;
+    height: 300px;
+    background: #c2c2c2;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #777;
+    font-style: italic;
+  }
+  

@@ -1,0 +1,69 @@
+.sozlamalar-wrapper {
+  background-color: #ffffff;
+  padding: 10px;
+  width: 100%;
+  width: auto;
+  height: 100%;
+  border-radius: 8px;
+  font-family: sans-serif;
+}
+
+.staff-settings, .restaurant-settings {
+  margin-bottom: 30px;
+}
+
+.staff-list {
+  list-style: none;
+  padding: 10px;
+  padding-top: 18px;
+  border: 0.5px solid #000000;
+  border-radius: 8px;
+  width: 100%;
+  width: auto;
+  height: auto;
+}
+
+.staff-card {
+  display: flex;
+  justify-content: space-between;
+  background: #cacaca;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  width: 100%;
+  width: auto;
+  height: 100%;
+}
+
+.actions button {
+  margin-left: 8px;
+}
+
+.restaurant-card {
+  background: #e0f7fa;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+
+.edit-btn{
+  background: #7cd87f;
+  color: white;
+  border: none;
+  padding-bottom: 30px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.delete-btn{
+  background: #d32114;
+  color: white;
+  border: none;
+  padding-bottom: 30px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  cursor: pointer;
+}
