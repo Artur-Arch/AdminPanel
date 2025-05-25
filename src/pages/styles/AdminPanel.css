@@ -91,7 +91,9 @@
 
 .aEdit{
   color: #000;
-  padding: 2vh;
+  padding: 1vh;
+  padding-left: 1vw;
+  padding-right: 1vw;
   border: 0.5px solid #dddd;
   margin-right: 14px;
 }

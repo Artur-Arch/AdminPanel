@@ -6,7 +6,8 @@ export default function Sozlamalar() {
   const [staff, setStaff] = useState([
     { id: 1, role: "Oshpaz", name: "Aliyev", phone: "+998901234567" },
     { id: 2, role: "Ofitsiant", name: "Karimov", phone: "+998907654321" },
-    { id: 3, role: "Ofitsiant", name: "Ali", phone: "+998937078047"}
+    { id: 3, role: "Ofitsiant", name: "Ali", phone: "+998937078047"},
+    { id: 3, role: "Ofitsiant", name: "Nodir", phone: "+998953267820"}
   ]);
   const [restaurant, setRestaurant] = useState({
     name: 'Choyxona "Navruz"',

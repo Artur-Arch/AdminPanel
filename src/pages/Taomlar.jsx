@@ -10,29 +10,33 @@ export default function Taomlar() {
   const [showModal, setShowModal] = useState(false);
   const [showBasket, setShowBasket] = useState(false);
   const [successMsg, setSuccessMsg] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const fetchTaomlar = () => {
-    axios.get("http://109.172.37.41:4000/product")
+    setLoading(true);
+    axios
+      .get("http://109.172.37.41:4000/product")
       .then((res) => {
-        console.log("Ma'lumot:", res.data);
         setTaomlar(res.data);
+        setLoading(false);
       })
       .catch((err) => {
         console.error("Taomlarni olishda xatolik:", err);
+        setLoading(false);
       });
   };
-  
-  
+
   useEffect(() => {
-
-    if (successMsg) {
-    const timer = setTimeout(() => {
-      setSuccessMsg(null);
-    }, 3000);
-    return () => clearTimeout(timer);
-  }
-
     fetchTaomlar();
+  }, []);
+
+  useEffect(() => {
+    if (successMsg) {
+      const time = setTimeout(() => {
+        setSuccessMsg(null);
+      }, 3000);
+      return () => clearTimeout(time);
+    }
   }, [successMsg]);
 
   const addToCart = (taom) => {
@@ -46,6 +50,15 @@ export default function Taomlar() {
         return [...prev, { ...taom, count: 1 }];
       }
     });
+  };
+
+  const currentUser = JSON.parse(localStorage.getItem("user"));
+  const userId = currentUser?.id;
+
+  const formatPrice = (price) => {
+    const priceStr = price.toString();
+    const formatted = priceStr.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    return formatted + " so'm";
   };
 
   const removeFromCart = (taom) => {
@@ -90,14 +103,18 @@ export default function Taomlar() {
         </div>
         {view === "menu" && (
           <div className="menu-view">
-            <div className="menu-items">
+            {loading ? (
+              <div className="spinner"></div>
+              ):(  <div className="menu-items">
               {taomlar.map((taom) => (
                 <div key={taom.id} className="stolAddCard">
-                  <img className="menu-cardIMG" src={taom.image} />
+                  <img
+                    className="menu-cardIMG"
+                    src={`http://109.172.37.41:4000${taom.image}`}
+                  />
                   <h4
                     style={{
                       margin: "5px 0 0 0",
-                      border: "1px solid #fff",
                       padding: "8px 0 5px 0",
                       borderRadius: "5px",
                       width: "auto",
@@ -105,14 +122,11 @@ export default function Taomlar() {
                   >
                     {taom.name}
                   </h4>
-                  <p style={{ margin: "10px 0 0 0" }}>{taom.category}</p>
+                  <p style={{ margin: "10px 0 0 0", fontWeight: 'normal' }}>{taom.category?.name}</p>
                   <div className="time-card" style={{ marginTop: "5px" }}>
-                    <img
-                      className="cardTime"
-                      src="/clock-regular.svg"
-                    />
+                    <img className="cardTime" src="/clock-regular.svg" />
                     <p style={{ fontSize: "13px", margin: "10px 0 8px 0" }}>
-                      {taom.time}min
+                      {taom.date ? `${taom.date} min` : "Vaqti yoq"}
                     </p>
                   </div>
                   <p
@@ -123,11 +137,11 @@ export default function Taomlar() {
                       borderRadius: "5px",
                     }}
                   >
-                    {taom.price} so'm
+                    {formatPrice(taom.price)}
                   </p>
                 </div>
               ))}
-            </div>
+            </div>)}
           </div>
         )}
 
@@ -137,11 +151,13 @@ export default function Taomlar() {
               <div className="menu-items">
                 {taomlar.map((taom) => (
                   <div key={taom.id} className="stolAddCard">
-                    <img className="menu-cardIMG" src={taom.image} />
+                    <img
+                      className="menu-cardIMG"
+                      src={`http://109.172.37.41:4000${taom.image}`}
+                    />
                     <h4
                       style={{
                         margin: "5px 0 0 0",
-                        border: "1px solid #fff",
                         padding: "8px 0 5px 0",
                         borderRadius: "5px",
                         width: "auto",
@@ -157,7 +173,7 @@ export default function Taomlar() {
                         borderRadius: "5px",
                       }}
                     >
-                      {taom.price} so'm
+                      {formatPrice(taom.price)}
                     </p>
                     <div className="count-controls">
                       <button
@@ -168,7 +184,10 @@ export default function Taomlar() {
                         -
                       </button>
                       <span className="count-value">
-                      {Math.max(cart.find((item) => item.id === taom.id)?.count || 0, 0)}
+                        {Math.max(
+                          cart.find((item) => item.id === taom.id)?.count || 0,
+                          0
+                        )}
                       </span>
                       <button
                         className="count-btn"
@@ -221,8 +240,8 @@ export default function Taomlar() {
                             <td>
                               {(item.price * item.count).toLocaleString(
                                 "ru-RU"
-                              )}
-                              {" "}so'm
+                              )}{" "}
+                              so'm
                             </td>
                           </tr>
                         ))}
@@ -280,10 +299,46 @@ export default function Taomlar() {
             setShowModal(false), setShowBasket(false);
           }}
           onConfirm={(orderData) => {
-            console.log("Yangi buyurtma:", orderData);
-            setCart([]);
-            setSuccessMsg("Buyurtma muvaffaqiyatli yuborildi!");
-            setShowModal(false);
+            const products = orderData.orderItems
+              .filter((item) => item?.productId && item.count > 0)
+              .map((item) => ({
+                productId: Number(item.productId),
+                count: Number(item.count),
+              }));
+
+            const totalPrice = orderData.orderItems.reduce((acc, item) => {
+              const price = item?.product?.price
+                ? Number(item.product.price)
+                : 0;
+              return acc + price * item.count;
+            }, 0);
+
+            const body = {
+              products: products,
+              tableNumber: orderData.tableNumber || "1",
+              totalPrice: totalPrice,
+              userId: 1,
+            };
+
+            console.log(
+              "Yuborilayotgan buyurtma:",
+              JSON.stringify(body, null, 2)
+            );
+
+            axios
+              .post("http://109.172.37.41:4000/order", body)
+              .then((res) => {
+                console.log("Buyurtma yuborildi:", res.data);
+                setCart([]);
+                setSuccessMsg("Buyurtma muvaffaqiyatli yuborildi!");
+              })
+              .catch((err) => {
+                console.error("Xatolik:", err);
+                if (err.response) {
+                  console.log("Status:", err.response.status);
+                  console.log("Data:", err.response.data);
+                }
+              });
           }}
         />
       )}

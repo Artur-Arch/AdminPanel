@@ -80,6 +80,10 @@
 
   .search-input:focus {
     outline: none;
-    border-color: #007bff;
-    
+    border-color: #007bff; 
+  }
+
+  .zakazlarTarixi-main{
+    margin-top: 40px;
+    margin-left: 10px;
   }

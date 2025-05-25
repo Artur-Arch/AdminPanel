@@ -91,7 +91,7 @@
   }
   
   .status-kitchen {
-    background-color: #fff3cd;
+    background-color: #fcebb6e0;
     color: #856404;
   }
   
@@ -107,3 +107,57 @@
     padding: 10px 0 5px 16px;
     border-radius: 8px;
   }
+
+ .order-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 5px 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.order-item-img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-right: 10px;
+}
+
+.order-item-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.item-name {
+  font-weight: bold;
+  margin: 0;
+}
+
+.item-count {
+  margin: 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.print-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  margin-bottom: 0px;
+  margin-top: 5px;
+}

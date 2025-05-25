@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import "../styles/modalBasket.css";
 
-export default function modalBasket({ cart, onClose, onConfirm }) {
+export default function ModalBasket({ cart, onClose, onConfirm, userId }) {
   const [orderType, setOrderType] = useState("");
   const [tableNumber, setTableNumber] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("")
 
   const handleConfirm = () => {
     if (orderType === "table" && !tableNumber) {
@@ -11,16 +12,26 @@ export default function modalBasket({ cart, onClose, onConfirm }) {
       return;
     }
 
-    if (orderType === "delivery" && !tableNumber) {
+    if (orderType === "delivery" && !phoneNumber) {
       alert("Iltimos, telefon raqam kiriting.");
       return;
     }
 
+    const totalPrice = cart.reduce(
+      (sum, item) => sum + item.price * item.count,
+      0
+    );
+
     const orderData = {
-      items: cart,
-      type: orderType,
-      table: orderType === "table" ? tableNumber : null,
-      table: orderType === "delivery" ? tableNumber : null
+      tableNumber: orderType === "table" ? tableNumber : null,
+      phoneNumber: orderType === "delivery" ? phoneNumber : null,
+      status: "PENDING",
+      userId: userId,
+      orderItems: cart.map((item) => ({
+        productId: item.id,
+        count: item.count,
+      })),
+      
     };
 
     onConfirm(orderData);
@@ -48,15 +59,16 @@ export default function modalBasket({ cart, onClose, onConfirm }) {
               onChange={() => setOrderType("delivery")}
             />
             Yetkazib berish
-          </label><br />
+          </label>
+          <br />
           {orderType === "delivery" && (
             <input
-              style={{marginTop: "0px"}}
+              style={{ marginTop: "0px" }}
               className="table-input"
               type="number"
               placeholder="telefon raqami"
-              value={tableNumber}
-              onChange={(e) => setTableNumber(e.target.value)}
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
             />
           )}
           <br />
@@ -68,10 +80,11 @@ export default function modalBasket({ cart, onClose, onConfirm }) {
               onChange={() => setOrderType("table")}
             />
             Stolga
-          </label><br />
+          </label>
+          <br />
           {orderType === "table" && (
             <input
-              style={{marginTop: "0px"}}
+              style={{ marginTop: "0px" }}
               className="table-input"
               type="number"
               placeholder="Stol raqami"
@@ -82,8 +95,12 @@ export default function modalBasket({ cart, onClose, onConfirm }) {
         </div>
 
         <div className="modal-actions">
-          <button className="modal-btn2" onClick={onClose}>Orqaga</button>
-          <button className="modal-btn1" onClick={handleConfirm}>Tasdiqlash</button>
+          <button className="modal-btn2" onClick={onClose}>
+            Orqaga
+          </button>
+          <button className="modal-btn1" onClick={handleConfirm}>
+            Tasdiqlash
+          </button>
         </div>
       </div>
     </div>
