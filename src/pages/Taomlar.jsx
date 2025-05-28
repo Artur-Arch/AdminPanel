@@ -15,7 +15,7 @@ export default function Taomlar() {
   const fetchTaomlar = () => {
     setLoading(true);
     axios
-      .get("http://109.172.37.41:4000/product")
+      .get("https://suddocs.uz/product")
       .then((res) => {
         setTaomlar(res.data);
         setLoading(false);
@@ -110,7 +110,8 @@ export default function Taomlar() {
                 <div key={taom.id} className="stolAddCard">
                   <img
                     className="menu-cardIMG"
-                    src={`http://109.172.37.41:4000${taom.image}`}
+                    src={`https://suddocs.uz${taom.image}`}
+                    alt={taom.name}
                   />
                   <h4
                     style={{
@@ -153,7 +154,8 @@ export default function Taomlar() {
                   <div key={taom.id} className="stolAddCard">
                     <img
                       className="menu-cardIMG"
-                      src={`http://109.172.37.41:4000${taom.image}`}
+                      src={`https://suddocs.uz${taom.image}`}
+                      alt={taom.name}
                     />
                     <h4
                       style={{
@@ -296,7 +298,8 @@ export default function Taomlar() {
         <ModalBasket
           cart={cart}
           onClose={() => {
-            setShowModal(false), setShowBasket(false);
+            setShowModal(false);
+            setShowBasket(false);
           }}
           onConfirm={(orderData) => {
             const products = orderData.orderItems
@@ -317,7 +320,7 @@ export default function Taomlar() {
               products: products,
               tableNumber: orderData.tableNumber || "1",
               totalPrice: totalPrice,
-              userId: 1,
+              userId: userId || 3
             };
 
             console.log(
@@ -326,7 +329,7 @@ export default function Taomlar() {
             );
 
             axios
-              .post("http://109.172.37.41:4000/order", body)
+              .post("https://suddocs.uz/order", body)
               .then((res) => {
                 console.log("Buyurtma yuborildi:", res.data);
                 setCart([]);

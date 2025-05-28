@@ -5,11 +5,12 @@
     width: 100%;
     width: auto;
     justify-content: space-around;
+    flex-wrap: wrap;
 }
 
 @media (max-width: 955px) {
     .menu-categories{
-        flex-direction: column;
+        flex-wrap: wrap;
     }
     
 }

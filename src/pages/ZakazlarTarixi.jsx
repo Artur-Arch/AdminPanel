@@ -7,6 +7,8 @@ const filters = [
   { label: "Yangi", key: "PENDING" },
   { label: "Navbatda", key: "COOKING" },
   { label: "Tayyor", key: "READY" },
+  { label: "Mijoz oldida", key: "COMPLETED" },
+  { label: "Tugallangan", key: "ARCHIVE" }
 ];
 
 const getStatusClass = (status) => {
@@ -17,6 +19,10 @@ const getStatusClass = (status) => {
       return "status-kitchen";
     case "READY":
       return "status-ready";
+    case "COMPLETED":
+      return "status-completed";
+    case "ARCHIVE":
+      return "status-archive";
     default:
       return "bg-gray-500";
   }
@@ -30,12 +36,13 @@ export default function ZakazTarixi() {
   const [sortAsc, setSortAsc] = useState(false);
   const [loading, setLoading] = useState(true);
 
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [ordersResponse, categoriesResponse] = await Promise.all([
-          axios.get("http://109.172.37.41:4000/order"),
-          axios.get("http://109.172.37.41:4000/category"),
+          axios.get("https://suddocs.uz/order"),
+          axios.get("https://suddocs.uz/category"),
         ]);
 
         const sanitizedOrders = ordersResponse.data.map((order) => ({
@@ -54,8 +61,6 @@ export default function ZakazTarixi() {
 
     fetchData();
   }, []);
-
-  // Move categoryMap inside the component and create it after categoryList is available
   const categoryMap = categoryList.reduce((map, category) => {
     map[category.id] = category.name;
     return map;
@@ -126,7 +131,7 @@ export default function ZakazTarixi() {
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Stol</th>
+                  <th style={{width: "auto"}}>Stol</th>
                   <th>Turi</th>
                   <th>Taomlar va Kategoriyalar</th>
                   <th>Vaqti</th>
@@ -136,7 +141,7 @@ export default function ZakazTarixi() {
               <tbody>
                 {filteredHistory.map((order) => (
                   <tr key={order.id}>
-                    <td>{order.id}</td>
+                    <td style={{width: 'auto'}}>{order.id}</td>
                     <td>{order.tableNumber}</td>
                     <td>Dine In</td>
                     <td>
@@ -154,7 +159,11 @@ export default function ZakazTarixi() {
                         : order.status === "COOKING"
                         ? "Navbatda"
                         : order.status === "READY"
-                        ? "Tayyor"
+                        ? "Tayyor" 
+                        : order.status === "COMPLETED"
+                        ? "Mijoz oldida"
+                        : order.status === "ARCHIVE"
+                        ? "Tugallangan"
                         : order.status}
                     </td>
                   </tr>

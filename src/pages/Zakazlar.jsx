@@ -8,6 +8,8 @@ const filters = [
   { label: "Barchasi", key: "All" },
   { label: "Navbatda", key: "PENDING" },
   { label: "Tayyor", key: "READY" },
+  { label: "Tayyorlanmoqda", key: "COOKING" },
+  { label: "Mijoz oldida", key: "COMPLETED" },
 ];
 
 const getStatusClass = (status) => {
@@ -18,6 +20,10 @@ const getStatusClass = (status) => {
       return "status-kitchen";
     case "READY":
       return "status-ready";
+    case "COMPLETED":
+      return "status-completed";
+    case "ARCHIVE":
+      return "status-archive";
     default:
       return "";
   }
@@ -39,22 +45,93 @@ export default function Zakazlar() {
     content: () => receiptRef.current,
   });
 
-  const handleCloseAndPrint = (order) => {
-    setCurrentOrder(order);
-    setTimeout(() => {
-      handlePrint();
-      setCurrentOrder(null);
-    }, 200);
+  const handleCloseAndPrint = async (order) => {
+    if (!order || !order.id) {
+      console.error("Order yoki order.id mavjud emas:", order);
+      alert("Buyurtma ma'lumotlari topilmadi. Qayta urinib ko'ring.");
+      return;
+    }
+
+    try {
+      console.log(`Buyurtma #${order.id} tekshirilmoqda`);
+      const checkResponse = await axios.get(`https://suddocs.uz/${order.id}`);
+      const response = await axios.put(
+        `https://suddocs.uz/${order.id}`,
+        { status: "ARCHIVE" },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("PATCH javobi:", response.data);
+
+      if (response.data.status !== "ARCHIVE") {
+        console.warn(
+          "Server statusni ARCHIVE ga o'zgartirmadi:",
+          response.data
+        );
+        alert(
+          "Buyurtma ARCHIVE holatiga o'tkazilmadi. Buyurtma faqat interfeysdan o'chiriladi."
+        );
+        setOrders(orders.filter((o) => o.id !== order.id));
+      } else {
+        setOrders(orders.filter((o) => o.id !== order.id));
+      }
+
+      if (receiptRef.current) {
+        setCurrentOrder(order);
+        setTimeout(() => {
+          handlePrint();
+          setCurrentOrder(null);
+        }, 200);
+      } else {
+        console.error("receiptRef mavjud emas");
+        alert("Chop etishda xatolik yuz berdi. Qayta urinib ko'ring.");
+      }
+    } catch (err) {
+      console.error(
+        "Statusni ARCHIVE ga o'zgartirishda xatolik:",
+        err.response?.data || err.message
+      );
+      if (err.response?.status === 404) {
+        alert(
+          "Buyurtma topilmadi. Ehtimol, u allaqachon o'chirilgan yoki arxivlangan."
+        );
+        setOrders(orders.filter((o) => o.id !== order.id));
+      } else if (err.response?.status === 500) {
+        alert(
+          "Serverda xatolik yuz berdi. Buyurtma faqat interfeysdan o'chiriladi."
+        );
+        setOrders(orders.filter((o) => o.id !== order.id));
+      } else if (err.response?.status === 401) {
+        alert("Avtorizatsiya xatosi. Tokenni tekshiring.");
+      } else {
+        alert("Buyurtma holatini o'zgartirib bo'lmadi. Qayta urinib ko'ring.");
+      }
+      if (receiptRef.current) {
+        setCurrentOrder(order);
+        setTimeout(() => {
+          handlePrint();
+          setCurrentOrder(null);
+        }, 200);
+      } else {
+        console.error("receiptRef mavjud emas");
+        alert("Chop etishda xatolik yuz berdi. Qayta urinib ko'ring.");
+      }
+    }
   };
 
   const handleDeleteOrder = async (id) => {
     if (window.confirm("Bu buyurtmani o'chirishni xohlaysizmi?")) {
       try {
-        await axios.delete(`http://109.172.37.41:4000/order/${id}`);
+        await axios.delete(`https://suddocs.uz/${id}`);
         setOrders(orders.filter((order) => order.id !== id));
       } catch (err) {
         console.error("Buyurtmani o'chirishda xatolik:", err);
-        alert("Buyurtmani o'chirib bo'lmadi. Ehtimol, u boshqa ma'lumotlarga bog'langan.");
+        alert(
+          "Buyurtmani o'chirib bo'lmadi. Ehtimol, u boshqa ma'lumotlarga bog'langan."
+        );
       }
     }
   };
@@ -134,16 +211,13 @@ export default function Zakazlar() {
         products: editingOrder.orderItems
           .filter((item) => item.productId && item.count > 0)
           .map((item) => ({
-            // ...(String(item.id).startsWith("temp-") ? {} : { id: parseInt(item.id) }),
             productId: Number(item.productId),
             count: Number(item.count),
           })),
       };
 
-      console.log("PUT so'rovi uchun ma'lumotlar:", updatedOrder);
-
-      const response = await axios.patch(
-        `http://109.172.37.41:4000/order/${editingOrder.id}`,
+      const response = await axios.put(
+        `https://suddocs.uz/${editingOrder.id}`,
         updatedOrder,
         {
           headers: {
@@ -152,19 +226,18 @@ export default function Zakazlar() {
         }
       );
 
-      console.log("PATCH javobi:", response.data);
-
       setOrders(
         orders.map((order) =>
-          order.id === editingOrder.id
-            ? { ...editingOrder, totalPrice }
-            : order
+          order.id === editingOrder.id ? { ...editingOrder, totalPrice } : order
         )
       );
       setShowEditModal(false);
       setEditingOrder(null);
     } catch (err) {
-      console.error("Buyurtmani yangilashda xatolik:", err.response?.data || err.message);
+      console.error(
+        "Buyurtmani yangilashda xatolik:",
+        err.response?.data || err.message
+      );
       alert("Buyurtmani yangilab bo'lmadi. Qayta urinib ko'ring.");
     }
   };
@@ -174,9 +247,9 @@ export default function Zakazlar() {
       try {
         const [ordersResponse, categoriesResponse, productsResponse] =
           await Promise.all([
-            axios.get("http://109.172.37.41:4000/order"),
-            axios.get("http://109.172.37.41:4000/category"),
-            axios.get("http://109.172.37.41:4000/product")
+            axios.get("https://suddocs.uz/order"),
+            axios.get("https://suddocs.uz/category"),
+            axios.get("https://suddocs.uz/product"),
           ]);
 
         const sanitized = ordersResponse.data.map((order) => ({
@@ -207,10 +280,10 @@ export default function Zakazlar() {
     return formatted + " so'm";
   };
 
-  const filteredOrders =
-    activeFilter === "All"
-      ? orders
-      : orders.filter((order) => order.status === activeFilter);
+  const filteredOrders = orders
+    .filter((order) => order.status !== "ARCHIVE")
+    .filter((order) => activeFilter === "All" || order.status === activeFilter);
+  filteredOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   return (
     <div className="zakazlar-wrapper">
@@ -244,27 +317,34 @@ export default function Zakazlar() {
                   {filter.label}
                   <span className="badge">
                     {filter.key === "All"
-                      ? orders.length
+                      ? orders.filter((o) => o.status !== "ARCHIVE").length
                       : orders.filter((o) => o.status === filter.key).length}
                   </span>
                 </button>
               ))}
             </div>
 
-            <div className="order-cards">
+            <div id="order-cards" className="order-cards">
               {filteredOrders.length === 0 ? (
-                <p className="no-orders">Bu kategoriya uchun buyurtmalar yo'q.</p>
+                <p className="no-orders">
+                  Bu kategoriya uchun buyurtmalar yo'q.
+                </p>
               ) : (
                 filteredOrders.map((order) => (
-                  <div className={`order-card ${loading ? "loading" : ""}`} key={order.id}>
+                  <div
+                    className={`order-card ${loading ? "loading" : ""}`}
+                    key={order.id}
+                  >
                     <div className="order-header">
                       <div style={{ display: "flex", flexDirection: "column" }}>
-                      <span className="order-id">Buyurtma #{order.id}</span>
-                      <span className="table-id">Stol - {order.tableNumber}</span>
+                        <span className="order-id">Buyurtma №{order.id}</span>
+                        <span className="table-id">
+                          Stol - {order.tableNumber}
+                        </span>
                       </div>
                       <button
                         style={{
-                          marginRight: "0px",
+                          marginRight: "10px",
                           padding: "5px 5px",
                           border: "1px solid #ccc",
                           background: "#f0f0f0",
@@ -297,7 +377,7 @@ export default function Zakazlar() {
                       {order.orderItems?.map((item) => (
                         <div className="order-item" key={item.id}>
                           <img
-                            src={`http://109.172.37.41:4000${item.product?.image}`}
+                            src={`https://suddocs.uz${item.product?.image}`}
                             alt={item.product?.name}
                             className="order-item-img"
                           />
@@ -348,20 +428,24 @@ export default function Zakazlar() {
                           {new Date(order.createdAt).toLocaleString()}
                         </p>
                       </div>
-                      {order.status === "READY" && (
+                      {order.status === "COMPLETED" && (
                         <button
                           className="print-btn"
                           onClick={() => handleCloseAndPrint(order)}
                         >
-                          To'lash va chop etish
+                          To'lash va chop etish ✍️
                         </button>
                       )}
-                    </div>
-
-                    <div className={`order-footer ${getStatusClass(order.status)}`}>
-                      {order.status === "PENDING" ? "Navbatda" : ""}
-                      {order.status === "READY" ? "Tayyor" : ""}
-                      {order.status === "COOKING" ? "Tayyorlanmoqda" : ""}
+                      <div
+                        className={`order-footer ${getStatusClass(
+                          order.status
+                        )}`}
+                      >
+                        {order.status === "PENDING" ? "Navbatda" : ""}
+                        {order.status === "READY" ? "Tayyor" : ""}
+                        {order.status === "COOKING" ? "Tayyorlanmoqda" : ""}
+                        {order.status === "COMPLETED" ? "Mijoz oldida" : ""}
+                      </div>
                     </div>
                   </div>
                 ))
@@ -373,14 +457,16 @@ export default function Zakazlar() {
 
       {showEditModal && (
         <div className="modal-overlay">
-          <div style={{paddingBottom: '20px'}} className="modal">
-            <h2>Buyurtma #{editingOrder?.id} ni tahrirlash</h2>
-            <div style={{
-              border: "1px solid rgb(82, 82, 82)",
-              padding: "10px",
-              borderRadius: "5px",
-            }}>
-              <h3 style={{marginTop: '0px'}}>Joriy taomlar:</h3>
+          <div style={{ paddingBottom: "20px" }} className="modal">
+            <h2>Buyurtma №{editingOrder?.id} ni tahrirlash</h2>
+            <div
+              style={{
+                border: "1px solid rgb(82, 82, 82)",
+                padding: "10px",
+                borderRadius: "5px",
+              }}
+            >
+              <h3 style={{ marginTop: "0px" }}>Joriy taomlar:</h3>
               {editingOrder?.orderItems.length ? (
                 editingOrder.orderItems.map((item) => (
                   <div
@@ -393,7 +479,7 @@ export default function Zakazlar() {
                     }}
                   >
                     <img
-                      src={`http://109.172.37.41:4000${item.product?.image}`}
+                      src={`https://suddocs.uz${item.product?.image}`}
                       alt={item.product?.name}
                       style={{
                         width: "50px",
@@ -424,7 +510,7 @@ export default function Zakazlar() {
               )}
             </div>
 
-            <h3 style={{marginBottom: '0px'}}>Yangi taom qo'shish:</h3>
+            <h3 style={{ marginBottom: "0px" }}>Yangi taom qo'shish:</h3>
             <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
               <select
                 value={newItem.productId}
@@ -445,7 +531,10 @@ export default function Zakazlar() {
                 min="1"
                 value={newItem.count}
                 onChange={(e) =>
-                  setNewItem({ ...newItem, count: parseInt(e.target.value) || 1 })
+                  setNewItem({
+                    ...newItem,
+                    count: parseInt(e.target.value) || 1,
+                  })
                 }
                 style={{ padding: "5px", width: "80px" }}
                 placeholder="Soni"
@@ -498,7 +587,17 @@ export default function Zakazlar() {
       )}
 
       <div style={{ display: "none" }}>
-        {currentOrder && <Receipt ref={receiptRef} order={currentOrder} />}
+        <Receipt
+          ref={receiptRef}
+          order={
+            currentOrder || {
+              id: null,
+              tableNumber: "",
+              totalPrice: 0,
+              orderItems: [],
+            }
+          }
+        />
       </div>
     </div>
   );

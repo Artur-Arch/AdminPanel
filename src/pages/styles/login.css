@@ -1,0 +1,122 @@
+/* Общий контейнер формы */
+.login-container {
+  background-color: #e6f0fa; /* Светло-голубой фон, похожий на изображение */
+  border: none; /* Убираем границу */
+  border-radius: 15px; /* Большие закругленные углы */
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 350px; /* Фиксированная ширина, как на изображении */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Легкая тень для объема */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Центрирование формы */
+}
+
+/* Заголовок формы */
+.login-title {
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+  background-color: #1976d2; /* Синий фон, как на изображении */
+  width: 100%;
+  text-align: center;
+  padding: 10px;
+  border-radius: 10px 10px 0 0; /* Закругление только верхних углов */
+}
+
+/* Индикатор загрузки */
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #1976d2; /* Синий цвет для спиннера */
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Сообщение об ошибке */
+.error-message {
+  color: #d32f2f; /* Красный цвет для ошибки */
+  font-size: 14px;
+  margin: 10px 0;
+  font-weight: 500;
+}
+
+/* Стили для инпутов */
+.modal-input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  box-sizing: border-box;
+  background-color: white;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.modal-input.error {
+  border-color: #d32f2f;
+  box-shadow: 0 0 5px rgba(211, 47, 47, 0.3);
+}
+
+/* Контейнер для инпута пароля и кнопки переключения */
+.password-container {
+  position: relative;
+  width: 100%;
+}
+
+/* Кнопка переключения видимости пароля */
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 38%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #1976d2;
+  padding: 0;
+}
+
+.toggle-password:hover {
+  color: #1565c0;
+}
+
+.modButton {
+  width: 100%;
+  padding: 12px;
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  padding-top: 6px;
+}
+
+.modButton:hover {
+  background-color: #1565c0;
+}
+
+@media (max-width: 768px) {
+  .login-container {
+    width: 90%;
+    margin-left: 0;
+    left: 5%;
+    transform: translateY(-50%);
+  }
+}
