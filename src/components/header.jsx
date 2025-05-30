@@ -1,21 +1,135 @@
-import './styles/header.css';
-export default function header() {
-  
+import React, { useState, useEffect } from "react";
+import "./styles/header.css";
+import axios from "axios";
+
+export default function Header() {
+  const [commissions, setCommissions] = useState({
+    totalCommission: 0,
+    dailyCommission: 0,
+    last30DaysCommission: 0,
+  });
+  const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const ordersResponse = await axios.get("https://suddocs.uz/order");
+        const orders = ordersResponse.data.map((order) => ({
+          ...order,
+          orderItems: Array.isArray(order.orderItems) ? order.orderItems : [],
+        }));
+
+        let usersData = [{ email: "AdminInfo@gmail.com", role: "CUSTOMER" }];
+        try {
+          const usersResponse = await axios.get("https://suddocs.uz/user");
+          usersData = usersResponse.data;
+        } catch (userError) {
+          console.warn("Foydalanuvchilar API'dan olishda xatolik:", userError);
+        }
+
+        const customerUsers = usersData.filter((user) => user.role === "CUSTOMER");
+        setUsers(customerUsers);
+        setSelectedUser(customerUsers.length > 0 ? customerUsers[0].username : "Foydalanuvchi topilmadi");
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayEnd = new Date(today);
+        todayEnd.setHours(23, 59, 59, 999);
+
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(today.getDate() - 30);
+        thirtyDaysAgo.setHours(0, 0, 0, 0);
+
+        const commissionRate = 0.05;
+        const totalCommission = orders.reduce((sum, order) => {
+          if (order.commission) {
+            return sum + order.commission;
+          }
+          const orderAmount =
+            order.totalAmount ||
+            order.orderItems.reduce(
+              (itemSum, item) => itemSum + (item.product?.price || 0) * item.count,
+              0
+            );
+          return sum + orderAmount * commissionRate;
+        }, 0);
+
+        const dailyCommission = orders
+          .filter(
+            (order) =>
+              new Date(order.createdAt) >= today &&
+              new Date(order.createdAt) <= todayEnd
+          )
+          .reduce((sum, order) => {
+            if (order.commission) {
+              return sum + order.commission;
+            }
+            const orderAmount =
+              order.totalAmount ||
+              order.orderItems.reduce(
+                (itemSum, item) => itemSum + (item.product?.price || 0) * item.count,
+                0
+              );
+            return sum + orderAmount * commissionRate;
+          }, 0);
+
+        const last30DaysCommission = orders
+          .filter((order) => new Date(order.createdAt) >= thirtyDaysAgo)
+          .reduce((sum, order) => {
+            if (order.commission) {
+              return sum + order.commission;
+            }
+            const orderAmount =
+              order.totalAmount ||
+              order.orderItems.reduce(
+                (itemSum, item) => itemSum + (item.product?.price || 0) * item.count,
+                0
+              );
+            return sum + orderAmount * commissionRate;
+          }, 0);
+
+        setCommissions({ totalCommission, dailyCommission, last30DaysCommission });
+      } catch (error) {
+        console.error("Xatolik yuz berdi:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
-    <>
     <div>
       <header>
         <div className="header__buttons">
-            <button style={{width: 'auto', height: 'auto'}}>Komissiya jami: $0.00</button>
-            <button style={{width: 'auto', height: 'auto'}}>Bugungi komissiya: $0.00</button>
-            <button style={{width: 'auto', height: 'auto'}}>Oxirgi 30 kungi komissiya: $0.00</button>
-            <select>
-                <option>AdminInfo@gmail.com</option>
-            </select>
+          <button style={{ width: "auto", height: "auto" }}>
+            Komissiya jami: {loading ? "..." : commissions.totalCommission.toLocaleString("uz-UZ")} so'm
+          </button>
+          <button style={{ width: "auto", height: "auto" }}>
+            Bugungi komissiya: {loading ? "..." : commissions.dailyCommission.toLocaleString("uz-UZ")} so'm
+          </button>
+          <button style={{ width: "auto", height: "auto" }}>
+            Oxirgi 30 kungi komissiya: {loading ? "..." : commissions.last30DaysCommission.toLocaleString("uz-UZ")} so'm
+          </button>
+          <select
+            value={selectedUser}
+            onChange={(e) => setSelectedUser(e.target.value)}
+          >
+            {users.length > 0 ? (
+              users.map((user) => (
+                <option key={user.id} value={user.username}>
+                  {user.username} {user.name ? `(${user.name})` : ""}
+                </option>
+              ))
+            ) : (
+              <option>Foydalanuvchi topilmadi</option>
+            )}
+          </select>
         </div>
       </header>
-      </div>
-    </>
-  )
+    </div>
+  );
 }
-

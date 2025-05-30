@@ -1,41 +1,86 @@
 import React, { useState } from "react";
 import "../styles/modalBasket.css";
 
-export default function ModalBasket({ cart, onClose, onConfirm, userId }) {
+export default function ModalBasket({
+  cart,
+  onClose,
+  onConfirm,
+  tables,
+  userId,
+}) {
   const [orderType, setOrderType] = useState("");
   const [tableNumber, setTableNumber] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("")
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   const handleConfirm = () => {
-    if (orderType === "table" && !tableNumber) {
-      alert("Iltimos, stol raqamini kiriting.");
-      return;
+    console.log("Введенный номер стола:", tableNumber);
+    console.log("Доступные столы:", tables);
+
+    if (orderType === "table") {
+      if (!tableNumber) {
+        alert("Iltimos, stol raqamini kiriting.");
+        return;
+      }
+      if (!Array.isArray(tables)) {
+        console.error("tables не является массивом:", tables);
+        alert(
+          "Xatolik: Stol ma'lumotlari yuklanmadi. Iltimos, qayta urinib ko'ring."
+        );
+        return;
+      }
+      const selectedTable = tables.find(
+        (t) => String(t.number) === String(tableNumber)
+      );
+      if (!selectedTable) {
+        alert(
+          "Bunday stol mavjud emas. Iltimos, to'g'ri stol raqamini kiriting."
+        );
+        return;
+      }
+      if (selectedTable.status === "busy") {
+        alert("Bu stol allaqachon band. Iltimos, boshqa stol tanlang.");
+        return;
+      }
+      const orderData = {
+        orderType,
+        tableId: selectedTable.id,
+        phoneNumber: orderType === "delivery" ? phoneNumber : null,
+        status: "PENDING",
+        userId: userId,
+        orderItems: cart.map((item) => ({
+          productId: item.id,
+          count: item.count,
+          product: item,
+        })),
+        tables,
+      };
+
+      console.log("Отправляемые данные:", orderData);
+      onConfirm(orderData);
+      onClose();
+    } else if (orderType === "delivery") {
+      if (!phoneNumber) {
+        alert("Iltimos, telefon raqam kiriting.");
+        return;
+      }
+      const orderData = {
+        orderType,
+        tableId: null,
+        phoneNumber,
+        status: "PENDING",
+        userId: userId,
+        orderItems: cart.map((item) => ({
+          productId: item.id,
+          count: item.count,
+          product: item,
+        })),
+        tables,
+      };
+
+      console.log("Отправляемые данные:", orderData);
+      onConfirm(orderData);
+      onClose();
     }
-
-    if (orderType === "delivery" && !phoneNumber) {
-      alert("Iltimos, telefon raqam kiriting.");
-      return;
-    }
-
-    const totalPrice = cart.reduce(
-      (sum, item) => sum + item.price * item.count,
-      0
-    );
-
-    const orderData = {
-      tableNumber: orderType === "table" ? tableNumber : null,
-      phoneNumber: orderType === "delivery" ? phoneNumber : null,
-      status: "PENDING",
-      userId: userId,
-      orderItems: cart.map((item) => ({
-        productId: item.id,
-        count: item.count,
-      })),
-      
-    };
-
-    onConfirm(orderData);
-    onClose();
   };
 
   return (
@@ -63,9 +108,8 @@ export default function ModalBasket({ cart, onClose, onConfirm, userId }) {
           <br />
           {orderType === "delivery" && (
             <input
-              style={{ marginTop: "0px" }}
               className="table-input"
-              type="number"
+              type="text"
               placeholder="telefon raqami"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
@@ -83,17 +127,29 @@ export default function ModalBasket({ cart, onClose, onConfirm, userId }) {
           </label>
           <br />
           {orderType === "table" && (
-            <input
-              style={{ marginTop: "0px" }}
+            <select
               className="table-input"
-              type="number"
-              placeholder="Stol raqami"
               value={tableNumber}
               onChange={(e) => setTableNumber(e.target.value)}
-            />
+            >
+              <option value="">Stol raqamini tanlang</option>
+              {tables.map((table) => (
+                <option
+                  key={table.id}
+                  value={table.number}
+                  disabled={table.status === "busy"}
+                >
+                  {table.number}{" "}
+                  {table.status === "busy" ? "(Band)" : "(Bo'sh)"}
+                </option>
+              ))}
+            </select>
           )}
         </div>
-
+        <p className="total-price">
+          Jami: {cart.reduce((sum, item) => sum + item.price * item.count, 0)}{" "}
+          so'm
+        </p>
         <div className="modal-actions">
           <button className="modal-btn2" onClick={onClose}>
             Orqaga

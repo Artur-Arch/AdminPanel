@@ -40,7 +40,7 @@ export const router = createBrowserRouter([
       { path: "Zakazlar", element: <Zakazlar /> },
       { path: "ZakazlarTarixi", element: <ZakazlarTarixi /> },
       { path: "Chiqish", element: <Chiqish /> }
-    ],
+    ]
   },
   {
     path: "*",

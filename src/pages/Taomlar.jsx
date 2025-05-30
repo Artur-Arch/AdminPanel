@@ -11,6 +11,17 @@ export default function Taomlar() {
   const [showBasket, setShowBasket] = useState(false);
   const [successMsg, setSuccessMsg] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [tables, setTables] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get("https://suddocs.uz/tables")
+      .then((res) => {
+        console.log("Данные столов:", res.data);
+        setTables(res.data.data); // Сохраняем массив столов
+      })
+      .catch((err) => console.error("Ошибка загрузки столов:", err));
+  }, []);
 
   const fetchTaomlar = () => {
     setLoading(true);
@@ -105,44 +116,48 @@ export default function Taomlar() {
           <div className="menu-view">
             {loading ? (
               <div className="spinner"></div>
-              ):(  <div className="menu-items">
-              {taomlar.map((taom) => (
-                <div key={taom.id} className="stolAddCard">
-                  <img
-                    className="menu-cardIMG"
-                    src={`https://suddocs.uz${taom.image}`}
-                    alt={taom.name}
-                  />
-                  <h4
-                    style={{
-                      margin: "5px 0 0 0",
-                      padding: "8px 0 5px 0",
-                      borderRadius: "5px",
-                      width: "auto",
-                    }}
-                  >
-                    {taom.name}
-                  </h4>
-                  <p style={{ margin: "10px 0 0 0", fontWeight: 'normal' }}>{taom.category?.name}</p>
-                  <div className="time-card" style={{ marginTop: "5px" }}>
-                    <img className="cardTime" src="/clock-regular.svg" />
-                    <p style={{ fontSize: "13px", margin: "10px 0 8px 0" }}>
-                      {taom.date ? `${taom.date} min` : "Vaqti yoq"}
+            ) : (
+              <div className="menu-items">
+                {taomlar.map((taom) => (
+                  <div key={taom.id} className="stolAddCard">
+                    <img
+                      className="menu-cardIMG"
+                      src={`https://suddocs.uz${taom.image}`}
+                      alt={taom.name}
+                    />
+                    <h4
+                      style={{
+                        margin: "5px 0 0 0",
+                        padding: "8px 0 5px 0",
+                        borderRadius: "5px",
+                        width: "auto",
+                      }}
+                    >
+                      {taom.name}
+                    </h4>
+                    <p style={{ margin: "10px 0 0 0", fontWeight: "normal" }}>
+                      {taom.category?.name}
+                    </p>
+                    <div className="time-card" style={{ marginTop: "5px" }}>
+                      <img className="cardTime" src="/clock-regular.svg" />
+                      <p style={{ fontSize: "13px", margin: "10px 0 8px 0" }}>
+                        {taom.date ? `${taom.date} min` : "Vaqti yoq"}
+                      </p>
+                    </div>
+                    <p
+                      style={{
+                        margin: "10px 0 0 0",
+                        border: "1px solid #fff",
+                        padding: "8px 0 0 0px",
+                        borderRadius: "5px",
+                      }}
+                    >
+                      {formatPrice(taom.price)}
                     </p>
                   </div>
-                  <p
-                    style={{
-                      margin: "10px 0 0 0",
-                      border: "1px solid #fff",
-                      padding: "8px 0 0 0px",
-                      borderRadius: "5px",
-                    }}
-                  >
-                    {formatPrice(taom.price)}
-                  </p>
-                </div>
-              ))}
-            </div>)}
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -309,6 +324,8 @@ export default function Taomlar() {
                 count: Number(item.count),
               }));
 
+            const tableId = orderData.orderType === "table" ? orderData.tableId : null;
+
             const totalPrice = orderData.orderItems.reduce((acc, item) => {
               const price = item?.product?.price
                 ? Number(item.product.price)
@@ -317,11 +334,18 @@ export default function Taomlar() {
             }, 0);
 
             const body = {
-              products: products,
-              tableNumber: orderData.tableNumber || "1",
-              totalPrice: totalPrice,
-              userId: userId || 3
+              products,
+              tableId,
+              totalPrice,
+              userId: userId || 2,
             };
+
+            if (!tableId && orderData.orderType === "table") {
+              alert(
+                "Bunday stol mavjud emas. Iltimos, to'g'ri stol raqamini kiriting."
+              );
+              return;
+            }
 
             console.log(
               "Yuborilayotgan buyurtma:",
@@ -334,6 +358,30 @@ export default function Taomlar() {
                 console.log("Buyurtma yuborildi:", res.data);
                 setCart([]);
                 setSuccessMsg("Buyurtma muvaffaqiyatli yuborildi!");
+
+                if (orderData.orderType === "table" && tableId) {
+                  axios
+                    .patch(`https://suddocs.uz/tables/${tableId}`, {
+                      status: "busy",
+                    })
+                    .then((res) => {
+                      console.log("Статус стола обновлен:", res.data);
+                      setTables((prev) =>
+                        prev.map((table) =>
+                          table.id === tableId
+                            ? { ...table, status: "busy" }
+                            : table
+                        )
+                      );
+                    })
+                    .catch((err) => {
+                      console.error("Ошибка при обновлении статуса стола:", err);
+                      if (err.response) {
+                        console.log("Status:", err.response.status);
+                        console.log("Data:", err.response.data);
+                      }
+                    });
+                }
               })
               .catch((err) => {
                 console.error("Xatolik:", err);
@@ -343,8 +391,11 @@ export default function Taomlar() {
                 }
               });
           }}
+          tables={tables}
+          userId={userId}
         />
       )}
+
       {successMsg && <div className="success-msg">{successMsg}</div>}
     </div>
   );

@@ -6,10 +6,9 @@
         "status": "Band"
     },
     {
-        "id": 2,
-        "name": "Stol - 2",
+        "name": "name",
         "number": 2,
-        "status": "Bo'sh"
+        "status": "busy"
     },
     {
         "id": 3,

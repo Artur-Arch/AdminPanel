@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "./styles/login.css"; // Импорт обновленных стилей
+import "./styles/login.css";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -10,7 +10,7 @@ export default function Login() {
   const [customer, setCustomer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // Состояние для видимости пароля
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -29,15 +29,15 @@ export default function Login() {
           setCustomer(customerUser);
         } else {
           setError(true);
-          setTimeout(() => setError(false), 3000); // Сброс ошибки через 3 секунды
+          setTimeout(() => setError(false), 3000);
         }
       } catch (err) {
         console.error("Foydalanuvchilarni yuklashda xatolik:", err);
         setError(true);
-        setTimeout(() => setError(false), 3000); // Сброс ошибки при ошибке загрузки
+        setTimeout(() => setError(false), 3000);
       } finally {
         setLoading(false);
-        if (!error) setError(false); // Сброс ошибки при успешной загрузке
+        if (!error) setError(false);
       }
     };
 
@@ -51,7 +51,7 @@ export default function Login() {
 
     if (!customer) {
       setError(true);
-      setTimeout(() => setError(false), 3000); // Сброс ошибки
+      setTimeout(() => setError(false), 3000);
       return;
     }
 
@@ -62,12 +62,12 @@ export default function Login() {
       navigate("/");
     } else {
       setError(true);
-      setTimeout(() => setError(false), 3000); // Сброс ошибки при неверном вводе
+      setTimeout(() => setError(false), 3000);
     }
   };
 
   const toggleShowPassword = () => {
-    setShowPassword(!showPassword); // Переключение видимости пароля
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -79,7 +79,7 @@ export default function Login() {
         <>
           {error && <p className="error-message">Login yoki parol xato. Iltimos, qayta urining!</p>}
           <input
-            className={`modal-input ${error ? "error" : ""}`}
+            className={`modal-input1 ${error ? "error" : ""}`}
             type="text"
             placeholder="Login kiriting"
             value={username}
@@ -87,7 +87,7 @@ export default function Login() {
           />
           <div className="password-container">
             <input
-              className={`modal-input ${error ? "error" : ""}`}
+              className={`modal-input1 ${error ? "error" : ""}`}
               type={showPassword ? "text" : "password"}
               placeholder="Parol kiriting"
               value={password}

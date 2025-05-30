@@ -6,7 +6,7 @@ const roleOptions = [
   { id: 1, value: "KITCHEN", label: "Oshpaz" },
   { id: 2, value: "CASHIER", label: "Ofitsiant" },
   { id: 3, value: "CUSTOMER", label: "Boshqaruvchi" },
-  { id: 3, value: "DIRECTOR", label: "Director" }
+  { id: 4, value: "BIGADMIN", label: "Director" }
 ];
 
 export default function Sozlamalar() {

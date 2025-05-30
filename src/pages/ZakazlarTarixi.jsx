@@ -8,7 +8,7 @@ const filters = [
   { label: "Navbatda", key: "COOKING" },
   { label: "Tayyor", key: "READY" },
   { label: "Mijoz oldida", key: "COMPLETED" },
-  { label: "Tugallangan", key: "ARCHIVE" }
+  { label: "Tugallangan", key: "ARCHIVE" },
 ];
 
 const getStatusClass = (status) => {
@@ -33,9 +33,9 @@ export default function ZakazTarixi() {
   const [categoryList, setCategoryList] = useState([]);
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
+  const [dateSearch, setDateSearch] = useState("");
   const [sortAsc, setSortAsc] = useState(false);
   const [loading, setLoading] = useState(true);
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,7 +53,7 @@ export default function ZakazTarixi() {
         setOrders(sanitizedOrders);
         setCategoryList(categoriesResponse.data);
       } catch (error) {
-        console.error("Xatolik yuz berdi:", error);
+        console.error("Произошла ошибка:", error);
       } finally {
         setLoading(false);
       }
@@ -61,6 +61,7 @@ export default function ZakazTarixi() {
 
     fetchData();
   }, []);
+
   const categoryMap = categoryList.reduce((map, category) => {
     map[category.id] = category.name;
     return map;
@@ -72,7 +73,10 @@ export default function ZakazTarixi() {
       const matchesSearch =
         order.id.toString().includes(search) ||
         order.tableNumber.toString().includes(search);
-      return matchesFilter && matchesSearch;
+      const matchesDate =
+        dateSearch === "" ||
+        new Date(order.createdAt).toLocaleDateString().includes(dateSearch);
+      return matchesFilter && matchesSearch && matchesDate;
     })
     .sort((a, b) => {
       const dateA = new Date(a.createdAt);
@@ -91,7 +95,7 @@ export default function ZakazTarixi() {
           fontWeight: "bold",
         }}
       >
-        Zakazlar tarixi
+        История заказов
       </h2>
       <div className="zakaz-tarixi-wrapper">
         {loading ? (
@@ -106,6 +110,13 @@ export default function ZakazTarixi() {
                 placeholder="Qidiruv (ID yoki Stol)..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+              />
+              <input
+                className="search-input"
+                style={{width: '8em'}}
+                type="date"
+                value={dateSearch}
+                onChange={(e) => setDateSearch(e.target.value)}
               />
               <div className="btn-box filters">
                 {filters.map((f) => (
@@ -122,7 +133,7 @@ export default function ZakazTarixi() {
                   className="sort-btn"
                   style={{ marginLeft: "10px" }}
                 >
-                  {sortAsc ? "⬆️ Eng eski" : "⬇️ Eng yangi"}
+                  {sortAsc ? "⬆️Eng eski" : "⬇️Eng yangi"}
                 </button>
               </div>
             </div>
@@ -131,7 +142,7 @@ export default function ZakazTarixi() {
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th style={{width: "auto"}}>Stol</th>
+                  <th style={{ width: "auto" }}>Stol</th>
                   <th>Turi</th>
                   <th>Taomlar va Kategoriyalar</th>
                   <th>Vaqti</th>
@@ -141,14 +152,14 @@ export default function ZakazTarixi() {
               <tbody>
                 {filteredHistory.map((order) => (
                   <tr key={order.id}>
-                    <td style={{width: 'auto'}}>{order.id}</td>
+                    <td style={{ width: "auto" }}>{order.id}</td>
                     <td>{order.tableNumber}</td>
-                    <td>Dine In</td>
+                    <td>Zalda</td>
                     <td>
                       {order.orderItems
                         .map(
                           (item) =>
-                            `${item.product?.name}  (${item.count})`
+                            `${item.product?.name} (${item.count})`
                         )
                         .join(", ")}
                     </td>
@@ -159,7 +170,7 @@ export default function ZakazTarixi() {
                         : order.status === "COOKING"
                         ? "Navbatda"
                         : order.status === "READY"
-                        ? "Tayyor" 
+                        ? "Tayyor"
                         : order.status === "COMPLETED"
                         ? "Mijoz oldida"
                         : order.status === "ARCHIVE"
