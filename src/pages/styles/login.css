@@ -24,6 +24,7 @@
   width: 100%;
   text-align: center;
   padding: 10px;
+  font-family: sans-serif, serif;
   border-radius: 10px 10px 0 0;
 }
 
@@ -59,6 +60,11 @@
   box-sizing: border-box;
   background-color: white;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.modal-input1:focus {
+  border: 0.5px solid #1976d2;
+  box-shadow: 0 0 5px rgba(25, 118, 210, 0.3);
 }
 
 .modal-input.error {
@@ -99,6 +105,9 @@
   cursor: pointer;
   transition: background-color 0.3s ease;
   padding-top: 6px;
+  font-family: sans-serif, serif;
+  font-weight: bold;
+  box-sizing: border-box;
 }
 
 .modButton:hover {

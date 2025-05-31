@@ -18,7 +18,7 @@ export default function Taomlar() {
       .get("https://suddocs.uz/tables")
       .then((res) => {
         console.log("Данные столов:", res.data);
-        setTables(res.data.data); // Сохраняем массив столов
+        setTables(res.data.data);
       })
       .catch((err) => console.error("Ошибка загрузки столов:", err));
   }, []);
@@ -83,30 +83,18 @@ export default function Taomlar() {
   };
 
   return (
-    <div className="taomlar-wrapper">
-      <h2
-        style={{
-          margin: "0px",
-          marginTop: "-15px",
-          marginLeft: "-5px",
-          fontWeight: "bold",
-          fontFamily: "sans-serif",
-        }}
-      >
-        Menyu
-      </h2>
+    <div className="menu-wrapper">
+      <h2 className="menu-title">Menyu</h2>
       <div className="menu-container">
-        <div className="catMenu menu-categories">
+        <div className="menu-tabs">
           <button
-            style={{ fontWeight: "bolder" }}
-            className={view === "menu" ? "CatButton active" : "CatButton"}
+            className={view === "menu" ? "tab-button active" : "tab-button"}
             onClick={() => setView("menu")}
           >
             Taomlar menyusi
           </button>
           <button
-            style={{ fontWeight: "bolder" }}
-            className={view === "order" ? "CatButton active" : "CatButton"}
+            className={view === "order" ? "tab-button active" : "tab-button"}
             onClick={() => setView("order")}
           >
             Zakaz yaratish
@@ -115,45 +103,23 @@ export default function Taomlar() {
         {view === "menu" && (
           <div className="menu-view">
             {loading ? (
-              <div className="spinner"></div>
+              <div className="spinner" />
             ) : (
               <div className="menu-items">
                 {taomlar.map((taom) => (
-                  <div key={taom.id} className="stolAddCard">
+                  <div key={taom.id} className="menu-card">
                     <img
-                      className="menu-cardIMG"
+                      className="menu-card__img"
                       src={`https://suddocs.uz${taom.image}`}
                       alt={taom.name}
                     />
-                    <h4
-                      style={{
-                        margin: "5px 0 0 0",
-                        padding: "8px 0 5px 0",
-                        borderRadius: "5px",
-                        width: "auto",
-                      }}
-                    >
-                      {taom.name}
-                    </h4>
-                    <p style={{ margin: "10px 0 0 0", fontWeight: "normal" }}>
-                      {taom.category?.name}
-                    </p>
-                    <div className="time-card" style={{ marginTop: "5px" }}>
-                      <img className="cardTime" src="/clock-regular.svg" />
-                      <p style={{ fontSize: "13px", margin: "10px 0 8px 0" }}>
-                        {taom.date ? `${taom.date} min` : "Vaqti yoq"}
-                      </p>
+                    <h4 className="menu-card__title">{taom.name}</h4>
+                    <p className="menu-card__category">{taom.category?.name}</p>
+                    <div className="menu-card__time">
+                      <img className="menu-card__time-icon" src="/clock-regular.svg" alt="clock" />
+                      <p>{taom.date ? `${taom.date} min` : "Vaqti yoq"}</p>
                     </div>
-                    <p
-                      style={{
-                        margin: "10px 0 0 0",
-                        border: "1px solid #fff",
-                        padding: "8px 0 0 0px",
-                        borderRadius: "5px",
-                      }}
-                    >
-                      {formatPrice(taom.price)}
-                    </p>
+                    <p className="menu-card__price">{formatPrice(taom.price)}</p>
                   </div>
                 ))}
               </div>
@@ -166,53 +132,29 @@ export default function Taomlar() {
             <div className="menu-view">
               <div className="menu-items">
                 {taomlar.map((taom) => (
-                  <div key={taom.id} className="stolAddCard">
+                  <div key={taom.id} className="menu-card">
                     <img
-                      className="menu-cardIMG"
+                      className="menu-card__img"
                       src={`https://suddocs.uz${taom.image}`}
                       alt={taom.name}
                     />
-                    <h4
-                      style={{
-                        margin: "5px 0 0 0",
-                        padding: "8px 0 5px 0",
-                        borderRadius: "5px",
-                        width: "auto",
-                      }}
-                    >
-                      {taom.name}
-                    </h4>
-                    <p
-                      style={{
-                        margin: "10px 0 0 0",
-                        border: "1px solid #fff",
-                        padding: "8px 0 0 0px",
-                        borderRadius: "5px",
-                      }}
-                    >
-                      {formatPrice(taom.price)}
-                    </p>
-                    <div className="count-controls">
+                    <h4 className="menu-card__title">{taom.name}</h4>
+                    <p className="menu-card__price">{formatPrice(taom.price)}</p>
+                    <div className="menu-card__controls">
                       <button
-                        className="count-btn"
-                        style={{ paddingLeft: "10px", paddingRight: "10px" }}
+                        className="control-btn"
                         onClick={() => removeFromCart(taom)}
                       >
                         -
                       </button>
-                      <span className="count-value">
+                      <span className="control-value">
                         {Math.max(
                           cart.find((item) => item.id === taom.id)?.count || 0,
                           0
                         )}
                       </span>
                       <button
-                        className="count-btn"
-                        style={{
-                          paddingTop: "10px",
-                          paddingLeft: "8px",
-                          paddingRight: "8px",
-                        }}
+                        className="control-btn"
                         onClick={() => addToCart(taom)}
                       >
                         +
@@ -223,24 +165,21 @@ export default function Taomlar() {
               </div>
             </div>
             <button
-              className={`show-basket-btn ${cart.length === 0 ? "hidden" : ""}`}
+              className={`basket-btn ${cart.length === 0 ? "hidden" : ""}`}
               disabled={cart.length === 0}
               onClick={() => setShowBasket(true)}
             >
               Buyurtma savati
             </button>
             {showBasket && (
-              <div className="overley">
-                <div className="order-view">
+              <div className="overlay">
+                <div className="basket-modal">
                   <h2>Buyurtma</h2>
                   {cart.length === 0 ? (
                     <p>Hozircha buyurtma yo'q</p>
                   ) : (
-                    <table
-                      className="modal-table"
-                      style={{ width: "100%", marginTop: "10px" }}
-                    >
-                      <thead style={{ backgroundColor: "rgb(144, 148, 180)" }}>
+                    <table className="basket-table">
+                      <thead>
                         <tr>
                           <th>Nomi</th>
                           <th>Miqdor</th>
@@ -249,54 +188,43 @@ export default function Taomlar() {
                         </tr>
                       </thead>
                       <tbody>
-                        {cart.map((item, i) => (
+                        {cart.map((item) => (
                           <tr key={item.id}>
                             <td>{item.name}</td>
                             <td>{item.count}</td>
                             <td>{item.price.toLocaleString("ru-RU")} so'm</td>
                             <td>
-                              {(item.price * item.count).toLocaleString(
-                                "ru-RU"
-                              )}{" "}
-                              so'm
+                              {(item.price * item.count).toLocaleString("ru-RU")} so'm
                             </td>
                           </tr>
                         ))}
                       </tbody>
-                      <tfoot style={{ borderTop: "1px solid #fff" }}>
+                      <tfoot>
                         <tr>
-                          <td
-                            colSpan="3"
-                            style={{
-                              textAlign: "left",
-                              fontWeight: "bold",
-                              fontSize: "16px",
-                            }}
-                          >
+                          <td colSpan="3" className="basket-table__total-label">
                             Jami:
                           </td>
-                          <td style={{ fontWeight: "bold" }}>
+                          <td className="basket-table__total">
                             {cart
                               .reduce(
                                 (sum, item) => sum + item.price * item.count,
                                 0
                               )
-                              .toLocaleString("ru-RU")}
-                            {""} so'm
+                              .toLocaleString("ru-RU")} so'm
                           </td>
                         </tr>
                       </tfoot>
                     </table>
                   )}
-                  <div className="order-buttons">
+                  <div className="basket-buttons">
                     <button
-                      className="order-buttons2"
+                      className="basket-buttons__back"
                       onClick={() => setShowBasket(false)}
                     >
                       Orqaga
                     </button>
                     <button
-                      className="order-buttons1"
+                      className="basket-buttons__confirm"
                       disabled={cart.length === 0}
                       onClick={() => setShowModal(true)}
                     >
@@ -396,7 +324,7 @@ export default function Taomlar() {
         />
       )}
 
-      {successMsg && <div className="success-msg">{successMsg}</div>}
+      {successMsg && <div className="success-message">{successMsg}</div>}
     </div>
   );
 }

@@ -1,170 +1,307 @@
-.stollar{
-    background-color: #ffffff;
-    padding: 10px;
-    border-radius: 8px;
+.stollar {
+  background-color: #ffffff;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.stolCat{
-    margin-top: 5px;
+.stolCat {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
 }
 
-.stolAddCard{
-    background-color: rgb(144, 148, 180);
-    width: 4.3em;
-    padding: 20px;
-    padding-top: 15px;
-    padding-bottom: 5px;
-    margin-top: 10px;
-    border: 0.5px solid grey;
-    border-radius: 8px;
-    text-align: center;
-    font-family: sans-serif;
-    font-weight: bold;
+.stolAddCard {
+  background-color: #f0f4ff;
+  width: 220px;
+  padding: 20px;
+  margin-top: 10px;
+  border: 1px solid #d9d9d9;
+  border-radius: 10px;
+  text-align: center;
+  font-family: sans-serif;
+  font-weight: bold;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.stol-container{
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    padding: 20px;
-    padding-right: 0px;
-    padding-left: 12.5px;
+.stolAddCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.main-stolBtn{
-    width: 10em;
-    height: 2.5em;
-    padding: 8px;
-    border-radius: 8px;
-    border: 0.5px solid rgb(153, 153, 153);
-    font-weight: bold;
-    font-family: sans-serif;
-    transition: background-color 0.3s ease;
+.stolAddCard.free {
+  border-left: 5px solid #52c41a;
 }
 
-.main-text{
-    font-size: 20px;
-    font-weight: bold;
-    font-family: sans-serif;
-    margin: 0;
-    border: 0.5px solid rgb(190, 190, 190);
-    width: 3.5em;
-    height: 2.5em;
-    padding: 5px;
-    border-radius: 8px;
-    text-align: center;
-    padding-top: 30px;
-    padding-bottom: 0px;
-    margin-left: -5.5px;
-    background-color: rgb(124, 132, 190);
+.stolAddCard.busy {
+  border-left: 5px solid #ff4d4f;
 }
 
-.modal-stol{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    background-color: #cde5fc;
-    width: 30em;
-    height: 20em;
-    border-radius: 10px;
-    padding: 20px;
-    padding-top: -10px;
-    border: 0.5px solid rgb(180, 180, 180);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-weight: bold;
-    font-family: sans-serif;
+.stolAddCard.add-card {
+  background-color: #e6f7ff;
+  cursor: pointer;
 }
 
-.modal2-input{
-    width: 18em;
-    height: 2em;
-    border-radius: 5px;
-    border: 0.5px solid rgb(189, 188, 188);
-    font-size: 15px;
+.stol-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px;
 }
 
-.modal-stolBtn{
-    display: flex;
-    gap: 20px;
+.main-stolBtn {
+  width: 120px;
+  height: 40px;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #d9d9d9;
+  font-weight: bold;
+  font-family: sans-serif;
+  background-color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.modal-btn1{
-    width: 8em;
-    height: 2.5em;
-    border-radius: 8px;
-    border: 0.5px solid rgb(153, 153, 153);
-    font-weight: bold;
-    font-family: sans-serif;
-    background-color: rgb(45, 180, 45);
-}
-.modal-btn2{
-    width: 8em;
-    height: 2.5em;
-    border-radius: 8px;
-    border: 0.5px solid rgb(153, 153, 153);
-    font-weight: bold;
-    font-family: sans-serif;
-    background-color: rgb(192, 46, 46);
+.main-stolBtn.active {
+  background-color: #1890ff;
+  color: #fff;
+  border-color: #1890ff;
 }
 
-.modal-btn2:hover{
-    background-color: rgb(218, 20, 20);
+.main-stolBtn:hover {
+  background-color: #e6f7ff;
 }
 
-.modal-btn1:hover{
-    background-color: rgb(29, 206, 29);
+.main-text {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #d6e4ff;
+  border: 1px solid #adc6ff;
 }
 
-.modal2-input:focus{
-    outline: none;
-    border: 0.5px solid rgb(102, 102, 102);
+.stol-info {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.view-orders-btn {
+  background-color: #1890ff;
+  color: #fff;
+  border: none;
+  padding: 8px;
+  width: 100%;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.view-orders-btn:hover {
+  background-color: #096dd9;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-stol {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  background-color: #e6f7ff;
+  width: 400px;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #d9d9d9;
+  font-family: sans-serif;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.modal2-input {
+  width: 100%;
+  height: 40px;
+  border-radius: 6px;
+  border: 1px solid #d9d9d9;
+  font-size: 16px;
+  padding: 0 10px;
+}
+
+.modal2-input:focus {
+  outline: none;
+  border: 1px solid #1890ff;
+  box-shadow: 0 0 4px rgba(24, 144, 255, 0.2);
+}
+
+.modal-stolBtn {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.modal-btn1 {
+  width: 120px;
+  height: 40px;
+  border-radius: 8px;
+  border: none;
+  font-weight: bold;
+  font-family: sans-serif;
+  background-color: #52c41a;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.modal-btn1:hover {
+  background-color: #389e0d;
+}
+
+.modal-btn2 {
+  width: 120px;
+  height: 40px;
+  border-radius: 8px;
+  border: none;
+  font-weight: bold;
+  font-family: sans-serif;
+  background-color: #ff4d4f;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.modal-btn2:hover {
+  background-color: #cf1322;
 }
 
 .status-btn {
-    padding: 8px;
-    margin-top: -5px;
-    margin-left: -15px;
-    width: 7.5em;
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    color: white;
-  }
-  
-  .status-btn.free {
-    background-color: #4CAF50;
-  }
-  
-  .status-btn.free:hover {
-    background-color: #45a049;
-  }
-  
-  .status-btn.busy {
-    background-color: #f44336;
-  }
-  
-  .status-btn.busy:hover {
-    background-color: #d32f2f;
-  }
-  
+  padding: 8px;
+  width: 100%;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  color: white;
+  transition: background-color 0.3s ease;
+}
 
-  .deleteBtn {
-    padding: 8px;
-    margin-top: -15px;
-    margin-left: -15px;
-    margin-bottom: 10px;
-    width: 7.5em;
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    color: white;
-  }
+.status-btn.free {
+  background-color: #52c41a;
+}
+
+.status-btn.free:hover {
+  background-color: #389e0d;
+}
+
+.status-btn.busy {
+  background-color: #ff4d4f;
+}
+
+.status-btn.busy:hover {
+  background-color: #cf1322;
+}
+
+.deleteBtn {
+  padding: 8px;
+  width: 100%;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: #ff7875;
+  color: white;
+  transition: background-color 0.3s ease;
+  margin-bottom: 10px;
+}
+
+.deleteBtn:hover {
+  background-color: #ff4d4f;
+}
+
+.error-message {
+  color: #ff4d4f;
+  background-color: #fff1f0;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #1890ff;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 50px auto;
+}
+
+.orders-list {
+  margin-top: 10px;
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.order-item {
+  background-color: #fafafa;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.order-item p {
+  margin: 5px 0;
+}
+
+.no-orders {
+  color: #888;
+  font-style: italic;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.order-items-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 10px 0;
+  font-size: 13px;
+}
+
+.order-item-detail {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 5px 0;
+}
+
+.order-item-detail img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.order-item-detail span {
+  font-size: 13px;
+  color: #333;
+}

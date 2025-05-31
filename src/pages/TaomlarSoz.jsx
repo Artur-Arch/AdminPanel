@@ -299,7 +299,6 @@ export default function TaomlarSoz() {
                 <input
                   type="text"
                   placeholder="Taom nomi"
-                  style={{ height: "1.3em" }}
                   className="modal-input"
                   value={dishes.name || ""}
                   onChange={(e) =>
@@ -309,7 +308,6 @@ export default function TaomlarSoz() {
                 <input
                   type="number"
                   placeholder="Narxi"
-                  style={{ height: "1.3em" }}
                   className="modal-input"
                   value={dishes.price || ""}
                   onChange={(e) =>
@@ -319,7 +317,6 @@ export default function TaomlarSoz() {
                 <input
                   type="number"
                   placeholder="Tayyorlanish vaqti (min)"
-                  style={{ height: "1.3em" }}
                   className="modal-input"
                   value={dishes.date || ""}
                   onChange={(e) =>
@@ -330,7 +327,6 @@ export default function TaomlarSoz() {
                 <input
                   type="file"
                   className="modal-input"
-                  style={{ height: "1.3em" }}
                   onChange={(e) =>
                     setDishes({ ...dishes, image: e.target.files[0] })
                   }
@@ -360,7 +356,7 @@ export default function TaomlarSoz() {
                     type="text"
                     placeholder="Yangi kategoriya nomi"
                     className="modal-input"
-                    style={{ width: "14.6em", height: "1.5em" }}
+                    style={{ width: "14.6em" }}
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value)}
                   />
@@ -393,7 +389,7 @@ export default function TaomlarSoz() {
                       padding: "8px 12px",
                       borderRadius: "6px",
                       border: "none",
-                      height: "3.3em",
+                      height: "3em",
                       backgroundColor: "#4CAF50",
                       color: "white",
                       cursor: "pointer",

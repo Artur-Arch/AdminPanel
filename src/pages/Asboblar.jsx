@@ -14,7 +14,6 @@ import {
   Filler,
 } from "chart.js";
 
-// Регистрируем компоненты Chart.js
 ChartJS.register(
   LineElement,
   PointElement,
@@ -44,20 +43,17 @@ export default function Asboblar() {
           orderItems: Array.isArray(order.orderItems) ? order.orderItems : [],
         }));
 
-        // Текущая дата и начало текущего дня
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const todayEnd = new Date(today);
         todayEnd.setHours(23, 59, 59, 999);
 
-        // Фильтрация заказов за сегодня
         const dailyOrders = orders.filter(
           (order) =>
             new Date(order.createdAt) >= today &&
             new Date(order.createdAt) <= todayEnd
         );
 
-        // Вычисление ежедневной статистики
         const orderCount = dailyOrders.length;
         const totalAmount = dailyOrders.reduce((sum, order) => {
           if (order.totalAmount) {
@@ -75,7 +71,6 @@ export default function Asboblar() {
 
         setDailyStats({ orderCount, totalAmount, averageCheck });
 
-        // Вычисление еженедельной статистики (за последние 7 дней)
         const oneWeekAgo = new Date();
         oneWeekAgo.setDate(today.getDate() - 6);
         oneWeekAgo.setHours(0, 0, 0, 0);
@@ -110,7 +105,6 @@ export default function Asboblar() {
     fetchData();
   }, []);
 
-  // Подготовка данных для графика
   const chartData = {
     labels: weeklyStats.map((stat) => stat.date),
     datasets: [

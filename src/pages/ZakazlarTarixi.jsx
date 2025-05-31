@@ -3,46 +3,49 @@ import "./styles/ZakazTarixi.css";
 import axios from "axios";
 
 const filters = [
-  { label: "Barchasi", key: "All" },
-  { label: "Yangi", key: "PENDING" },
-  { label: "Navbatda", key: "COOKING" },
-  { label: "Tayyor", key: "READY" },
-  { label: "Mijoz oldida", key: "COMPLETED" },
-  { label: "Tugallangan", key: "ARCHIVE" },
+  { label: "Barchasi", name: "ALL" },
+  { label: "Yangi", name: "PENDING" },
+  { label: "Tayyorlanmoqda", name: "COOKING" },
+  { label: "Tayyor", name: "READY" },
+  { label: "Mijoz Oldida", name: "COMPLETED" },
+  { label: "Tugallangan", name: "ARCHIVE" },
 ];
 
 const getStatusClass = (status) => {
   switch (status) {
     case "PENDING":
-      return "status-waitlist";
+      return "status--pending";
     case "COOKING":
-      return "status-kitchen";
+      return "status--cooking";
     case "READY":
-      return "status-ready";
+      return "status--ready";
     case "COMPLETED":
-      return "status-completed";
+      return "status--completed";
     case "ARCHIVE":
-      return "status-archive";
+      return "status--archived";
     default:
-      return "bg-gray-500";
+      return "status--default";
   }
 };
 
 export default function ZakazTarixi() {
   const [orders, setOrders] = useState([]);
   const [categoryList, setCategoryList] = useState([]);
-  const [filter, setFilter] = useState("All");
-  const [search, setSearch] = useState("");
-  const [dateSearch, setDateSearch] = useState("");
-  const [sortAsc, setSortAsc] = useState(false);
+  const [tables, setTables] = useState([]);
+  const [activeFilter, setActiveFilter] = useState("ALL");
+  const [searchInput, setSearchInput] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [sortAscending, setSortAscending] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [ordersResponse, categoriesResponse] = await Promise.all([
+        const [ordersResponse, categoriesResponse, tablesResponse] = await Promise.all([
           axios.get("https://suddocs.uz/order"),
           axios.get("https://suddocs.uz/category"),
+          axios.get("https://suddocs.uz/tables"),
         ]);
 
         const sanitizedOrders = ordersResponse.data.map((order) => ({
@@ -52,8 +55,9 @@ export default function ZakazTarixi() {
 
         setOrders(sanitizedOrders);
         setCategoryList(categoriesResponse.data);
+        setTables(tablesResponse.data.data || []);
       } catch (error) {
-        console.error("Произошла ошибка:", error);
+        console.error("Xatolik yuz berdi:", error);
       } finally {
         setLoading(false);
       }
@@ -62,128 +66,120 @@ export default function ZakazTarixi() {
     fetchData();
   }, []);
 
-  const categoryMap = categoryList.reduce((map, category) => {
-    map[category.id] = category.name;
-    return map;
-  }, {});
+  const categoryMap = categoryList.reduce((map, category) => ({
+    ...map,
+    [category.id]: category.name,
+  }), {});
+  
+  const tableMap = tables.reduce((map, table) => ({
+    ...map,
+    [table.id]: table.number,
+  }), {});
 
   const filteredHistory = orders
     .filter((order) => {
-      const matchesFilter = filter === "All" || order.status === filter;
-      const matchesSearch =
-        order.id.toString().includes(search) ||
-        order.tableNumber.toString().includes(search);
-      const matchesDate =
-        dateSearch === "" ||
-        new Date(order.createdAt).toLocaleDateString().includes(dateSearch);
-      return matchesFilter && matchesSearch && matchesDate;
+      const matchesFilterStatus = activeFilter === "ALL" || order.status === activeFilter;
+      const matchesSearchInput = 
+        order.id.toString().includes(searchInput) ||
+        (tableMap[order.tableId]?.toString().includes(searchInput) || "");
+      const orderDate = new Date(order.createdAt);
+      const start = startDate ? new Date(startDate) : null;
+      const end = endDate ? new Date(endDate) : null;
+      const matchesDateRange = 
+        (!start || orderDate >= start) &&
+        (!end || orderDate <= new Date(end).setHours(23, 59, 59, 999));
+      return matchesFilterStatus && matchesSearchInput && matchesDateRange;
     })
     .sort((a, b) => {
       const dateA = new Date(a.createdAt);
       const dateB = new Date(b.createdAt);
-      return sortAsc ? dateA - dateB : dateB - dateA;
+      return sortAscending ? dateA - dateB : dateB - dateA;
     });
 
   return (
-    <>
-      <h2
-        style={{
-          margin: "0px",
-          marginTop: "-15px",
-          marginLeft: "-5px",
-          fontFamily: "sans-serif",
-          fontWeight: "bold",
-        }}
-      >
-        История заказов
-      </h2>
-      <div className="zakaz-tarixi-wrapper">
-        {loading ? (
-          <div className="spinner"></div>
-        ) : (
-          <div>
-            <div className="filter-search">
+    <div>
+      <h2 className="order-history__title">Buyurtmalar Tarixi</h2>
+    <div className="order-history-wrapper">
+      {loading ? (
+        <div className="spinner" />
+      ) : (
+        <div>
+          <div className="history-filters">
+            <div className="history-filters__search">
               <input
-                className="search-input"
+                className="history-filters__input"
                 type="number"
                 min="0"
-                placeholder="Qidiruv (ID yoki Stol)..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                placeholder="ID yoki Stol bo'yicha Qidirish..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
               />
               <input
-                className="search-input"
-                style={{width: '8em'}}
+                className="history-filters__input history-filters__date"
                 type="date"
-                value={dateSearch}
-                onChange={(e) => setDateSearch(e.target.value)}
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                placeholder="Tugash Sanasi"
               />
-              <div className="btn-box filters">
-                {filters.map((f) => (
-                  <button
-                    key={f.key}
-                    className={filter === f.key ? "active" : ""}
-                    onClick={() => setFilter(f.key)}
-                  >
-                    {f.label}
-                  </button>
-                ))}
-                <button
-                  onClick={() => setSortAsc(!sortAsc)}
-                  className="sort-btn"
-                  style={{ marginLeft: "10px" }}
-                >
-                  {sortAsc ? "⬆️Eng eski" : "⬇️Eng yangi"}
-                </button>
-              </div>
             </div>
-
-            <table className="history-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th style={{ width: "auto" }}>Stol</th>
-                  <th>Turi</th>
-                  <th>Taomlar va Kategoriyalar</th>
-                  <th>Vaqti</th>
-                  <th>Holati</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredHistory.map((order) => (
-                  <tr key={order.id}>
-                    <td style={{ width: "auto" }}>{order.id}</td>
-                    <td>{order.tableNumber}</td>
-                    <td>Zalda</td>
-                    <td>
-                      {order.orderItems
-                        .map(
-                          (item) =>
-                            `${item.product?.name} (${item.count})`
-                        )
-                        .join(", ")}
-                    </td>
-                    <td>{new Date(order.createdAt).toLocaleString()}</td>
-                    <td className={getStatusClass(order.status)}>
-                      {order.status === "PENDING"
-                        ? "Yangi"
-                        : order.status === "COOKING"
-                        ? "Navbatda"
-                        : order.status === "READY"
-                        ? "Tayyor"
-                        : order.status === "COMPLETED"
-                        ? "Mijoz oldida"
-                        : order.status === "ARCHIVE"
-                        ? "Tugallangan"
-                        : order.status}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="history-filters__buttons">
+              {filters.map((f) => (
+                <button
+                  key={f.name}
+                  className={`history-filters__button ${activeFilter === f.name ? "active" : ""}`}
+                  onClick={() => setActiveFilter(f.name)}
+                >
+                  {f.label}
+                </button>
+              ))}
+              <button
+                className="history-filters__sort-btn"
+                onClick={() => setSortAscending(!sortAscending)}
+              >
+                {sortAscending ? "↑ Eng Eski" : "↓ Eng Yangi"}
+              </button>
+            </div>
+            <br />
           </div>
-        )}
-      </div>
-    </>
+
+          <table className="history-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Stol</th>
+                <th>Turi</th>
+                <th>Taomlar</th>
+                <th>Vaqti</th>
+                <th>Holati</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredHistory.map((order) => (
+                <tr key={order.id}>
+                  <td>{order.id}</td>
+                  <td>{tableMap[order.tableId] || "N/A"}</td>
+                  <td>Zalda</td>
+                  <td>
+                    {order.orderItems
+                      .map((item) => `${item.product?.name} (${item.count})`)
+                      .join(", ")}
+                  </td>
+                  <td>{new Date(order.createdAt).toLocaleString()}</td>
+                  <td className={getStatusClass(order.status)}>
+                    {order.status === "PENDING" ? "Yangi" :
+                     order.status === "COOKING" ? "Tayyorlanmoqda" :
+                     order.status === "READY" ? "Tayyor" :
+                     order.status === "COMPLETED" ? "Mijoz Oldida" :
+                     order.status === "ARCHIVE" ? "Tugallangan" :
+                     "Noma'lum"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+    </div>
   );
 }

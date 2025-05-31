@@ -4,21 +4,37 @@ import "./styles/AdminPanel.css";
 
 export default function AdminPanel() {
   const [orders, setOrders] = useState([]);
+  const [tables, setTables] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalType, setModalType] = useState("");
 
   useEffect(() => {
-    const fetchOrders = async () => {
+    const fetchData = async () => {
       try {
-        const res = await axios.get("https://suddocs.uz/order");
-        setOrders(res.data);
+        const [ordersRes, tablesRes] = await Promise.all([
+          axios.get("https://suddocs.uz/order"),
+          axios.get("https://suddocs.uz/tables"),
+        ]);
+
+        const sanitizedOrders = ordersRes.data.map((order) => ({
+          ...order,
+          orderItems: Array.isArray(order.orderItems) ? order.orderItems : [],
+        }));
+
+        setOrders(sanitizedOrders);
+        setTables(tablesRes.data.data); // Предполагается, что данные столов находятся в tablesRes.data.data
       } catch (error) {
-        console.error("Ошибка загрузки заказов:", error);
+        console.error("Ошибка загрузки данных:", error);
       }
     };
 
-    fetchOrders();
+    fetchData();
   }, []);
+
+  const tableMap = tables.reduce((map, table) => {
+    map[table.id] = table.number;
+    return map;
+  }, {});
 
   const formatPrice = (price) => {
     const priceStr = price.toString();
@@ -89,7 +105,7 @@ export default function AdminPanel() {
                 {orders.map((order, index) => (
                   <tr key={`${order.id}-${index}`}>
                     <td>№ {order.id}</td>
-                    <td>{order.tableNumber}</td>
+                    <td>{tableMap[order.tableId] || "N/A"}</td>
                     <td>
                       {order.orderItems
                         .map((item) => `${item.product.name} (${item.count})`)
@@ -192,7 +208,7 @@ export default function AdminPanel() {
                       <b>Zakaz №</b> {selectedOrder.id}
                     </p>
                     <p>
-                      <b>Stol:</b> {selectedOrder.tableNumber}
+                      <b>Stol:</b> {tableMap[selectedOrder.tableId] || "N/A"}
                     </p>
                     <p>
                       <b>Taomlar:</b>

@@ -1,89 +1,268 @@
-.zakaz-tarixi-wrapper {
-    padding: 20px;
-    background: #f9f9f9;
-    min-height: 100vh;
-    font-family: sans-serif;
-    padding-left: 35px;
-    border-radius: 8px;
+.order-history-wrapper {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  font-family: 'Inter', sans-serif;
+}
+
+.order-history__title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: -15px 0 0px -15px;
+  font-family: 'Inter', sans-serif;
+
+}
+
+.history-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.history-filters__search {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.history-filters__input {
+  padding: 8px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.history-filters__input:focus {
+  outline: none;
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.history-filters__date {
+  width: 150px;
+}
+
+.history-filters__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: thin;
+  scrollbar-color: #d9d9d9 #f5f5f5;
+}
+
+.history-filters__buttons::-webkit-scrollbar {
+  height: 8px;
+}
+
+.history-filters__buttons::-webkit-scrollbar-thumb {
+  background-color: #d9d9d9;
+  border-radius: 4px;
+}
+
+.history-filters__buttons::-webkit-scrollbar-track {
+  background-color: #f5f5f5;
+}
+
+.history-filters__button {
+  padding: 8px 16px;
+  border: 1px solid #d9d9d9;
+  background: #f5f5f5;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.history-filters__button:hover {
+  background: #e6f7ff;
+  border-color: #40c4ff;
+}
+
+.history-filters__button.active {
+  background: #1890ff;
+  color: #fff;
+  border-color: #1890ff;
+  box-shadow: 0 2px 4px rgba(24, 144, 255, 0.2);
+}
+
+.history-filters__sort-btn {
+  padding: 8px 16px;
+  border: 1px solid #d9d9d9;
+  background: #ffffff;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.history-filters__sort-btn:hover {
+  background: #e6f7ff;
+  border-color: #1890ff;
+}
+
+/* Таблица */
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.history-table th,
+.history-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e8ecef;
+  font-size: 14px;
+}
+
+.history-table th {
+  background: #f0f4f8;
+  font-weight: 600;
+  color: #333;
+}
+
+.history-table tr:hover {
+  background: #f9f9f9;
+}
+
+.history-table td {
+  color: #333;
+}
+
+.status--pending {
+  background: #ff6f6f;
+  color: #c0392b;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.status--cooking {
+  background: #ffe297;
+  color: #e67e22;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.status--ready {
+  background: #9aff9a;
+  color: #27ae60;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.status--completed {
+  background: #a9e4ff;
+  color: #2980b9;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.status--archived {
+  background: #cecece;
+  color: #999;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.status--default {
+  background: #e8ecef;
+  color: #666;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+/* Спиннер */
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #1890ff;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+}
+
+/* Анимации */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .order-history-wrapper {
+    padding: 15px;
   }
-  
-  .zakaz-tarixi-wrapper h2 {
-    margin-bottom: 20px;
-  }
-  
-  .filter-search {
-    display: flex;
+
+  .history-filters__search {
     flex-direction: column;
-    gap: 10px;
-    margin-bottom: 20px;
   }
-  
-  .filter-search input {
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 14px;
-    margin-right: 20px;
-  }
-  
-  .filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  
-  .filters button {
-    padding: 8px 16px;
-    border: none;
-    background-color: #e0e0e0;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease;
-  }
-  
-  .filters button.active {
-    background-color: #179b28;
-    color: white;
-    transition: background-color 0.3s ease;
-  }
-  
-  .history-table {
+
+  .history-filters__input,
+  .history-filters__date {
     width: 100%;
-    margin-top: 10px;
-    border-collapse: collapse;
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
   }
-  
+
+  .history-filters__button,
+  .history-filters__sort-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
   .history-table th,
   .history-table td {
-    padding: 12px 16px;
-    text-align: left;
-    border-bottom: 1px solid #eee;
+    padding: 10px;
+    font-size: 13px;
   }
-  
-  .history-table th {
-    background-color: #f0f0f0;
-    font-weight: 600;
-  }
-  
-  .history-table tr:hover {
-    background-color: #f5f5f5;
-  }
-  
-  .btn-box{
-    margin-top: 0px;
+}
+
+@media (max-width: 480px) {
+  .order-history__title {
+    font-size: 20px;
   }
 
-  .search-input:focus {
-    outline: none;
-    border-color: #007bff; 
+  .history-filters__button,
+  .history-filters__sort-btn {
+    font-size: 12px;
+    padding: 5px 10px;
   }
 
-  .zakazlarTarixi-main{
-    margin-top: 40px;
-    margin-left: 10px;
+  .history-table {
+    font-size: 12px;
   }
+
+  .history-table th,
+  .history-table td {
+    padding: 8px;
+  }
+
+  .status--pending,
+  .status--cooking,
+  .status--ready,
+  .status--completed,
+  .status--archived,
+  .status--default {
+    font-size: 12px;
+    padding: 3px 6px;
+  }
+}

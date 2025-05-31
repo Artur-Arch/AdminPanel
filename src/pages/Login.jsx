@@ -72,7 +72,7 @@ export default function Login() {
 
   return (
     <div className="login-container">
-      <h2 className="login-title">Kirish</h2>
+      <h2 className="login-title">Admin profiliga kirish</h2>
       {loading ? (
         <div className="spinner"></div>
       ) : (

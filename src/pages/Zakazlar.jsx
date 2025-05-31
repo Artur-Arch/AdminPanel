@@ -1,30 +1,29 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useReactToPrint } from "react-to-print";
-import { TableContext } from "../TableContext.jsx";
 import Receipt from "../components/Receipt.jsx";
 import "./styles/Zakazlar.css";
 import axios from "axios";
 
 const filters = [
-  { label: "Barchasi", key: "All" },
-  { label: "Navbatda", key: "PENDING" },
-  { label: "Tayyor", key: "READY" },
-  { label: "Tayyorlanmoqda", key: "COOKING" },
-  { label: "Mijoz oldida", key: "COMPLETED" },
+  { label: "Barchasi", name: "All" },
+  { label: "Navbatda", name: "PENDING" },
+  { label: "Tayyor", name: "READY" },
+  { label: "Tayyorlanmoqda", name: "COOKING" },
+  { label: "Mijoz oldida", name: "COMPLETED" },
 ];
 
 const getStatusClass = (status) => {
   switch (status) {
     case "PENDING":
-      return "status-waitlist";
+      return "status--pending";
     case "COOKING":
-      return "status-kitchen";
+      return "status--cooking";
     case "READY":
-      return "status-ready";
+      return "status--ready";
     case "COMPLETED":
-      return "status-completed";
+      return "status--completed";
     case "ARCHIVE":
-      return "status-archive";
+      return "status--archive";
     default:
       return "";
   }
@@ -57,7 +56,7 @@ export default function Zakazlar() {
     try {
       console.log(`Buyurtma #${order.id} tekshirilmoqda`);
       const checkResponse = await axios.get(`https://suddocs.uz/order/${order.id}`);
-      const response = await axios.put(
+      const response = await axios.patch(
         `https://suddocs.uz/order/${order.id}`,
         { status: "ARCHIVE" },
         {
@@ -112,24 +111,106 @@ export default function Zakazlar() {
     }
   };
 
-const handleDeleteOrder = async (orderId, tableId) => {
-    try {
-      await axios.delete(`https://suddocs.uz/order/${orderId}`);
-      const ordersResponse = await axios.get("https://suddocs.uz/order");
-      const orders = ordersResponse.data;
-      const hasActiveOrders = orders.some(
-        (order) => order.tableId === tableId && order.status !== "ARCHIVE"
-      );
-      setTables((prev) =>
-        prev.map((table) =>
-          table.id === tableId
-            ? { ...table, status: hasActiveOrders ? "Band" : "Bo'sh" }
-            : table
-        )
-      );
-      console.log(`Статус стола ${tableId} обновлен`);
-    } catch (error) {
-      console.error("Ошибка удаления заказа:", error);
+  const handleDeleteOrder = async (id) => {
+    if (window.confirm("Bu buyurtmani o'chirishni xohlaysizmi?")) {
+      try {
+        console.log("Удаление заказа с ID:", id);
+        const order = orders.find((o) => o.id === id);
+        console.log("Найденный заказ:", order);
+        const tableId = order?.tableId;
+        console.log("tableId заказа:", tableId);
+
+        await axios.delete(`https://suddocs.uz/order/${id}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+
+        setOrders(orders.filter((order) => order.id !== id));
+        alert("Buyurtma muvaffaqiyatli o'chirildi!");
+
+        if (tableId) {
+          const hasOtherOrders = orders.some(
+            (o) => o.id !== id && o.tableId === tableId && o.status !== "ARCHIVE"
+          );
+          console.log("Есть другие заказы для стола:", hasOtherOrders);
+
+          if (!hasOtherOrders) {
+            try {
+              await axios.patch(
+                `https://suddocs.uz/tables/${tableId}`,
+                { status: "empty" },
+                {
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                  },
+                }
+              );
+              setTables((prev) =>
+                prev.map((table) =>
+                  table.id === tableId ? { ...table, status: "empty" } : table
+                )
+              );
+              console.log(`Статус стола ${tableId} обновлен на empty на сервере и локально`);
+            } catch (err) {
+              console.error("Ошибка при обновлении статуса стола:", {
+                message: err.message,
+                status: err.response?.status,
+                data: err.response?.data,
+              });
+              alert("Не удалось обновить статус стола на сервере. Попробуйте снова.");
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Buyurtmani o'chirishda xatolik:", {
+          message: err.message,
+          status: err.response?.status,
+          data: err.response?.data,
+        });
+        if (err.response?.status === 404) {
+          alert("Buyurtma topilmadi. Ehtimol, u allaqachon o'chirilgan.");
+          setOrders(orders.filter((order) => order.id !== id));
+          const order = orders.find((o) => o.id === id);
+          const tableId = order?.tableId;
+          if (tableId) {
+            const hasOtherOrders = orders.some(
+              (o) => o.id !== id && o.tableId === tableId && o.status !== "ARCHIVE"
+            );
+            if (!hasOtherOrders) {
+              try {
+                await axios.patch(
+                  `https://suddocs.uz/tables/${tableId}`,
+                  { status: "empty" },
+                  {
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                  }
+                );
+                setTables((prev) =>
+                  prev.map((table) =>
+                    table.id === tableId ? { ...table, status: "empty" } : table
+                  )
+                );
+                console.log(`Статус стола ${tableId} обновлен на empty на сервере и локально (404)`);
+              } catch (err) {
+                console.error("Ошибка при обновлении статуса стола (404):", {
+                  message: err.message,
+                  status: err.response?.status,
+                  data: err.response?.data,
+                });
+                alert("Не удалось обновить статус стола на сервере. Попробуйте снова.");
+              }
+            }
+          }
+        } else {
+          alert("Buyurtmani o'chirib bo'lmadi. Qayta urinib ko'ring.");
+        }
+      }
     }
   };
 
@@ -291,162 +372,96 @@ const handleDeleteOrder = async (orderId, tableId) => {
   filteredOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   return (
-    <div className="zakazlar-wrapper">
-      <h3
-        style={{
-          margin: "0",
-          marginLeft: "-20px",
-          marginTop: "-15px",
-          marginBottom: "-15px",
-          fontWeight: "bold",
-          fontSize: "24px",
-        }}
-      >
-        Zakazlar
-      </h3>
+    <div className="orders-wrapper">
+      <h3 className="orders-title">Zakazlar</h3>
 
-      <div className="zakazlar-main">
+      <div className="orders-container">
         {loading ? (
-          <div className="spinner"></div>
+          <div className="spinner" />
         ) : (
           <div>
-            <div className="filters">
+            <div className="order-filters">
               {filters.map((filter) => (
                 <button
-                  key={filter.key}
-                  className={`filter-btn ${
-                    activeFilter === filter.key ? "active" : ""
-                  }`}
-                  onClick={() => setActiveFilter(filter.key)}
+                  key={filter.name}
+                  className={`filter-button ${activeFilter === filter.name ? "active" : ""}`}
+                  onClick={() => setActiveFilter(filter.name)}
                 >
                   {filter.label}
-                  <span className="badge">
-                    {filter.key === "All"
+                  <span className="filter-badge">
+                    {filter.name === "All"
                       ? orders.filter((o) => o.status !== "ARCHIVE").length
-                      : orders.filter((o) => o.status === filter.key).length}
+                      : orders.filter((o) => o.status === filter.name).length}
                   </span>
                 </button>
               ))}
             </div>
 
-            <div id="order-cards" className="order-cards">
+            <div className="order-list">
               {filteredOrders.length === 0 ? (
-                <p className="no-orders">
-                  Bu kategoriya uchun buyurtmalar yo'q.
-                </p>
+                <p className="no-orders">Bu kategoriya uchun buyurtmalar yo'q.</p>
               ) : (
                 filteredOrders.map((order) => (
-                  <div
-                    className={`order-card ${loading ? "loading" : ""}`}
-                    key={order.id}
-                  >
-                    <div className="order-header">
-                      <div style={{ display: "flex", flexDirection: "column" }}>
-                        <span className="order-id">Buyurtma №{order.id}</span>
-                        <span className="table-id">
+                  <div className="order-card" key={order.id}>
+                    <div className="order-card__header">
+                      <div className="order-card__info">
+                        <span className="order-card__id">Buyurtma №{order.id}</span>
+                        <span className="order-card__table">
                           {order.table?.name} - {order.table?.number || "N/A"}
                         </span>
                       </div>
+                      <div className="orderCardHeader">
                       <button
-                        style={{
-                          marginRight: "10px",
-                          padding: "5px 5px",
-                          border: "1px solid #ccc",
-                          background: "#f0f0f0",
-                          cursor: "pointer",
-                          fontSize: "14px",
-                        }}
+                        className="order-card__edit-btn"
                         onClick={() => handleEditOrder(order)}
                       >
                         ✏️
                       </button>
                       <button
-                        style={{
-                          marginLeft: "-35px",
-                          paddingTop: "12px",
-                          display: "flex",
-                          alignItems: "center",
-                          border: "0.5px solid rgb(82, 82, 82)",
-                          background: "transparent",
-                          color: "red",
-                          cursor: "pointer",
-                          fontSize: "18px",
-                        }}
+                        className="order-card__delete-btn"
                         onClick={() => handleDeleteOrder(order.id)}
                       >
                         ×
                       </button>
+                      </div>
                     </div>
 
-                    <div className="order-items">
+                    <div className="order-card__items">
                       {order.orderItems?.map((item) => (
                         <div className="order-item" key={item.id}>
                           <img
                             src={`https://suddocs.uz${item.product?.image}`}
                             alt={item.product?.name}
-                            className="order-item-img"
+                            className="order-item__img"
                           />
-                          <div className="order-item-info">
-                            <p className="item-name">{item.product?.name}</p>
-                            <p className="item-count">Soni: {item.count}</p>
+                          <div className="order-item__info">
+                            <p className="order-item__name">{item.product?.name}</p>
+                            <p className="order-item__count">Soni: {item.count}</p>
                           </div>
                         </div>
                       ))}
                     </div>
 
-                    <div className="order-body">
+                    <div className="order-card__body">
                       <p>Taomlar soni: {order.orderItems?.length || 0}</p>
-                      <p style={{ fontWeight: "bold", fontSize: "15px" }}>
-                        Umumiy narxi: {formatPrice(order.totalPrice)}
-                      </p>
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "flex-start",
-                          marginTop: "0px",
-                          marginBottom: "5px",
-                          border: "1px solid #ccc",
-                          paddingLeft: "10px",
-                          borderRadius: "5px",
-                        }}
-                      >
-                        <p
-                          style={{
-                            fontWeight: "bold",
-                            fontSize: "14px",
-                            marginBottom: "0px",
-                          }}
-                        >
-                          Buyurtma berilgan vaqti:
-                        </p>
-                        <p
-                          style={{
-                            fontWeight: "bold",
-                            fontSize: "16px",
-                            marginTop: "3px",
-                          }}
-                        >
-                          {new Date(order.createdAt).toLocaleString()}
-                        </p>
+                      <p className="order-card__total">Umumiy narxi: {formatPrice(order.totalPrice)}</p>
+                      <div className="order-card__time">
+                        <p className="order-card__time-label">Buyurtma berilgan vaqti:</p>
+                        <p className="order-card__time-value">{new Date(order.createdAt).toLocaleString()}</p>
                       </div>
                       {order.status === "COMPLETED" && (
                         <button
-                          className="print-btn"
+                          className="order-card__print-btn"
                           onClick={() => handleCloseAndPrint(order)}
                         >
                           To'lash va chop etish ✍️
                         </button>
                       )}
-                      <div
-                        className={`order-footer ${getStatusClass(
-                          order.status
-                        )}`}
-                      >
-                        {order.status === "PENDING" ? "Navbatda" : ""}
-                        {order.status === "READY" ? "Tayyor" : ""}
-                        {order.status === "COOKING" ? "Tayyorlanmoqda" : ""}
-                        {order.status === "COMPLETED" ? "Mijoz oldida" : ""}
+                      <div className={`order-card__status ${getStatusClass(order.status)}`}>
+                        {order.status === "PENDING" && "Navbatda"}
+                        {order.status === "READY" && "Tayyor"}
+                        {order.status === "COOKING" && "Tayyorlanmoqda"}
+                        {order.status === "COMPLETED" && "Mijoz oldida"}
                       </div>
                     </div>
                   </div>
@@ -459,48 +474,23 @@ const handleDeleteOrder = async (orderId, tableId) => {
 
       {showEditModal && (
         <div className="modal-overlay">
-          <div style={{ paddingBottom: "20px" }} className="modal">
-            <h2>Buyurtma №{editingOrder?.id} ni tahrirlash</h2>
-            <div
-              style={{
-                border: "1px solid rgb(82, 82, 82)",
-                padding: "10px",
-                borderRadius: "5px",
-              }}
-            >
-              <h3 style={{ marginTop: "0px" }}>Joriy taomlar:</h3>
+          <div className="modal">
+            <h2 className="modal__title">Buyurtma №{editingOrder?.id} ni tahrirlash</h2>
+            <div className="modal__items">
+              <h3>Joriy taomlar:</h3>
               {editingOrder?.orderItems.length ? (
                 editingOrder.orderItems.map((item) => (
-                  <div
-                    key={item.id}
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      marginBottom: "10px",
-                    }}
-                  >
+                  <div className="modal__item" key={item.id}>
                     <img
                       src={`https://suddocs.uz${item.product?.image}`}
                       alt={item.product?.name}
-                      style={{
-                        width: "50px",
-                        height: "50px",
-                        borderRadius: "5px",
-                        marginRight: "10px",
-                      }}
+                      className="modal__item-img"
                     />
-                    <span>
+                    <span className="modal__item-name">
                       {item.product?.name} (Soni: {item.count})
                     </span>
                     <button
-                      style={{
-                        color: "red",
-                        border: "1px solid red",
-                        padding: "5px",
-                        cursor: "pointer",
-                        marginLeft: "10px",
-                      }}
+                      className="modal__item-remove"
                       onClick={() => handleRemoveItem(item.id)}
                     >
                       O'chirish
@@ -512,14 +502,14 @@ const handleDeleteOrder = async (orderId, tableId) => {
               )}
             </div>
 
-            <h3 style={{ marginBottom: "0px" }}>Yangi taom qo'shish:</h3>
-            <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
+            <h3 className="modal__add-title">Yangi taom qo'shish:</h3>
+            <div className="modal__add-form">
               <select
+                className="modal__select"
                 value={newItem?.productId}
                 onChange={(e) =>
                   setNewItem({ ...newItem, productId: e.target.value })
                 }
-                style={{ padding: "5px", width: "200px" }}
               >
                 <option value="">Taom tanlang</option>
                 {products.map((product) => (
@@ -529,6 +519,7 @@ const handleDeleteOrder = async (orderId, tableId) => {
                 ))}
               </select>
               <input
+                className="modal__input"
                 type="number"
                 min="1"
                 value={newItem.count}
@@ -538,47 +529,22 @@ const handleDeleteOrder = async (orderId, tableId) => {
                     count: parseInt(e.target.value) || 1,
                   })
                 }
-                style={{ padding: "5px", width: "50px" }}
                 placeholder="Soni"
               />
-              <button
-                onClick={handleAddItem}
-                style={{
-                  padding: "5px 10px",
-                  background: "blue",
-                  color: "white",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-              >
+              <button className="modal__add-btn" onClick={handleAddItem}>
                 Qo'shish
               </button>
             </div>
 
-            <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
-              <button
-                onClick={handleSaveOrder}
-                style={{
-                  padding: "10px 20px",
-                  background: "blue",
-                  color: "white",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-              >
+            <div className="modal__buttons">
+              <button className="modal__save-btn" onClick={handleSaveOrder}>
                 Saqlash
               </button>
               <button
+                className="modal__close-btn"
                 onClick={() => {
                   setShowEditModal(false);
                   setEditingOrder(null);
-                }}
-                style={{
-                  padding: "10px 20px",
-                  background: "red",
-                  color: "white",
-                  border: "none",
-                  cursor: "pointer",
                 }}
               >
                 Yopish
