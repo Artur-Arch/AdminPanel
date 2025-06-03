@@ -22,9 +22,9 @@ export default function AdminPanel() {
         }));
 
         setOrders(sanitizedOrders);
-        setTables(tablesRes.data.data); // Предполагается, что данные столов находятся в tablesRes.data.data
+        setTables(tablesRes.data.data);
       } catch (error) {
-        console.error("Ошибка загрузки данных:", error);
+        console.error("Error fetching data:", error);
       }
     };
 
@@ -39,7 +39,7 @@ export default function AdminPanel() {
   const formatPrice = (price) => {
     const priceStr = price.toString();
     const formatted = priceStr.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-    return formatted + " so'm";
+    return `${formatted} so'm`;
   };
 
   const handleView = (order) => {
@@ -53,15 +53,12 @@ export default function AdminPanel() {
   };
 
   const handleDelete = async (orderId) => {
-    const confirmDelete = window.confirm(
-      `Rostdan ham bu zakazni o'chirmoqchimisiz?`
-    );
+    const confirmDelete = window.confirm("Rostdan ham bu zakazni o'chirmoqchimisiz?");
     if (!confirmDelete) return;
 
     try {
       await axios.delete(`https://suddocs.uz/order/${orderId}`);
       alert("Zakaz o'chirildi");
-
       const res = await axios.get("https://suddocs.uz/order");
       setOrders(res.data);
 
@@ -75,19 +72,35 @@ export default function AdminPanel() {
     }
   };
 
-  return (
-    <>
-      <div>
-        <h1 className="text">Administrator paneli</h1>
+  const getStatusText = (status) => {
+    switch (status) {
+      case "PENDING":
+        return "Navbatda";
+      case "COOKING":
+        return "Tayyorlanmoqda";
+      case "READY":
+        return "Tayyor";
+      case "COMPLETED":
+        return "Mijoz oldida";
+      case "ARCHIVE":
+        return "Tugallangan";
+      default:
+        return status;
+    }
+  };
 
-        <div style={{ backgroundColor: "white", borderRadius: "5px" }}>
-          <div>
-            <h2 style={{ padding: "10px", marginBottom: "0px" }}>
-              Barcha Zakazlar
-            </h2>
-          </div>
-          <div className="orders">
-            <table>
+  return (
+    <div className="app">
+      <header className="header1">
+        <h1 style={{
+          color: '#ffffff'
+        }}>Administrator paneli</h1>
+      </header>
+      <div className="admin-panel">
+        <section className="orders-section">
+          <h2>Barcha Zakazlar</h2>
+          <div className="table-container">
+            <table className="orders-table">
               <thead>
                 <tr>
                   <th>Zakaz nomeri</th>
@@ -106,7 +119,7 @@ export default function AdminPanel() {
                   <tr key={`${order.id}-${index}`}>
                     <td>№ {order.id}</td>
                     <td>{tableMap[order.tableId] || "N/A"}</td>
-                    <td>
+                    <td className="item-column">
                       {order.orderItems
                         .map((item) => `${item.product.name} (${item.count})`)
                         .join(", ")}
@@ -116,227 +129,161 @@ export default function AdminPanel() {
                     <td>{formatPrice(order.totalPrice)}</td>
                     <td>
                       <span
-                        className={`status ${
+                        className={`status-badge ${
                           order.status === "PENDING"
-                            ? "status-waitlist"
+                            ? "status-pending"
                             : order.status === "COOKING"
-                            ? "status-kitchen"
+                            ? "status-cooking"
                             : order.status === "READY"
                             ? "status-ready"
                             : order.status === "COMPLETED"
                             ? "status-completed"
                             : order.status === "ARCHIVE"
                             ? "status-archive"
-                            : "bg-gray-500"
+                            : "status-default"
                         }`}
-                        style={{
-                          alignItems: "center",
-                          display: "flex",
-                          justifyContent: "center",
-                          height: "100%",
-                          fontSize: "14px",
-                          fontWeight: "bold",
-                          fontFamily: "Roboto, sans-serif",
-                        }}
                       >
-                        {order.status === "PENDING" ? "Navbatda" : ""}
-                        {order.status === "READY" ? "Tayyor" : ""}
-                        {order.status === "COOKING" ? "Tayyorlanmoqda" : ""}
-                        {order.status === "COMPLETED" ? "Mijoz oldida" : ""}
-                        {order.status === "ARCHIVE" ? "Tugallangan" : ""}
+                        {getStatusText(order.status)}
                       </span>
                     </td>
                     <td>{new Date(order.createdAt).toLocaleDateString()}</td>
-                    <td className="EditBox">
+                    <td className="actions-column">
                       {order.status !== "ARCHIVE" && (
                         <>
-                          <a
-                            className="aEdit edit"
-                            href="#"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              handleEdit(order);
-                            }}
+                          <button
+                            className="action-button edit"
+                            onClick={() => handleEdit(order)}
                           >
                             Tahrirlash
-                          </a>
-                          <a
-                            className="aEdit delete"
-                            href="#"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              handleDelete(order.id);
-                            }}
+                          </button>
+                          <button
+                            className="action-button delete"
+                            onClick={() => handleDelete(order.id)}
                           >
                             O'chirish
-                          </a>
+                          </button>
                         </>
                       )}
-                      <a
-                        className="aEdit view"
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleView(order);
-                        }}
+                      <button
+                        className="action-button view"
+                        onClick={() => handleView(order)}
                       >
                         Ko'rish
-                      </a>
+                      </button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            {selectedOrder && (
-              <div className="modal-overlay">
-                <div
-                  className="modal"
-                  style={{
-                    height: "auto",
-                    width: "auto",
-                    maxWidth: "600px",
-                    padding: "20px",
-                  }}
-                >
-                  <div className="modal-content">
-                    <h3>
-                      {modalType === "view"
-                        ? "Zakaz haqida"
-                        : "Zakazni tahrirlash"}
-                    </h3>
-                    <p>
-                      <b>Zakaz №</b> {selectedOrder.id}
-                    </p>
-                    <p>
-                      <b>Stol:</b> {tableMap[selectedOrder.tableId] || "N/A"}
-                    </p>
-                    <p>
-                      <b>Taomlar:</b>
-                      <br />
-                      {selectedOrder.orderItems.map((item, index) => (
-                        <div
-                          key={index}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            marginBottom: "5px",
-                          }}
-                        >
-                          <img
-                            src={`https://suddocs.uz${item.product?.image}`}
-                            alt={item.product?.name}
-                            style={{
-                              width: "50px",
-                              height: "50px",
-                              borderRadius: "5px",
-                              marginRight: "10px",
-                            }}
-                          />
-                          <span>
-                            {item.product.name} ({item.count})
-                          </span>
-                        </div>
-                      ))}
-                    </p>
+          </div>
+        </section>
 
-                    <p>
-                      <b>Status:</b> {selectedOrder.status}
-                      {selectedOrder.status === "PENDING"
-                        ? " (Navbatda)"
-                        : selectedOrder.status === "COOKING"
-                        ? " (Tayyorlanmoqda)"
-                        : selectedOrder.status === "READY"
-                        ? " (Tayyor)"
-                        : selectedOrder.status === "COMPLETED"
-                        ? " (Mijoz oldida)"
-                        : selectedOrder.status === "ARCHIVE"
-                        ? " (Tugallangan)"
-                        : ""}
-                    </p>
-                    <p>
-                      <b>Umumiy narxi:</b>{" "}
-                      {formatPrice(selectedOrder.totalPrice)}
-                    </p>
-
-                    {modalType === "edit" && (
-                      <>
-                        <label>Holatni o'zgartirish:</label>
-                        <br />
-                        <br />
-                        <select
-                          className="modal-input"
-                          style={{
-                            width: "10em",
-                            marginBottom: "10px",
-                            marginRight: "10px",
-                          }}
-                          value={selectedOrder.status}
-                          onChange={(e) =>
-                            setSelectedOrder({
-                              ...selectedOrder,
-                              status: e.target.value,
-                            })
-                          }
-                        >
-                          <option value="PENDING">Navbatda</option>
-                          <option value="COOKING">Tayyorlanmoqda</option>
-                          <option value="READY">Tayyor</option>
-                          <option value="COMPLETED">Mijoz oldida</option>
-                          <option value="ARCHIVE">Tugallangan</option>
-                        </select>
-                        <button
-                          onClick={async () => {
-                            try {
-                              await axios.put(
-                                `https://suddocs.uz/order/${selectedOrder.id}`,
-                                {
-                                  status: selectedOrder.status,
-                                }
-                              );
-                              alert("Zakaz yangilandi");
-                              setSelectedOrder(null);
-                              setModalType("");
-                              const res = await axios.get(
-                                "https://suddocs.uz/order"
-                              );
-                              setOrders(res.data);
-                            } catch (err) {
-                              alert("Xatolik yuz berdi");
-                              console.error(err);
-                            }
-                          }}
-                          className="modal-buttons1"
-                          style={{
-                            width: "auto",
-                            paddingRight: "15px",
-                            paddingLeft: "15px",
-                            marginRight: "10px",
-                          }}
-                        >
-                          Saqlash
-                        </button>
-                      </>
-                    )}
-
-                    <button
-                      onClick={() => setSelectedOrder(null)}
+        {selectedOrder && (
+          <div className="modal-overlay">
+            <div className="modal">
+              <div className="modal-content">
+                <h3>{modalType === "view" ? "Zakaz haqida" : "Zakazni tahrirlash"}</h3>
+                <p>
+                  <b>Zakaz №</b> {selectedOrder.id}
+                </p>
+                <p>
+                  <b>Stol:</b> {tableMap[selectedOrder.tableId] || "N/A"}
+                </p>
+                <p>
+                  <b>Taomlar:</b>
+                  {selectedOrder.orderItems.map((item, index) => (
+                    <div
+                      key={index}
                       style={{
-                        width: "auto",
-                        paddingRight: "20px",
-                        paddingLeft: "20px",
-                        marginRight: "10px",
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: "var(--space-2)",
                       }}
-                      className="modal-buttons2"
                     >
-                      Yopish
+                      <img
+                        src={`https://suddocs.uz${item.product?.image}`}
+                        alt={item.product?.name}
+                        style={{
+                          width: "50px",
+                          height: "50px",
+                          borderRadius: "var(--radius-md)",
+                          marginRight: "var(--space-3)",
+                        }}
+                      />
+                      <span>
+                        {item.product.name} ({item.count})
+                      </span>
+                    </div>
+                  ))}
+                </p>
+                <p>
+                  <b>Status:</b> {getStatusText(selectedOrder.status)}
+                </p>
+                <p>
+                  <b>Umumiy narxi:</b> {formatPrice(selectedOrder.totalPrice)}
+                </p>
+
+                {modalType === "edit" && (
+                  <div style={{ marginBottom: "var(--space-4)" }}>
+                    <label>Holatni o'zgartirish:</label>
+                    <select
+                      className="modal-input"
+                      value={selectedOrder.status}
+                      onChange={(e) =>
+                        setSelectedOrder({
+                          ...selectedOrder,
+                          status: e.target.value,
+                        })
+                      }
+                      style={{
+                        width: "100%",
+                        padding: "var(--space-2)",
+                        borderRadius: "var(--radius-md)",
+                        border: `1px solid var(--color-neutral-300)`,
+                        marginTop: "var(--space-2)",
+                      }}
+                    >
+                      <option value="PENDING">Navbatda</option>
+                      <option value="COOKING">Tayyorlanmoqda</option>
+                      <option value="READY">Tayyor</option>
+                      <option value="COMPLETED">Mijoz oldida</option>
+                      <option value="ARCHIVE">Tugallangan</option>
+                    </select>
+                    <button
+                      className="action-button edit"
+                      onClick={async () => {
+                        try {
+                          await axios.put(`https://suddocs.uz/order/${selectedOrder.id}`, {
+                            status: selectedOrder.status,
+                          });
+                          alert("Zakaz yangilandi");
+                          setSelectedOrder(null);
+                          setModalType("");
+                          const res = await axios.get("https://suddocs.uz/order");
+                          setOrders(res.data);
+                        } catch (err) {
+                          alert("Xatolik yuz berdi");
+                          console.error(err);
+                        }
+                      }}
+                      style={{ marginTop: "var(--space-3)" }}
+                    >
+                      Saqlash
                     </button>
                   </div>
-                </div>
+                )}
+
+                <button
+                  className="action-button delete"
+                  onClick={() => setSelectedOrder(null)}
+                >
+                  Yopish
+                </button>
               </div>
-            )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }

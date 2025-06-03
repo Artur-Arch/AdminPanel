@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Plus, Trash, Edit, Eye, Loader2 } from "lucide-react";
 import "./styles/Stollar.css";
 
 export default function Stollar() {
@@ -77,14 +78,10 @@ export default function Stollar() {
               stol.id === table.id ? { ...stol, status: "Bo'sh" } : stol
             )
           );
-          console.log(`Stol ${table.id} statusi "Bo'sh" ga o'zgartirildi`);
         }
       }
     } catch (error) {
-      console.error(
-        "Statuslarni tekshirishda xato:",
-        error.response?.data || error.message
-      );
+      console.error("Statuslarni tekshirishda xato:", error.response?.data || error.message);
       setError("Stol statuslarini yangilashda xato");
     }
   };
@@ -94,18 +91,30 @@ export default function Stollar() {
       setError("Iltimos, stol nomi va raqamini kiriting");
       return;
     }
+    if (!["Bo'sh", "Band"].includes(newStol.status)) {
+      setError("Iltimos, to'g'ri status tanlang");
+      return;
+    }
 
     try {
-      const res = await axios.post(API_URL, {
-        name: newStol.name,
-        number: parseInt(newStol.number),
-        status: statusMapToBackend[newStol.status],
-      });
+      const res = await axios.post(
+        API_URL,
+        {
+          name: newStol.name,
+          number: parseInt(newStol.number),
+          status: statusMapToBackend[newStol.status],
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
       const newTable = {
         ...res.data.data,
-        status:
-          statusMapToFrontend[res.data.data.status] || res.data.data.status,
+        status: statusMapToFrontend[res.data.data.status] || res.data.data.status,
         orders: [],
       };
 
@@ -115,7 +124,8 @@ export default function Stollar() {
       setError(null);
     } catch (err) {
       console.error("Stol qo'shishda xato:", err);
-      setError("Stol qo'shishda xato");
+      const errorMessage = err.response?.data?.message || err.message || "Stol qo'shishda xato";
+      setError(errorMessage);
     }
   };
 
@@ -150,7 +160,11 @@ export default function Stollar() {
     if (!window.confirm(`"${name}" stolni o'chirishni xohlaysizmi?`)) return;
 
     try {
-      await axios.delete(`${API_URL}/${id}`);
+      await axios.delete(`${API_URL}/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       setStollar((prev) => prev.filter((stol) => stol.id !== id));
       setError(null);
     } catch (err) {
@@ -178,227 +192,268 @@ export default function Stollar() {
   const categories = ["Barcha", "Bo'sh", "Band"];
 
   return (
-    <>
-      <h3
-        style={{
-          marginTop: "-15px",
-          marginLeft: "-5px",
-          fontWeight: "bold",
-          fontFamily: "sans-serif",
-          marginBottom: "10px",
-          fontSize: "25px",
-        }}
-      >
-        Stollar
-      </h3>
-      {error && <div className="error-message">{error}</div>}
-      {loading ? (
-        <div className="spinner"></div>
-      ) : (
-        <div className="stollar">
-          <nav className="stolCat menu-categories">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                className={
-                  filter === cat ? "main-stolBtn active" : "main-stolBtn"
-                }
-                onClick={() => setFilter(cat)}
-              >
-                {cat} stollar
-              </button>
-            ))}
-          </nav>
-
-          <div className="stol-container">
-            <article>
-              <div className="stolAddCard add-card">
+    <div className="app">
+      <div className="main-content">
+        <div className="main-content-table">
+        <h1 className="section-title1">Stollar</h1>
+        {error && <div className="text-danger">{error}</div>}
+        </div>
+        {loading ? (
+          <div className="spinner">
+          </div>
+        ) : (
+          <div>
+            <div className="filter-container">
+              <div className="filter-buttons">
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    className={`filter-button ${filter === cat ? "active" : ""}`}
+                    onClick={() => setFilter(cat)}
+                  >
+                    {cat} stollar
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="table-grid">
+              <div className="table-card add-table-card">
                 <button
-                  className="addMenu"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                  className="action-button primary add-table-button"
                   onClick={() => {
                     setModal(true);
                     setError(null);
                   }}
                 >
-                  +
+                  <Plus size={52} />
+                  <span>Stol qo'shish</span>
                 </button>
-                <h3>Stol qo'shish</h3>
               </div>
-            </article>
-
-            {stollar
-              .filter((s) => filter === "Barcha" || s.status === filter)
-              .map((stol) => {
-                const tableOrders = getOrdersForTable(stol.id);
-                return (
-                  <article key={stol.id}>
+              {stollar
+                .filter((s) => filter === "Barcha" || s.status === filter)
+                .map((stol) => {
+                  const tableOrders = getOrdersForTable(stol.id);
+                  return (
                     <div
-                      className={`stolAddCard ${
-                        stol.status === "Band" ? "busy" : "free"
-                      }`}
+                      key={stol.id}
+                      className={`table-card ${stol.status === "Band" ? "band" : "bosh"}`}
                     >
-                      <h4 className="main-text">{stol.name}</h4>
-                      <p className="stol-info">Raqami: {stol.number}</p>
-                      <p className="stol-info">
-                        Holati: <strong>{stol.status}</strong>
-                      </p>
-                      <p className="stol-info">
-                        Faol buyurtmalar: <strong>{tableOrders.length}</strong>
-                      </p>
-                      {tableOrders.length > 0 && (
-                        <button
-                          className="view-orders-btn"
-                          onClick={() => handleShowOrders(stol)}
+                      <div className="table-header">
+                        <h3 className="table-number">{stol.name}</h3>
+                        <span
+                          className={`status-badge ${stol.status === "Band" ? "band" : "bosh"}`}
                         >
-                          Buyurtmalarni ko'rish
+                          {stol.status}
+                        </span>
+                      </div>
+                      <div className="table-info">
+                        <div className="info-row">
+                          <span className="info-label">Raqami:</span>
+                          <span className="info-value">{stol.number}</span>
+                        </div>
+                        <div className="info-row">
+                          <span className="info-label">Faol buyurtmalar:</span>
+                          <span className="info-value">{tableOrders.length}</span>
+                        </div>
+                      </div>
+                      <div className="table-actions">
+                        {tableOrders.length > 0 && (
+                          <button
+                            className="action-button primary"
+                            onClick={() => handleShowOrders(stol)}
+                          >
+                            <Eye size={16} />
+                            Buyurtmalarni ko'rish
+                          </button>
+                        )}
+                        <button
+                          className="action-button danger"
+                          onClick={() => handleDelete(stol.id, stol.name)}
+                        >
+                          <Trash size={16} />
+                          O'chirish
                         </button>
-                      )}
-                      <button
-                        className="deleteBtn"
-                        onClick={() => handleDelete(stol.id, stol.name)}
-                      >
-                        🗑️ O'chirish
-                      </button>
-                      <button
-                        className={`status-btn ${
-                          stol.status === "Bo'sh" ? "free" : "busy"
-                        }`}
-                        onClick={() => handleStatusChange(stol.id, stol.status)}
-                      >
-                        {stol.status === "Bo'sh" ? "Band qilish" : "Bo'shatish"}
-                      </button>
+                        <button
+                          className={`action-button ${stol.status === "Bo'sh" ? "success" : "primary"}`}
+                          onClick={() => handleStatusChange(stol.id, stol.status)}
+                        >
+                          <Edit size={16} />
+                          {stol.status === "Bo'sh" ? "Band qilish" : "Bo'shatish"}
+                        </button>
+                      </div>
                     </div>
-                  </article>
-                );
-              })}
-          </div>
-        </div>
-      )}
-
-      {modal && (
-        <div className="modal-overlay">
-          <div className="modal-stol">
-            <h3>Yangi stol qo'shish</h3>
-            <input
-              className="modal2-input"
-              type="text"
-              placeholder="Stol nomi"
-              value={newStol.name}
-              onChange={(e) => setNewStol({ ...newStol, name: e.target.value })}
-            />
-            <input
-              className="modal2-input"
-              type="number"
-              placeholder="Stol raqami"
-              value={newStol.number}
-              onChange={(e) =>
-                setNewStol({ ...newStol, number: e.target.value })
-              }
-            />
-            <select
-              className="modal2-input"
-              value={newStol.status}
-              onChange={(e) =>
-                setNewStol({ ...newStol, status: e.target.value })
-              }
-            >
-              <option value="Bo'sh">Bo'sh</option>
-              <option value="Band">Band</option>
-            </select>
-            <div className="modal-stolBtn">
-              <button className="modal-btn1" onClick={handleAddStol}>
-                Qo'shish
-              </button>
-              <button
-                className="modal-btn2"
-                onClick={() => {
-                  setModal(false);
-                  setError(null);
-                }}
-              >
-                Bekor qilish
-              </button>
+                  );
+                })}
             </div>
           </div>
-        </div>
-      )}
-
-      {orderModal && selectedTable && (
-        <div className="modal-overlay">
-          <div className="modal-stol">
-            <h3>{selectedTable.name} uchun buyurtmalar</h3>
-            <div className="orders-list">
-              {getOrdersForTable(selectedTable.id).length === 0 ? (
-                <p className="no-orders">Faol buyurtmalar yo'q</p>
-              ) : (
-                getOrdersForTable(selectedTable.id).map((order) => (
-                  <div
-                    key={order.id}
-                    className="order-item"
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-start",
-                    }}
+        )}
+        {modal && (
+          <div
+            className={`modal-backdrop ${modal ? "active" : ""}`}
+            onClick={() => {
+              setModal(false);
+              setError(null);
+            }}
+          >
+            <div
+              className="modal fade-in"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="modal-header">
+                <h2 className="modal-title">Yangi stol qo'shish</h2>
+              </div>
+              <div className="modal-body1">
+                <div className="form-group">
+                  <label className="form-label">Stol nomi</label>
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="Stol nomi"
+                    value={newStol.name}
+                    onChange={(e) => setNewStol({ ...newStol, name: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Stol raqami</label>
+                  <input
+                    className="form-control"
+                    type="number"
+                    placeholder="Stol raqami"
+                    value={newStol.number}
+                    onChange={(e) => setNewStol({ ...newStol, number: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Status</label>
+                  <select
+                    className="form-control"
+                    value={newStol.status}
+                    onChange={(e) => setNewStol({ ...newStol, status: e.target.value })}
                   >
-                    <p>
-                      <strong>Buyurtma №{order.id}</strong>
-                    </p>
-                    <div className="order-items-list">
-                      <span>Taomlar:</span>
-                      {order.orderItems.length > 0 ? (
-                        order.orderItems.map((item, index) => (
-                          <div
-                            key={index}
-                            className="order-item-detail"
-                            style={{
+                    <option value="Bo'sh">Bo'sh</option>
+                    <option value="Band">Band</option>
+                  </select>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-success" onClick={handleAddStol}>
+                  Qo'shish
+                </button>
+                <button
+                  className="btn btn-danger"
+                  onClick={() => {
+                    setModal(false);
+                    setError(null);
+                  }}
+                >
+                  Bekor qilish
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        {orderModal && selectedTable && (
+          <div
+            className={`modal-backdrop ${orderModal ? "active" : ""}`}
+            onClick={() => {
+              setOrderModal(false);
+              setSelectedTable(null);
+            }}
+          >
+            <div
+              style={{ maxWidth: "600px", width: "100%" }}
+              className="modal fade-in"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="modal-header">
+                <h2 className="modal-title">{selectedTable.name} uchun buyurtmalar</h2>
+              </div>
+              <div className="modal-body1">
+                {getOrdersForTable(selectedTable.id).length === 0 ? (
+                  <p className="text-secondary">Faol buyurtmalar yo'q</p>
+                ) : (
+                  getOrdersForTable(selectedTable.id).map((order) => (
+                    <div key={order.id} className="order-item">
+                      <div className="order-items-list">
+                      <p style={{
+                        marginTop: "-15px",
+                        marginBottom: "0px"
+                      }} className="info-label">
+                        <strong>Buyurtma №{order.id}</strong>
+                      </p>
+                        <span className="info-label">Taomlar:</span>
+                        {order.orderItems.length > 0 ? (
+                          order.orderItems.map((item, index) => (
+                            <div key={index} style={{
                               display: "flex",
                               alignItems: "center",
-                              gap: "10px",
-                              margin: "5px 0",
-                            }}
-                          >
-                            <img
-                              src={
-                                item.product?.image
-                                  ? `https://suddocs.uz${item.product.image}`
-                                  : "https://suddocs.uz/placeholder.png"
-                              }
-                              alt={item.product?.name || "Product"}
-                              style={{
-                                width: "40px",
-                                height: "40px",
-                                objectFit: "cover",
-                                borderRadius: "4px",
-                              }}
-                            />
-                            <span>
-                              {item.product?.name || "Nomalum taom"} (
-                              {item.count})
-                            </span>
-                          </div>
-                        ))
-                      ) : (
-                        <span>Buyurtmada taomlar yo'q</span>
-                      )}
+                              gap: "15px"
+                            }} className="order-item-detail">
+                              <img
+                                src={
+                                  item.product?.image
+                                    ? `https://suddocs.uz${item.product.image}`
+                                    : "https://suddocs.uz/placeholder.png"
+                                }
+                                alt={item.product?.name || "Product"}
+                                style={{
+                                  width: "40px",
+                                  height: "40px",
+                                  objectFit: "cover",
+                                  borderRadius: "4px",
+                                }}
+                              />
+                              <span className="info-value">
+                                 {item.product?.name || "Nomalum taom"} ({item.count})
+                              </span>
+                            </div>
+                          ))
+                        ) : (
+                          <span className="text-secondary">Buyurtmada taomlar yo'q</span>
+                        )}
+                      <p style={{
+                        borderTop: "0.5px solid var(--gray-200)",
+                        width: "200px",
+                        paddingLeft: "10px",
+                        paddingRight: "10px",
+                        paddingTop: "8px",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "end",
+                        marginTop: "20px",
+                        marginBottom: "-20px"
+                      }} className="info-row">
+                        <span className="info-label">Narxi:</span>
+                        <span className="info-value">{formatPrice(order.totalPrice)}</span>
+                      </p>
+                      </div>
                     </div>
-                    <p>Narxi: {formatPrice(order.totalPrice)}</p>
-                  </div>
-                ))
-              )}
+                  ))
+                )}
+              </div>
+              <div className="modal-footer">
+                <button
+                  className="btn btn-danger"
+                  onClick={() => {
+                    setOrderModal(false);
+                    setSelectedTable(null);
+                  }}
+                >
+                  Yopish
+                </button>
+              </div>
             </div>
-            <button
-              className="modal-btn2"
-              onClick={() => {
-                setOrderModal(false);
-                setSelectedTable(null);
-              }}
-            >
-              Yopish
-            </button>
           </div>
-        </div>
-      )}
-    </>
+        )}
+      </div>
+    </div>
   );
 }

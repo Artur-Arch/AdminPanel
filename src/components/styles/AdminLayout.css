@@ -4,9 +4,6 @@
 }
 
 main{
-    border: 0.5px solid #000;
-    background-color: rgb(226, 217, 217);
-    border-radius: 5px;
     height: 100vh;
     height: auto;
     padding: 20px;

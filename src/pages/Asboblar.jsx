@@ -62,7 +62,8 @@ export default function Asboblar() {
           return (
             sum +
             order.orderItems.reduce(
-              (itemSum, item) => itemSum + (item.product?.price || 0) * item.count,
+              (itemSum, item) =>
+                itemSum + (item.product?.price || 0) * item.count,
               0
             )
           );
@@ -89,7 +90,10 @@ export default function Asboblar() {
           );
 
           weeklyData.push({
-            date: day.toLocaleDateString("uz-UZ", { day: "2-digit", month: "2-digit" }),
+            date: day.toLocaleDateString("uz-UZ", {
+              day: "2-digit",
+              month: "2-digit",
+            }),
             orderCount: dayOrders.length,
           });
         }
@@ -111,8 +115,8 @@ export default function Asboblar() {
       {
         label: "Buyurtmalar soni",
         data: weeklyStats.map((stat) => stat.orderCount),
-        backgroundColor: "rgba(75, 192, 192, 0.2)",
-        borderColor: "rgba(75, 192, 192, 1)",
+        backgroundColor: "rgba(67, 97, 238, 0.2)", // Updated to match --color-primary
+        borderColor: "var(--color-primary)",
         borderWidth: 2,
         fill: true,
       },
@@ -121,71 +125,126 @@ export default function Asboblar() {
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     scales: {
       y: {
         beginAtZero: true,
         title: {
           display: true,
           text: "Buyurtmalar soni",
+          color: "var(--color-text-primary)",
+          font: {
+            size: 14,
+            family: "var(--font-family)",
+          },
+        },
+        ticks: {
+          color: "var(--color-text-secondary)",
         },
       },
       x: {
         title: {
           display: true,
           text: "Sana",
+          color: "var(--color-text-primary)",
+          font: {
+            size: 14,
+            family: "var(--font-family)",
+          },
         },
+        ticks: {
+          color: "var(--color-text-secondary)",
+        },
+      },
+    },
+    plugins: {
+      legend: {
+        labels: {
+          color: "var(--color-text-primary)",
+          font: {
+            size: 12,
+            family: "var(--font-family)",
+          },
+        },
+      },
+      tooltip: {
+        backgroundColor: "var(--color-card-background)",
+        titleColor: "var(--color-text-primary)",
+        bodyColor: "var(--color-text-primary)",
+        borderColor: "var(--color-border)",
+        borderWidth: 1,
       },
     },
   };
 
   return (
-    <>
-      <h3
-        style={{
-          margin: "0",
-          marginTop: "-15px",
-          marginLeft: "-5px",
-          fontSize: "25px",
-          fontWeight: "bold",
-          fontFamily: "sans-serif",
-        }}
-      >
-        Asboblar
-      </h3>
-      <div className="asboblar">
-        <h2 style={{ margin: "0" }}>📊 Statistika</h2>
-        <section className="daily-stats">
-          <h3>📅 Bugungi kun statistikasi</h3>
-          {loading ? (
-            <div className="spinner"></div>
-          ) : (
-            <div className="stats-cards">
-              <div className="stat-card">
-                <p>Buyurtmalar soni</p>
-                <h4>{dailyStats.orderCount}</h4>
-              </div>
-              <div className="stat-card">
-                <p>Umumiy summa</p>
-                <h4>{dailyStats.totalAmount.toLocaleString("uz-UZ")} so'm</h4>
-              </div>
-              <div className="stat-card">
-                <p>kuniga o'rtacha buyurtma miqdori</p>
-                <h4>{Math.round(dailyStats.averageCheck).toLocaleString("uz-UZ")} so'm</h4>
-              </div>
+    <div className="container">
+      <header className="header-asboblar">
+        <h1
+          style={{
+            color: "#ffffff",
+            fontSize: "2.5rem",
+            marginLeft: "-5px",
+          }}
+          className="header-title fade-in"
+        >
+          Asboblar
+        </h1>
+        <h2 className="header-subtitle fade-in">
+          <svg>
+            <use xlinkHref="#stats-icon" />
+          </svg>
+          Statistika
+        </h2>
+      </header>
+      <section className="section daily-stats">
+        <h3 className="section-title">
+          <svg>
+            <use xlinkHref="#calendar-icon" />
+          </svg>
+          Bugungi kun statistikasi
+        </h3>
+        {loading ? (
+          <div className="spinner"></div>
+        ) : (
+          <div className="stats-cards">
+            <div className="stats-card card-hover fade-in">
+              <p className="stats-card-title">Buyurtmalar soni</p>
+              <h4 className="stats-card-value">{dailyStats.orderCount}</h4>
+              <span className="stats-card-unit">ta</span>
             </div>
-          )}
-        </section>
-        <section className="weekly-stats">
-          <h3>📈 Haftalik statistika</h3>
-          {loading ? (
-            <div className="spinner"></div>
-          ) : (
-            <div className="chart-placeholder">
-              <Line data={chartData} options={chartOptions} />
+            <div className="stats-card card-hover fade-in">
+              <p className="stats-card-title">Umumiy summa</p>
+              <h4 className="stats-card-value">
+                {dailyStats.totalAmount.toLocaleString("uz-UZ")}
+              </h4>
+              <span className="stats-card-unit">so'm</span>
             </div>
-          )}
-        </section>
-      </div>
-    </>
+            <div className="stats-card card-hover fade-in">
+              <p className="stats-card-title">O'rtacha buyurtma miqdori</p>
+              <h4 className="stats-card-value">
+                {Math.round(dailyStats.averageCheck).toLocaleString("uz-UZ")}
+              </h4>
+              <span className="stats-card-unit">so'm</span>
+            </div>
+          </div>
+        )}
+      </section>
+      <section className="section chart-container">
+        <h3 className="section-title">
+          <svg>
+            <use xlinkHref="#chart-icon" />
+          </svg>
+          Haftalik statistika
+        </h3>
+        {loading ? (
+          <div className="spinner"></div>
+        ) : (
+          <div className="chart">
+            <Line data={chartData} options={chartOptions} />
+          </div>
+        )}
+      </section>
+    </div>
   );
 }

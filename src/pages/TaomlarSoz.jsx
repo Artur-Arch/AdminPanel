@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import "./styles/TaomlarSoz.css";
 import axios from "axios";
+import { Plus, Edit, Trash, Loader2, Clock } from "lucide-react";
+import "./styles/TaomlarSoz.css";
 
 export default function TaomlarSoz() {
   const [menu, setMenu] = useState([]);
@@ -24,7 +25,7 @@ export default function TaomlarSoz() {
     setLoading(true);
     axios("https://suddocs.uz/product")
       .then((res) => setMenu(res.data))
-      .catch((err) => console.error("Menyu olishda xatolik:", err))
+      .catch((err) => console.error("Menyuştlashda xatolik:", err))
       .finally(() => setLoading(false));
   };
 
@@ -108,7 +109,7 @@ export default function TaomlarSoz() {
   };
 
   const handleDelete = (id) => {
-    if (window.confirm("Taomini o'chirishni istaysizmi?")) {
+    if (window.confirm("Taomni o'chirishni istaysizmi?")) {
       axios
         .delete(`https://suddocs.uz/product/${id}`)
         .then(() => fetchMenu())
@@ -162,211 +163,226 @@ export default function TaomlarSoz() {
   };
 
   return (
-    <>
-      <h3
+    <div className="container">
+      <header
         style={{
-          marginTop: "-15px",
-          marginLeft: "-5px",
-          fontWeight: "bold",
-          fontFamily: "sans-serif",
-          marginBottom: "0px",
-          fontSize: "25px",
+          background: "var(--color-primary)",
+          color: "var(--color-white)",
         }}
+        className="header"
       >
-        Taomlar sozlamasi
-      </h3>
-      <div className="menu-container">
-        <section className="menu">
-          <nav className="menu-categories">
-            {["Hammasi", ...categoryList.map((cat) => cat.name)].map((cat) => {
-              const realCat = categoryList.find((c) => c.name === cat);
-              return (
-                <div
-                  key={cat}
-                  style={{ display: "flex", alignItems: "center" }}
+        <div className="header-container">
+          <h1 className="header-title">Taomlar sozlamasi</h1>
+        </div>
+      </header>
+      <section>
+        <nav className="category-tabs">
+          {["Hammasi", ...categoryList.map((cat) => cat.name)].map((cat) => {
+            const realCat = categoryList.find((c) => c.name === cat);
+            return (
+              <div key={cat} style={{ display: "flex", alignItems: "center" }}>
+                <button
+                  className={`category-tab ${
+                    newCategory === cat ? "active" : ""
+                  }`}
+                  onClick={() => setNewCategory(cat)}
                 >
+                  {cat}
+                </button>
+                {cat !== "Hammasi" && (
                   <button
-                    className={
-                      newCategory === cat
-                        ? "CatButton active"
-                        : "main-catButton"
-                    }
-                    onClick={() => setNewCategory(cat)}
+                    className="food-card-button delete"
+                    onClick={() => handleDeleteCategory(realCat?.id)}
                   >
-                    {cat}
+                    <Trash size={16} />
                   </button>
-                  {cat !== "Hammasi" && (
-                    <button
-                      onClick={() => handleDeleteCategory(realCat?.id)}
-                      style={{
-                        marginLeft: "5px",
-                        paddingTop: "12px",
-                        display: "flex",
-                        alignItems: "center",
-                        border: "0.5px solid rgb(0, 0, 0)",
-                        background: "transparent",
-                        color: "red",
-                        cursor: "pointer",
-                        fontSize: "18px",
-                      }}
-                    >
-                      ×
-                    </button>
-                  )}
-                </div>
-              );
-            })}
-          </nav>
+                )}
+              </div>
+            );
+          })}
+        </nav>
 
-          {loading ? (
-            <div className="spinner"></div>
-          ) : (
-            <div className="menu-items">
-              <article className="menu-card">
-                <div
-                  className="menu-addCard"
-                  onClick={() => setShowModal(true)}
-                >
-                  <button className="addMenu">+</button>
-                  <h3 style={{ margin: "5px 0px 0px 0px" }}>Taom qoshish</h3>
+        {loading ? (
+          <div className="spinner">
+          </div>
+        ) : filteredMenu.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-state-icon">
+              <Plus size={48} />
+            </div>
+            <h2 className="empty-state-title">Taomlar topilmadi</h2>
+            <p className="empty-state-text">
+              Yangi taom qo'shish uchun Hammasi ga o'tib {<Plus />} tugmani
+              bosing.
+            </p>
+          </div>
+        ) : (
+          <div className="food-grid">
+            <article
+              className="add-food-card"
+              onClick={() => setShowModal(true)}
+            >
+              <div className="add-food-icon">
+                <Plus size={32} />
+              </div>
+              <h3 className="add-food-text">Taom qo'shish</h3>
+            </article>
+            {filteredMenu.map((i) => (
+              <article key={i.id} className="food-card">
+                <div className="food-card-image-container">
+                  <img
+                    className="food-card-image"
+                    src={`https://suddocs.uz${i.image}`}
+                    alt={i.name}
+                  />
                 </div>
-              </article>
-              {filteredMenu.map((i) => (
-                <article key={i.id}>
-                  <div className="menu-addCard">
-                    <img
-                      className="menu-cardIMG"
-                      src={`https://suddocs.uz${i.image}`}
-                      alt={i.name}
-                    />
-                    <h3
-                      style={{
-                        margin: "5px 0px 0px -15px",
-                        paddingLeft: "5px",
-                        textAlign: "center",
-                      }}
-                    >
-                      {i.name}
-                    </h3>
-                    <div className="menu-cardTime">
-                      <img
-                        style={{ width: "13px" }}
-                        src="/clock-regular.svg"
-                        alt="clock"
-                      />
-                      <p style={{ margin: "0px", fontSize: "13px" }}>
-                        {i.date ? `${i.date} min` : "Vaqti yoq"}
-                      </p>
-                    </div>
-                    <h3 style={{ margin: "0px", marginBottom: "-10px" }}>
-                      {formatPrice(i.price)}
-                    </h3>
-                    <div className="menu-cardEditButtons">
-                      <button
-                        className="menu-cardEditButtons1"
-                        onClick={() => handleDelete(i.id)}
-                      >
-                        🗑
-                      </button>
-                      <button
-                        className="menu-cardEditButtons2"
-                        onClick={() => handleEdit(i)}
-                      >
-                        ✏️
-                      </button>
+                <div className="food-card-content">
+                  <h3 className="food-card-title">{i.name}</h3>
+                  <div className="food-card-meta">
+                    <div className="food-card-time">
+                      <Clock size={16} className="food-card-time-icon" />
+                      <span>{i.date ? `${i.date} min` : "Vaqti yo'q"}</span>
                     </div>
                   </div>
-                </article>
-              ))}
-            </div>
-          )}
-          {showModal && (
-            <div className="modal-overlay">
-              <div className="modal">
-                <h2>{editing ? "Taomni tahrirlash" : "Yangi taom qo'shish"}</h2>
+                  <div className="food-card-price">{formatPrice(i.price)}</div>
+                  <div className="food-card-actions">
+                    <button
+                      className="food-card-button edit"
+                      onClick={() => handleEdit(i)}
+                    >
+                      <Edit size={16} />
+                    </button>
+                    <button
+                      className="food-card-button delete"
+                      onClick={() => handleDelete(i.id)}
+                    >
+                      <Trash size={16} />
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+        {showModal && (
+          <div
+            className={`modal-backdrop ${showModal ? "active" : ""}`}
+            onClick={() => {
+              setShowModal(false);
+              setEditing(false);
+              resetDish();
+            }}
+          >
+            <div className="modal fade-in" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2 className="modal-title">
+                  {editing ? "Taomni tahrirlash" : "Yangi taom qo'shish"}
+                </h2>
+              </div>
+              <div className="modal-body1">
                 {editing && typeof dishes.image === "string" && (
                   <img
                     src={`https://suddocs.uz${dishes.image}`}
                     alt="Current"
                     style={{
                       width: "100px",
-                      marginBottom: "10px",
-                      borderRadius: "8px",
+                      marginBottom: "var(--spacing-3)",
+                      borderRadius: "var(--radius-md)",
                     }}
                   />
                 )}
-
-                <input
-                  type="text"
-                  placeholder="Taom nomi"
-                  className="modal-input"
-                  value={dishes.name || ""}
-                  onChange={(e) =>
-                    setDishes({ ...dishes, name: e.target.value })
-                  }
-                />
-                <input
-                  type="number"
-                  placeholder="Narxi"
-                  className="modal-input"
-                  value={dishes.price || ""}
-                  onChange={(e) =>
-                    setDishes({ ...dishes, price: e.target.value })
-                  }
-                />
-                <input
-                  type="number"
-                  placeholder="Tayyorlanish vaqti (min)"
-                  className="modal-input"
-                  value={dishes.date || ""}
-                  onChange={(e) =>
-                    setDishes({ ...dishes, date: e.target.value })
-                  }
-                />
-
-                <input
-                  type="file"
-                  className="modal-input"
-                  onChange={(e) =>
-                    setDishes({ ...dishes, image: e.target.files[0] })
-                  }
-                />
-
-                <select
-                  className="modal-input"
-                  style={{ width: "21.4em" }}
-                  value={dishes.categoryId || ""}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setDishes({
-                      ...dishes,
-                      categoryId: val === "" ? null : parseInt(val),
-                    });
-                  }}
-                >
-                  <option value="">Kategoriya tanlang</option>
-                  {categoryList.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
-                <div style={{ display: "flex", gap: "10px", marginTop: "0px" }}>
+                <div className="form-group">
+                  <label className="form-label">Taom nomi</label>
                   <input
                     type="text"
-                    placeholder="Yangi kategoriya nomi"
-                    className="modal-input"
-                    style={{ width: "14.6em" }}
-                    value={newCategory}
-                    onChange={(e) => setNewCategory(e.target.value)}
+                    placeholder="Taom nomi"
+                    className="form-control"
+                    value={dishes.name || ""}
+                    onChange={(e) =>
+                      setDishes({ ...dishes, name: e.target.value })
+                    }
                   />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Narxi</label>
+                  <input
+                    type="number"
+                    placeholder="Narxi"
+                    className="form-control"
+                    value={dishes.price || ""}
+                    onChange={(e) =>
+                      setDishes({ ...dishes, price: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Tayyorlanish vaqti (min)</label>
+                  <input
+                    type="number"
+                    placeholder="Tayyorlanish vaqti (min)"
+                    className="form-control"
+                    value={dishes.date || ""}
+                    onChange={(e) =>
+                      setDishes({ ...dishes, date: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Rasm (JPG formatda)</label>
+                  <input
+                    type="file"
+                    className="form-control"
+                    onChange={(e) =>
+                      setDishes({ ...dishes, image: e.target.files[0] })
+                    }
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Kategoriya</label>
+                  <select
+                    className="form-control"
+                    value={dishes.categoryId || ""}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setDishes({
+                        ...dishes,
+                        categoryId: val === "" ? null : parseInt(val),
+                      });
+                    }}
+                  >
+                    <option value="">Kategoriya tanlang</option>
+                    {categoryList.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div
+                  className="form-group"
+                  style={{
+                    display: "flex",
+                    gap: "var(--spacing-3)",
+                    alignItems: "flex-end",
+                  }}
+                >
+                  <div style={{ flex: 1 }}>
+                    <label className="form-label">Yangi kategoriya nomi</label>
+                    <input
+                      type="text"
+                      placeholder="Yangi kategoriya nomi"
+                      className="form-control"
+                      value={newCategory}
+                      onChange={(e) => setNewCategory(e.target.value)}
+                    />
+                  </div>
                   <button
+                    className="btn btn-success"
                     onClick={() => {
                       if (!newCategory.trim()) {
                         alert("Kategoriya nomini kiriting.");
                         return;
                       }
-
                       axios
                         .post("https://suddocs.uz/category", {
                           name: newCategory.trim(),
@@ -385,41 +401,30 @@ export default function TaomlarSoz() {
                           alert("Kategoriya qo'shilmadi.");
                         });
                     }}
-                    style={{
-                      padding: "8px 12px",
-                      borderRadius: "6px",
-                      border: "none",
-                      height: "3em",
-                      backgroundColor: "#4CAF50",
-                      color: "white",
-                      cursor: "pointer",
-                    }}
                   >
                     Qo'shish
                   </button>
                 </div>
-
-                <br />
-                <div className="modal-buttons-box">
-                  <button className="modal-buttons1" onClick={handleAddDish}>
-                    {editing ? "Saqlash" : "Qoshish"}
-                  </button>
-                  <button
-                    className="modal-buttons2"
-                    onClick={() => {
-                      setShowModal(false);
-                      setEditing(false);
-                      resetDish();
-                    }}
-                  >
-                    Bekor qilish
-                  </button>
-                </div>
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-success" onClick={handleAddDish}>
+                  {editing ? "Saqlash" : "Qo'shish"}
+                </button>
+                <button
+                  className="btn btn-danger"
+                  onClick={() => {
+                    setShowModal(false);
+                    setEditing(false);
+                    resetDish();
+                  }}
+                >
+                  Bekor qilish
+                </button>
               </div>
             </div>
-          )}
-        </section>
-      </div>
-    </>
+          </div>
+        )}
+      </section>
+    </div>
   );
 }

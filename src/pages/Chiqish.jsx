@@ -16,6 +16,7 @@ export default function Chiqish() {
 
   return (
     <>
+    <div className="header1">
       <h2
         style={{
           margin: "0",
@@ -23,10 +24,12 @@ export default function Chiqish() {
           marginLeft: "-5px",
           fontSize: "25px",
           fontFamily: "sans-serif",
+          color: "#ffffff"
         }}
       >
         Chiqish
       </h2>
+      </div>
       <div style={{ padding: "20px" }}>
         <p
             style={{

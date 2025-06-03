@@ -1,27 +1,63 @@
 import React from 'react';
-import './styles/sidebar.css'
-import { Link, useLocation } from 'react-router-dom'
+import './styles/sidebar.css';
+import { Link, useLocation } from 'react-router-dom';
+import { Menu, LogOut, Home, FileText, Users, Coffee, ShoppingBag, Settings, List } from 'lucide-react';
+
 export default function Sidebar() {
   const location = useLocation();
   return (
-    <>
-      <aside className="sidebar">
-      <h1 style={{ fontSize: '50px', margin: '5px' }}>ADMIN</h1>
-        <nav className="sidebar__nav">
-            <ul>
-                <li className='dataSidebar'> <Link to="/AdminPanel" className={location.pathname === '/AdminPanel' ? 'active' : ''}>Administrator paneli</Link> </li>
-                <li className='dataSidebar'> <Link to="/Asboblar" className={location.pathname === '/Asboblar' ? 'active' : ''}>Asboblar paneli</Link> </li>
-                <li className='dataSidebar'> <Link to="/ZakazlarTarixi" className={location.pathname === '/ZakazlarTarixi' ? 'active' : ''}>Zakaz tarixi</Link> </li>
-                <li className='dataSidebar'> <Link to="/Zakazlar" className={location.pathname === '/Zakazlar' ? 'active' : ''}>Zakazlar</Link> </li>
-                <li className='dataSidebar'> <Link to="/Taomlar" className={location.pathname === '/Taomlar' ? 'active' : ''}>Taomlar</Link> </li>
-                <li className='dataSidebar'> <Link to="/TaomlarSoz" className={location.pathname === '/TaomlarSoz' ? 'active' : ''}>Taomlar sozlamasi</Link> </li>
-                <li className='dataSidebar'> <Link to="/Stollar" className={location.pathname === '/Stollar' ? 'active' : ''}>Stollar</Link> </li>
-                <li className='dataSidebar'> <Link to="/Sozlamalar" className={location.pathname === '/Sozlamalar' ? 'active' : ''}>Sozlamalar</Link> </li>
-                <li className='dataSidebar'> <Link to="/Chiqish" className={location.pathname === '/Chiqish' ? 'active' : ''}>Chiqish</Link> </li>
-            </ul>
-        </nav>
-      </aside>
-    </>
-  )
+    <aside className="sidebar">
+      <div className="sidebar-header">
+        <h1 style={{
+          fontSize: '24px',
+          fontWeight: 'bold',
+          color: '#fff',
+          textAlign: 'center',
+          marginBottom: '-12px',
+          padding: '10px 0'
+        }}>ADMIN</h1>
+        <button className="mobile-menu-toggle">
+          <Menu size={24} />
+        </button>
+      </div>
+      <nav className="sidebar-nav">
+        <Link to="/AdminPanel" className={`nav-item ${location.pathname === '/AdminPanel' ? 'active' : ''}`}>
+          <Home size={20} />
+          <span>Administrator paneli</span>
+        </Link>
+        <Link to="/Asboblar" className={`nav-item ${location.pathname === '/Asboblar' ? 'active' : ''}`}>
+          <Users size={20} />
+          <span>Asboblar paneli</span>
+        </Link>
+        <Link to="/ZakazlarTarixi" className={`nav-item ${location.pathname === '/ZakazlarTarixi' ? 'active' : ''}`}>
+          <FileText size={20} />
+          <span>Zakaz tarixi</span>
+        </Link>
+        <Link to="/Zakazlar" className={`nav-item ${location.pathname === '/Zakazlar' ? 'active' : ''}`}>
+          <ShoppingBag size={20} />
+          <span>Zakazlar</span>
+        </Link>
+        <Link to="/Taomlar" className={`nav-item ${location.pathname === '/Taomlar' ? 'active' : ''}`}>
+          <Coffee size={20} />
+          <span>Taomlar</span>
+        </Link>
+        <Link to="/TaomlarSoz" className={`nav-item ${location.pathname === '/TaomlarSoz' ? 'active' : ''}`}>
+          <Settings size={20} />
+          <span>Taomlar sozlamasi</span>
+        </Link>
+        <Link to="/Stollar" className={`nav-item ${location.pathname === '/Stollar' ? 'active' : ''}`}>
+          <List size={20} />
+          <span>Stollar</span>
+        </Link>
+        <Link to="/Sozlamalar" className={`nav-item ${location.pathname === '/Sozlamalar' ? 'active' : ''}`}>
+          <Settings size={20} />
+          <span>Sozlamalar</span>
+        </Link>
+        <Link to="/Chiqish" className={`nav-item logout ${location.pathname === '/Chiqish' ? 'active' : ''}`}>
+          <LogOut size={20} />
+          <span>Chiqish</span>
+        </Link>
+      </nav>
+    </aside>
+  );
 }
-

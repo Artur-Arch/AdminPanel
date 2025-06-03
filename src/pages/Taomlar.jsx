@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import ModalBasket from "../components/modal/modal-basket";
-import "./styles/Taomlar.css";
+import "./styles/taomlar.css";
 import axios from "axios";
+import { Clock, ShoppingCart } from "lucide-react";
+import ModalBasket from "../components/modal/modal-basket";
 
 export default function Taomlar() {
   const [taomlar, setTaomlar] = useState([]);
@@ -83,10 +84,10 @@ export default function Taomlar() {
   };
 
   return (
-    <div className="menu-wrapper">
-      <h2 className="menu-title">Menyu</h2>
-      <div className="menu-container">
-        <div className="menu-tabs">
+    <section className="content-section">
+      <div className="section-header">
+        <h2>Menyu</h2>
+        <div className="tab-controls">
           <button
             className={view === "menu" ? "tab-button active" : "tab-button"}
             onClick={() => setView("menu")}
@@ -100,46 +101,51 @@ export default function Taomlar() {
             Zakaz yaratish
           </button>
         </div>
-        {view === "menu" && (
-          <div className="menu-view">
-            {loading ? (
-              <div className="spinner" />
-            ) : (
-              <div className="menu-items">
-                {taomlar.map((taom) => (
-                  <div key={taom.id} className="menu-card">
-                    <img
-                      className="menu-card__img"
-                      src={`https://suddocs.uz${taom.image}`}
-                      alt={taom.name}
-                    />
-                    <h4 className="menu-card__title">{taom.name}</h4>
-                    <p className="menu-card__category">{taom.category?.name}</p>
-                    <div className="menu-card__time">
-                      <img className="menu-card__time-icon" src="/clock-regular.svg" alt="clock" />
-                      <p>{taom.date ? `${taom.date} min` : "Vaqti yoq"}</p>
-                    </div>
-                    <p className="menu-card__price">{formatPrice(taom.price)}</p>
+      </div>
+      {view === "menu" && (
+        <div className="menu-grid">
+          {loading ? (
+            <div className="spinner" />
+          ) : (
+            taomlar.map((taom) => (
+              <div key={taom.id} className="menu-card">
+                <div className="menu-image">
+                  <img
+                    src={`https://suddocs.uz${taom.image}`}
+                    alt={taom.name}
+                  />
+                </div>
+                <div className="menu-details">
+                  <h3>{taom.name}</h3>
+                  <span className="category">{taom.category?.name}</span>
+                  <div className="menu-meta">
+                    <span className="prep-time">
+                      <Clock size={16} />
+                      {taom.date ? `${taom.date} min` : "Vaqti yoq"}
+                    </span>
+                    <span className="price">{formatPrice(taom.price)}</span>
                   </div>
-                ))}
+                </div>
               </div>
-            )}
-          </div>
-        )}
-
-        {view === "order" && (
-          <>
-            <div className="menu-view">
-              <div className="menu-items">
-                {taomlar.map((taom) => (
-                  <div key={taom.id} className="menu-card">
-                    <img
-                      className="menu-card__img"
-                      src={`https://suddocs.uz${taom.image}`}
-                      alt={taom.name}
-                    />
-                    <h4 className="menu-card__title">{taom.name}</h4>
-                    <p className="menu-card__price">{formatPrice(taom.price)}</p>
+            ))
+          )}
+        </div>
+      )}
+      {view === "order" && (
+        <>
+          <div className="menu-grid">
+            {taomlar.map((taom) => (
+              <div key={taom.id} className="menu-card">
+                <div className="menu-image">
+                  <img
+                    src={`https://suddocs.uz${taom.image}`}
+                    alt={taom.name}
+                  />
+                </div>
+                <div className="menu-details">
+                  <h3>{taom.name}</h3>
+                  <span className="price">{formatPrice(taom.price)}</span>
+                  <div className="menu-meta">
                     <div className="menu-card__controls">
                       <button
                         className="control-btn"
@@ -161,82 +167,98 @@ export default function Taomlar() {
                       </button>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-            <button
-              className={`basket-btn ${cart.length === 0 ? "hidden" : ""}`}
-              disabled={cart.length === 0}
-              onClick={() => setShowBasket(true)}
-            >
-              Buyurtma savati
-            </button>
-            {showBasket && (
-              <div className="overlay">
-                <div className="basket-modal">
-                  <h2>Buyurtma</h2>
-                  {cart.length === 0 ? (
-                    <p>Hozircha buyurtma yo'q</p>
-                  ) : (
-                    <table className="basket-table">
-                      <thead>
-                        <tr>
-                          <th>Nomi</th>
-                          <th>Miqdor</th>
-                          <th>Narxi</th>
-                          <th>Summasi</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {cart.map((item) => (
-                          <tr key={item.id}>
-                            <td>{item.name}</td>
-                            <td>{item.count}</td>
-                            <td>{item.price.toLocaleString("ru-RU")} so'm</td>
-                            <td>
-                              {(item.price * item.count).toLocaleString("ru-RU")} so'm
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                      <tfoot>
-                        <tr>
-                          <td colSpan="3" className="basket-table__total-label">
-                            Jami:
-                          </td>
-                          <td className="basket-table__total">
-                            {cart
-                              .reduce(
-                                (sum, item) => sum + item.price * item.count,
-                                0
-                              )
-                              .toLocaleString("ru-RU")} so'm
-                          </td>
-                        </tr>
-                      </tfoot>
-                    </table>
-                  )}
-                  <div className="basket-buttons">
-                    <button
-                      className="basket-buttons__back"
-                      onClick={() => setShowBasket(false)}
-                    >
-                      Orqaga
-                    </button>
-                    <button
-                      className="basket-buttons__confirm"
-                      disabled={cart.length === 0}
-                      onClick={() => setShowModal(true)}
-                    >
-                      Buyurtmani rasmiylashtirish
-                    </button>
-                  </div>
                 </div>
               </div>
-            )}
-          </>
-        )}
-      </div>
+            ))}
+          </div>
+          <button
+            className={`basket-btn ${cart.length === 0 ? "hidden" : ""}`}
+            disabled={cart.length === 0}
+            onClick={() => setShowBasket(true)}
+          >
+            <span className="basket-count">{cart.length}</span>
+            <span className="basket-icon" style={{
+              display: "inline-block",
+              marginRight: "8px",
+              verticalAlign: "middle",
+            }}><ShoppingCart size={20} /></span>
+            Buyurtma savati
+          </button>
+          {showBasket && (
+            <div className="overlay">
+              <div className="basket-modal">
+                <h2 style={{
+                  textAlign: "center",
+                  marginBottom: "20px",
+                  color: "#333",
+                  fontSize: "24px",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                  marginTop: "-15px",
+                  paddingBottom: "20px",
+                }}>Buyurtma</h2>
+                {cart.length === 0 ? (
+                  <p>Hozircha buyurtma yo'q</p>
+                ) : (
+                  <table className="basket-table">
+                    <thead>
+                      <tr>
+                        <th>Nomi</th>
+                        <th>Miqdor</th>
+                        <th>Narxi</th>
+                        <th>Summasi</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {cart.map((item) => (
+                        <tr key={item.id}>
+                          <td>{item.name}</td>
+                          <td>{item.count}</td>
+                          <td>{item.price.toLocaleString("ru-RU")} so'm</td>
+                          <td>
+                            {(item.price * item.count).toLocaleString("ru-RU")} so'm
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td colSpan="3" className="basket-table__total-label">
+                          Jami:
+                        </td>
+                        <td className="basket-table__total">
+                          {cart
+                            .reduce(
+                              (sum, item) => sum + item.price * item.count,
+                              0
+                            )
+                            .toLocaleString("ru-RU")} so'm
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                )}
+                <div className="basket-buttons">
+                  <button
+                    className="basket-buttons__back"
+                    onClick={() => setShowBasket(false)}
+                  >
+                    Orqaga
+                  </button>
+                  <button
+                    className="basket-buttons__confirm"
+                    disabled={cart.length === 0}
+                    onClick={() => setShowModal(true)}
+                  >
+                    Buyurtmani rasmiylashtirish
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
+      )}
       {showModal && (
         <ModalBasket
           cart={cart}
@@ -323,8 +345,7 @@ export default function Taomlar() {
           userId={userId}
         />
       )}
-
       {successMsg && <div className="success-message">{successMsg}</div>}
-    </div>
+    </section>
   );
 }

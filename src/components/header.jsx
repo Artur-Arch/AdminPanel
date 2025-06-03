@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./styles/header.css";
 import axios from "axios";
+import { User, ChevronDown } from "lucide-react";
 
 export default function Header() {
   const [commissions, setCommissions] = useState({
@@ -102,34 +103,38 @@ export default function Header() {
   }, []);
 
   return (
-    <div>
-      <header>
-        <div className="header__buttons">
-          <button style={{ width: "auto", height: "auto" }}>
-            Komissiya jami: {loading ? "..." : commissions.totalCommission.toLocaleString("uz-UZ")} so'm
-          </button>
-          <button style={{ width: "auto", height: "auto" }}>
-            Bugungi komissiya: {loading ? "..." : commissions.dailyCommission.toLocaleString("uz-UZ")} so'm
-          </button>
-          <button style={{ width: "auto", height: "auto" }}>
-            Oxirgi 30 kungi komissiya: {loading ? "..." : commissions.last30DaysCommission.toLocaleString("uz-UZ")} so'm
-          </button>
-          <select
-            value={selectedUser}
-            onChange={(e) => setSelectedUser(e.target.value)}
-          >
-            {users.length > 0 ? (
-              users.map((user) => (
-                <option key={user.id} value={user.username}>
-                  {user.username} {user.name ? `(${user.name})` : ""}
-                </option>
-              ))
-            ) : (
-              <option>Foydalanuvchi topilmadi</option>
-            )}
-          </select>
+    <header className="main-header">
+      <div className="stats-container">
+        <div className="stat-item">
+          <span className="stat-label">Komissiya jami:</span>
+          <span className="stat-value">{loading ? "..." : commissions.totalCommission.toLocaleString("uz-UZ")} so'm</span>
         </div>
-      </header>
-    </div>
+        <div className="stat-item">
+          <span className="stat-label">Bugungi komissiya:</span>
+          <span className="stat-value">{loading ? "..." : commissions.dailyCommission.toLocaleString("uz-UZ")} so'm</span>
+        </div>
+        <div className="stat-item">
+          <span className="stat-label">Oxirgi 30 kungi komissiya:</span>
+          <span className="stat-value">{loading ? "..." : commissions.last30DaysCommission.toLocaleString("uz-UZ")} so'm</span>
+        </div>
+      </div>
+      <div className="user-dropdown">
+        <select
+          className="dropdown-toggle"
+          value={selectedUser}
+          onChange={(e) => setSelectedUser(e.target.value)}
+        >
+          {users.length > 0 ? (
+            users.map((user) => (
+              <option key={user.id} value={user.username}>
+                {user.username} {user.name ? `(${user.name})` : ""}
+              </option>
+            ))
+          ) : (
+            <option>Foydalanuvchi topilmadi</option>
+          )}
+        </select>
+      </div>
+    </header>
   );
 }

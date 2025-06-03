@@ -44,7 +44,7 @@ export default function ModalBasket({
       const orderData = {
         orderType,
         tableId: selectedTable.id,
-        phoneNumber: orderType === "delivery" ? phoneNumber : null,
+        phoneNumber: null,
         status: "PENDING",
         userId: userId,
         orderItems: cart.map((item) => ({
@@ -84,51 +84,49 @@ export default function ModalBasket({
   };
 
   return (
-    <div className="modal-backdrop">
-      <div className="modal-content">
+    <div className="overlay">
+      <div className="basket-modal">
         <h2>Buyurtma</h2>
-        <ul>
+        <ul className="cart-list">
           {cart.map((item) => (
-            <li key={item.id}>
-              {item.name} — {item.count} × {item.price} so'm
+            <li key={item.id} className="cart-item">
+              {item.name} — {item.count} × {item.price.toLocaleString("ru-RU")} so'm
             </li>
           ))}
         </ul>
-
         <div className="order-options">
-          <label>
+          <label className="order-option">
             <input
               type="radio"
               name="orderType"
               value="delivery"
+              checked={orderType === "delivery"}
               onChange={() => setOrderType("delivery")}
             />
             Yetkazib berish
           </label>
-          <br />
           {orderType === "delivery" && (
             <input
-              className="table-input"
+              className="modal-input"
               type="text"
-              placeholder="telefon raqami"
+              placeholder="Telefon raqami"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
             />
           )}
-          <br />
-          <label>
+          <label className="order-option">
             <input
               type="radio"
               name="orderType"
               value="table"
+              checked={orderType === "table"}
               onChange={() => setOrderType("table")}
             />
             Stolga
           </label>
-          <br />
           {orderType === "table" && (
             <select
-              className="table-input"
+              className="modal-input"
               value={tableNumber}
               onChange={(e) => setTableNumber(e.target.value)}
             >
@@ -147,14 +145,13 @@ export default function ModalBasket({
           )}
         </div>
         <p className="total-price">
-          Jami: {cart.reduce((sum, item) => sum + item.price * item.count, 0)}{" "}
-          so'm
+          Jami: {cart.reduce((sum, item) => sum + item.price * item.count, 0).toLocaleString("ru-RU")} so'm
         </p>
-        <div className="modal-actions">
-          <button className="modal-btn2" onClick={onClose}>
+        <div className="basket-buttons">
+          <button className="basket-buttons__back" onClick={onClose}>
             Orqaga
           </button>
-          <button className="modal-btn1" onClick={handleConfirm}>
+          <button className="basket-buttons__confirm" onClick={handleConfirm}>
             Tasdiqlash
           </button>
         </div>
