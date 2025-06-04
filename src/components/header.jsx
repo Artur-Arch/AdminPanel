@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import "./styles/header.css";
 import axios from "axios";
 import { User, ChevronDown } from "lucide-react";
@@ -12,6 +13,8 @@ export default function Header() {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState("");
   const [loading, setLoading] = useState(true);
+
+  const commissionRate = useSelector((state) => state.commission.commissionRate);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,7 +46,6 @@ export default function Header() {
         thirtyDaysAgo.setDate(today.getDate() - 30);
         thirtyDaysAgo.setHours(0, 0, 0, 0);
 
-        const commissionRate = 0.05;
         const totalCommission = orders.reduce((sum, order) => {
           if (order.commission) {
             return sum + order.commission;
@@ -54,7 +56,7 @@ export default function Header() {
               (itemSum, item) => itemSum + (item.product?.price || 0) * item.count,
               0
             );
-          return sum + orderAmount * commissionRate;
+          return sum + orderAmount * (commissionRate / 100);
         }, 0);
 
         const dailyCommission = orders
@@ -73,7 +75,7 @@ export default function Header() {
                 (itemSum, item) => itemSum + (item.product?.price || 0) * item.count,
                 0
               );
-            return sum + orderAmount * commissionRate;
+            return sum + orderAmount * (commissionRate / 100);
           }, 0);
 
         const last30DaysCommission = orders
@@ -88,7 +90,7 @@ export default function Header() {
                 (itemSum, item) => itemSum + (item.product?.price || 0) * item.count,
                 0
               );
-            return sum + orderAmount * commissionRate;
+            return sum + orderAmount * (commissionRate / 100);
           }, 0);
 
         setCommissions({ totalCommission, dailyCommission, last30DaysCommission });
@@ -100,7 +102,7 @@ export default function Header() {
     };
 
     fetchData();
-  }, []);
+  }, [commissionRate]);
 
   return (
     <header className="main-header">

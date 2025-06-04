@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Plus, Edit, Trash, Phone, Loader2 } from "lucide-react";
+import CommissionInput from "../components/CommissionInput";
 import "./styles/Sozlamalar.css";
 
 const roleOptions = [
@@ -111,12 +112,15 @@ export default function Sozlamalar() {
   return (
     <div className="container">
       <header className="app-header">
-        <h1 style={{color: "#ffffff"}} className="app-title">Sozlamalar</h1>
+        <h1 style={{ color: "#ffffff" }} className="app-title">
+          Sozlamalar
+        </h1>
       </header>
       <section className="add-employee-section">
         <h2 className="section-title">Xodimlar</h2>
         {loading ? (
           <div className="spinner">
+            <Loader2 className="animate-spin" />
           </div>
         ) : error ? (
           <p className="text-danger">{error}</p>
@@ -136,17 +140,23 @@ export default function Sozlamalar() {
                   key={person.id}
                   className="employee-card"
                   data-position={
-                    person.role === "KITCHEN" ? "Oshpaz" :
-                    person.role === "CASHIER" ? "Ofitsiant" :
-                    person.role === "CUSTOMER" ? "Boshqaruvchi" :
-                    "Direktor"
+                    person.role === "KITCHEN"
+                      ? "Oshpaz"
+                      : person.role === "CASHIER"
+                      ? "Ofitsiant"
+                      : person.role === "CUSTOMER"
+                      ? "Boshqaruvchi"
+                      : "Direktor"
                   }
                 >
                   <div className="employee-position">
-                    {person.role === "KITCHEN" ? "Oshpaz" :
-                     person.role === "CASHIER" ? "Ofitsiant" :
-                     person.role === "CUSTOMER" ? "Boshqaruvchi" :
-                     "Direktor"}
+                    {person.role === "KITCHEN"
+                      ? "Oshpaz"
+                      : person.role === "CASHIER"
+                      ? "Ofitsiant"
+                      : person.role === "CUSTOMER"
+                      ? "Boshqaruvchi"
+                      : "Direktor"}
                   </div>
                   <h3 className="employee-name">
                     {person.name} {person.surname}
@@ -168,24 +178,32 @@ export default function Sozlamalar() {
                       onClick={() => {
                         const confirmDelete = window.confirm(
                           `Rostdan ham "${person.name} ${person.surname}" (${
-                            person.role === "KITCHEN" ? "Oshpaz" :
-                            person.role === "CASHIER" ? "Ofitsiant" :
-                            person.role === "CUSTOMER" ? "Boshqaruvchi" :
-                            "Direktor"
+                            person.role === "KITCHEN"
+                              ? "Oshpaz"
+                              : person.role === "CASHIER"
+                              ? "Ofitsiant"
+                              : person.role === "CUSTOMER"
+                              ? "Boshqaruvchi"
+                              : "Direktor"
                           }) xodimini o'chirmoqchimisiz?`
                         );
                         if (confirmDelete) {
-                          axios.delete(`https://suddocs.uz/user/${person.id}`, {
-                            headers: {
-                              "Content-Type": "application/json",
-                              ...(localStorage.getItem("token") && { Authorization: `Bearer ${localStorage.getItem("token")}` }),
-                            },
-                          }).then(() => {
-                            setStaff(staff.filter((s) => s.id !== person.id));
-                          }).catch((err) => {
-                            console.error("Xodimni o'chirishda xatolik:", err);
-                            alert("Xodimni o'chirishda xatolik yuz berdi.");
-                          });
+                          axios
+                            .delete(`https://suddocs.uz/user/${person.id}`, {
+                              headers: {
+                                "Content-Type": "application/json",
+                                ...(localStorage.getItem("token") && {
+                                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                                }),
+                              },
+                            })
+                            .then(() => {
+                              setStaff(staff.filter((s) => s.id !== person.id));
+                            })
+                            .catch((err) => {
+                              console.error("Xodimni o'chirishda xatolik:", err);
+                              alert("Xodimni o'chirishda xatolik yuz berdi.");
+                            });
                         }
                       }}
                     >
@@ -200,15 +218,17 @@ export default function Sozlamalar() {
         )}
       </section>
 
+      <section className="commission-section">
+        <h2 className="section-title">Xizmat haqi</h2>
+        <CommissionInput orderAmount={100000} />
+      </section>
+
       {showAddModal && (
         <div
           className={`modal-backdrop ${showAddModal ? "active" : ""}`}
           onClick={() => setShowAddModal(false)}
         >
-          <div
-            className="modal fade-in"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="modal fade-in" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3 className="modal-title">Yangi Xodim Qo'shish</h3>
             </div>
@@ -218,9 +238,7 @@ export default function Sozlamalar() {
                 <select
                   className="form-control"
                   value={newStaff.role}
-                  onChange={(e) =>
-                    setNewStaff({ ...newStaff, role: e.target.value })
-                  }
+                  onChange={(e) => setNewStaff({ ...newStaff, role: e.target.value })}
                 >
                   {roleOptions.map((option) => (
                     <option key={option.id} value={option.value}>
@@ -236,9 +254,7 @@ export default function Sozlamalar() {
                   className="form-control"
                   placeholder="Ismi"
                   value={newStaff.name}
-                  onChange={(e) =>
-                    setNewStaff({ ...newStaff, name: e.target.value })
-                  }
+                  onChange={(e) => setNewStaff({ ...newStaff, name: e.target.value })}
                 />
               </div>
               <div className="form-group">
@@ -248,9 +264,7 @@ export default function Sozlamalar() {
                   className="form-control"
                   placeholder="Familiyasi"
                   value={newStaff.surname}
-                  onChange={(e) =>
-                    setNewStaff({ ...newStaff, surname: e.target.value })
-                  }
+                  onChange={(e) => setNewStaff({ ...newStaff, surname: e.target.value })}
                 />
               </div>
               <div className="form-group">
@@ -260,9 +274,7 @@ export default function Sozlamalar() {
                   className="form-control"
                   placeholder="Login"
                   value={newStaff.username}
-                  onChange={(e) =>
-                    setNewStaff({ ...newStaff, username: e.target.value })
-                  }
+                  onChange={(e) => setNewStaff({ ...newStaff, username: e.target.value })}
                 />
               </div>
               <div className="form-group">
@@ -272,9 +284,7 @@ export default function Sozlamalar() {
                   className="form-control"
                   placeholder="+998 XX XXX XX XX"
                   value={newStaff.phone}
-                  onChange={(e) =>
-                    setNewStaff({ ...newStaff, phone: e.target.value })
-                  }
+                  onChange={(e) => setNewStaff({ ...newStaff, phone: e.target.value })}
                 />
               </div>
               <div className="form-group">
@@ -284,9 +294,7 @@ export default function Sozlamalar() {
                   className="form-control"
                   placeholder="Parol"
                   value={newStaff.password}
-                  onChange={(e) =>
-                    setNewStaff({ ...newStaff, password: e.target.value })
-                  }
+                  onChange={(e) => setNewStaff({ ...newStaff, password: e.target.value })}
                 />
               </div>
             </div>
@@ -307,10 +315,7 @@ export default function Sozlamalar() {
           className={`modal-backdrop ${editingStaff ? "active" : ""}`}
           onClick={() => setEditingStaff(null)}
         >
-          <div
-            className="modal fade-in"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="modal fade-in" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3 className="modal-title">Xodimni Tahrirlash</h3>
             </div>

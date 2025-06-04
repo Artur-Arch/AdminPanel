@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useSelector } from "react-redux";
 import { useReactToPrint } from "react-to-print";
 import { Pencil, X, Printer, Package2, CircleDot, ChefHat, Hamburger, UserCircle2 } from "lucide-react";
 import Receipt from "../components/Receipt.jsx";
@@ -40,7 +41,6 @@ const getStatusClass = (status) => {
   return statusClasses[status] || "";
 };
 
-// API utility functions
 const createApiRequest = (token) => ({
   headers: {
     "Content-Type": "application/json",
@@ -83,6 +83,8 @@ export default function Zakazlar() {
     error: null,
   });
 
+  const commissionRate = useSelector((state) => state.commission.commissionRate);
+
   const receiptRef = useRef();
   const token = localStorage.getItem("token");
 
@@ -106,8 +108,7 @@ export default function Zakazlar() {
   }, []);
 
   const handlePrint = useReactToPrint({
-    content: () => receiptRef.current,
-    onBeforeGetContent: () => new Promise((resolve) => setTimeout(resolve, 100)),
+    contentRef: receiptRef,
   });
 
   const fetchAllData = useCallback(async () => {
@@ -162,7 +163,7 @@ export default function Zakazlar() {
   const archiveOrder = useCallback(
     async (orderId) => {
       try {
-        const response = await axios.patch(
+        const response = await axios.put(
           `${API_ENDPOINTS.orders}/${orderId}`,
           { status: "ARCHIVE" },
           createApiRequest(token)
@@ -183,24 +184,26 @@ export default function Zakazlar() {
         return;
       }
       try {
+        updateState({ currentOrder: order });
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        if (!receiptRef.current) {
+          console.error("Receipt ref is null");
+          alert("Chop etish uchun ma'lumotlar tayyor emas.");
+          return;
+        }
         await archiveOrder(order.id);
+        handlePrint();
         updateState({
           orders: state.orders.filter((o) => o.id !== order.id),
-          currentOrder: order,
+          currentOrder: null,
         });
-        setTimeout(() => {
-          handlePrint();
-          updateState({ currentOrder: null });
-        }, 200);
       } catch (error) {
+        console.error("Close and print error:", error);
+        alert("Chop etishda xatolik yuz berdi.");
         updateState({
           orders: state.orders.filter((o) => o.id !== order.id),
-          currentOrder: order,
+          currentOrder: null,
         });
-        setTimeout(() => {
-          handlePrint();
-          updateState({ currentOrder: null });
-        }, 200);
       }
     },
     [state.orders, archiveOrder, handlePrint]
@@ -337,17 +340,16 @@ export default function Zakazlar() {
       const newOrderItem = {
         productId: Number(product.id),
         count: Number(count),
+        product,
       };
 
-      const products = [
-        ...state.editingOrder.orderItems.map((item) => ({
-          productId: Number(item.productId),
-          count: Number(item.count),
-        })),
-        newOrderItem,
-      ];
+      const updatedOrderItems = [...state.editingOrder.orderItems, newOrderItem];
+      const totalPrice = calculateTotalPrice(updatedOrderItems);
 
-      const totalPrice = calculateTotalPrice([...state.editingOrder.orderItems, newOrderItem]);
+      const products = updatedOrderItems.map((item) => ({
+        productId: Number(item.productId),
+        count: Number(item.count),
+      }));
 
       const payload = {
         products,
@@ -362,12 +364,7 @@ export default function Zakazlar() {
         const res = await axios.put(
           `${API_BASE}/order/${state.editingOrder.id}`,
           payload,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              ...(token && { Authorization: `Bearer ${token}` }),
-            },
-          }
+          createApiRequest(token)
         );
         console.log("PUT response (add):", res.data);
 
@@ -456,105 +453,115 @@ export default function Zakazlar() {
                   <p>Bu kategoriya uchun buyurtmalar yo'q.</p>
                 </div>
               ) : (
-                filteredOrders.map((order) => (
-                  <div className="order-card" key={order.id}>
-                    <div className="order-card__header">
-                      <div className="order-card__info">
-                        <span className="order-card__id">
-                          Buyurtma №{order.id}
-                        </span>
-                        <span className="order-card__table">
-                          {order.table?.name || "Stol"} -{" "}
-                          {order.table?.number || "N/A"}
-                        </span>
-                      </div>
-                      <div className="order-card__actions">
-                        <button
-                          className="order-card__edit-btn"
-                          onClick={() => handleEditOrder(order)}
-                          title="Tahrirlash"
-                        >
-                          <Pencil size={20} />
-                        </button>
-                        <button
-                          className="order-card__delete-btn"
-                          onClick={() => handleDeleteOrder(order.id)}
-                          title="O'chirish"
-                        >
-                          <X size={20} />
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="order-card__items">
-                      {order.orderItems?.map((item) => (
-                        <div className="order-item" key={item.id}>
-                          <img
-                            src={`${API_BASE}${item.product?.image || "/placeholder-food.jpg"}`}
-                            alt={item.product?.name || "Taom"}
-                            className="order-item__img"
-                            onError={(e) => {
-                              e.target.src = "/placeholder-food.jpg";
-                            }}
-                          />
-                          <div className="order-item__info">
-                            <p className="order-item__name">
-                              {item.product?.name || "Noma'lum taom"}
-                            </p>
-                            <p className="order-item__count">
-                              Soni: {item.count}
-                            </p>
-                            <p className="order-item__price">
-                              {formatPrice(item.product?.price || 0)}
-                            </p>
-                          </div>
+                filteredOrders.map((order) => {
+                  const commission = order.totalPrice * (commissionRate / 100);
+                  const totalWithCommission = order.totalPrice + commission;
+                  return (
+                    <div className="order-card" key={order.id}>
+                      <div className="order-card__header">
+                        <div className="order-card__info">
+                          <span className="order-card__id">
+                            Buyurtma №{order.id}
+                          </span>
+                          <span className="order-card__table">
+                            <strong>{order.table?.name || "Stol"} -{" "}</strong>
+                            <strong>{order.table?.number || "N/A"}</strong>
+                          </span>
                         </div>
-                      ))}
-                    </div>
-
-                    <div className="order-card__body">
-                      <div className="order-card__stats">
-                        <p>Taomlar soni: {order.orderItems?.length || 0}</p>
-                        <p className="order-card__total">
-                          Umumiy narxi: {formatPrice(order.totalPrice || 0)}
-                        </p>
+                        <div className="order-card__actions">
+                          <button
+                            className="order-card__edit-btn"
+                            onClick={() => handleEditOrder(order)}
+                            title="Tahrirlash"
+                          >
+                            <Pencil size={20} />
+                          </button>
+                          <button
+                            className="order-card__delete-btn"
+                            onClick={() => handleDeleteOrder(order.id)}
+                            title="O'chirish"
+                          >
+                            <X size={20} />
+                          </button>
+                        </div>
                       </div>
 
-                      <div className="order-card__time">
-                        <p className="order-card__time-label">
-                          Buyurtma berilgan vaqti:
-                        </p>
-                        <p className="order-card__time-value">
-                          {new Date(order.createdAt).toLocaleString("uz-UZ", {
-                            timeZone: "Asia/Tashkent",
-                            year: "numeric",
-                            month: "2-digit",
-                            day: "2-digit",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </p>
+                      <div className="order-card__items">
+                        {order.orderItems?.map((item) => (
+                          <div className="order-item" key={item.id}>
+                            <img
+                              src={`${API_BASE}${item.product?.image || "/placeholder-food.jpg"}`}
+                              alt={item.product?.name || "Taom"}
+                              className="order-item__img"
+                              onError={(e) => {
+                                e.target.src = "/placeholder-food.jpg";
+                              }}
+                            />
+                            <div className="order-item__info">
+                              <p className="order-item__name">
+                                {item.product?.name || "Noma'lum taom"}
+                              </p>
+                              <p className="order-item__count">
+                                Soni: <strong>{item.count}</strong>
+                              </p>
+                              <p className="order-item__price">
+                                {formatPrice(item.product?.price || 0)}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
                       </div>
 
-                      {order.status === "COMPLETED" && (
-                        <button
-                          className="order-card__print-btn"
-                          onClick={() => handleCloseAndPrint(order)}
+                      <div className="order-card__body">
+                        <div className="order-card__stats">
+                          <p>Taomlar soni: <strong>{order.orderItems?.length || 0}</strong></p>
+                          <p className="order-card__total">
+                            Umumiy narxi: <strong>{formatPrice(order.totalPrice || 0)}</strong>
+                          </p>
+                          <p className="order-card__total">
+                            Komissiya ({commissionRate}%): <strong>{formatPrice(commission)}</strong>
+                          </p>
+                          <p className="order-card__total">
+                            Jami (komissiya bilan): <strong>{formatPrice(totalWithCommission)}</strong>
+                          </p>
+                        </div>
+
+                        <div className="order-card__time">
+                          <p className="order-card__time-label">
+                            Buyurtma berilgan vaqti:
+                          </p>
+                          <p className="order-card__time-value">
+                            {new Date(order.createdAt).toLocaleString("uz-UZ", {
+                              timeZone: "Asia/Tashkent",
+                              year: "numeric",
+                              month: "2-digit",
+                              day: "2-digit",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </p>
+                        </div>
+
+                        {order.status === "COMPLETED" && (
+                          <button
+                            className="order-card__print-btn"
+                            onClick={() => handleCloseAndPrint(order)}
+                          >
+                            To'lash va chop etish <Printer size={20} />
+                          </button>
+                        )}
+
+                        <div
+                          className={`order-card__status ${getStatusClass(
+                            order.status
+                          )}`}
                         >
-                          To'lash va chop etish <Printer size={20} />
-                        </button>
-                      )}
-
-                      <div
-                        className={`order-card__status ${getStatusClass(
-                          order.status
-                        )}`}
-                      >
-                        {STATUS_LABELS[order.status] || order.status}
+                          {STATUS_LABELS[order.status] || order.status}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </>
@@ -666,8 +673,19 @@ export default function Zakazlar() {
 
             <div className="modal__footer">
               <div className="modal__total">
-                Jami:{" "}
+                Umumiy narxi:{" "}
                 {formatPrice(calculateTotalPrice(state.editingOrder.orderItems))}
+              </div>
+              <div className="modal__total">
+                Komissiya ({commissionRate}%):{" "}
+                {formatPrice(calculateTotalPrice(state.editingOrder.orderItems) * (commissionRate / 100))}
+              </div>
+              <div className="modal__total">
+                Jami (komissiya bilan):{" "}
+                {formatPrice(
+                  calculateTotalPrice(state.editingOrder.orderItems) +
+                  calculateTotalPrice(state.editingOrder.orderItems) * (commissionRate / 100)
+                )}
               </div>
             </div>
           </div>
@@ -677,12 +695,23 @@ export default function Zakazlar() {
       <div style={{ display: "none" }}>
         <Receipt
           ref={receiptRef}
-          order={state.currentOrder || {
-            id: null,
-            tableNumber: "",
-            totalPrice: 0,
-            orderItems: [],
-          }}
+          order={
+            state.currentOrder
+              ? {
+                  ...state.currentOrder,
+                  tableNumber: state.currentOrder.table?.number || 'N/A',
+                  commission: state.currentOrder.totalPrice * (commissionRate / 100),
+                  totalWithCommission: state.currentOrder.totalPrice + state.currentOrder.totalPrice * (commissionRate / 100),
+                }
+              : {
+                  id: null,
+                  tableNumber: "",
+                  totalPrice: 0,
+                  orderItems: [],
+                  commission: 0,
+                  totalWithCommission: 0,
+                }
+          }
         />
       </div>
     </div>

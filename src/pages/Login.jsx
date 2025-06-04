@@ -91,13 +91,7 @@ export default function Login() {
         </div>
 
         {loading ? (
-          <div className="loading-container">
-            <div className="spinner-container">
               <div className="spinner"></div>
-              <div className="spinner-reverse"></div>
-            </div>
-            <p className="loading-text">Ma'lumotlar yuklanmoqda...</p>
-          </div>
         ) : (
           <div className="form-container">
             {/* Error Message */}

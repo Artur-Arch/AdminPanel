@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import axios from "axios";
 import "./styles/AdminPanel.css";
 
@@ -7,6 +8,8 @@ export default function AdminPanel() {
   const [tables, setTables] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalType, setModalType] = useState("");
+
+  const commissionRate = useSelector((state) => state.commission.commissionRate);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -92,9 +95,7 @@ export default function AdminPanel() {
   return (
     <div className="app">
       <header className="header1">
-        <h1 style={{
-          color: '#ffffff'
-        }}>Administrator paneli</h1>
+        <h1 style={{ color: '#ffffff' }}>Administrator paneli</h1>
       </header>
       <div className="admin-panel">
         <section className="orders-section">
@@ -103,76 +104,84 @@ export default function AdminPanel() {
             <table className="orders-table">
               <thead>
                 <tr>
-                  <th>Zakaz nomeri</th>
+                  <th>Zakaz №</th>
                   <th>Stol</th>
                   <th>Taom</th>
                   <th>To'lash turi</th>
                   <th>Soliq</th>
                   <th>Umumiy narxi</th>
+                  <th>Komissiya</th>
+                  <th>Jami</th>
                   <th>Holat</th>
                   <th>Sana</th>
                   <th>Bajariladigan ishi</th>
                 </tr>
               </thead>
               <tbody>
-                {orders.map((order, index) => (
-                  <tr key={`${order.id}-${index}`}>
-                    <td>№ {order.id}</td>
-                    <td>{tableMap[order.tableId] || "N/A"}</td>
-                    <td className="item-column">
-                      {order.orderItems
-                        .map((item) => `${item.product.name} (${item.count})`)
-                        .join(", ")}
-                    </td>
-                    <td>-</td>
-                    <td>{formatPrice((order.totalPrice * 4) / 100)}</td>
-                    <td>{formatPrice(order.totalPrice)}</td>
-                    <td>
-                      <span
-                        className={`status-badge ${
-                          order.status === "PENDING"
-                            ? "status-pending"
-                            : order.status === "COOKING"
-                            ? "status-cooking"
-                            : order.status === "READY"
-                            ? "status-ready"
-                            : order.status === "COMPLETED"
-                            ? "status-completed"
-                            : order.status === "ARCHIVE"
-                            ? "status-archive"
-                            : "status-default"
-                        }`}
-                      >
-                        {getStatusText(order.status)}
-                      </span>
-                    </td>
-                    <td>{new Date(order.createdAt).toLocaleDateString()}</td>
-                    <td className="actions-column">
-                      {order.status !== "ARCHIVE" && (
-                        <>
-                          <button
-                            className="action-button edit"
-                            onClick={() => handleEdit(order)}
-                          >
-                            Tahrirlash
-                          </button>
-                          <button
-                            className="action-button delete"
-                            onClick={() => handleDelete(order.id)}
-                          >
-                            O'chirish
-                          </button>
-                        </>
-                      )}
-                      <button
-                        className="action-button view"
-                        onClick={() => handleView(order)}
-                      >
-                        Ko'rish
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {orders.map((order, index) => {
+                  const commission = order.totalPrice * (commissionRate / 100);
+                  const totalWithCommission = order.totalPrice + commission;
+                  return (
+                    <tr key={`${order.id}-${index}`}>
+                      <td>№ {order.id}</td>
+                      <td>{tableMap[order.tableId] || "N/A"}</td>
+                      <td className="item-column">
+                        {order.orderItems
+                          .map((item) => `${item.product.name} (${item.count})`)
+                          .join(", ")}
+                      </td>
+                      <td>-</td>
+                      <td>{formatPrice((order.totalPrice * 4) / 100)}</td>
+                      <td>{formatPrice(order.totalPrice)}</td>
+                      <td>{formatPrice(commission)}</td>
+                      <td>{formatPrice(totalWithCommission)}</td>
+                      <td>
+                        <span
+                          className={`status-badge ${
+                            order.status === "PENDING"
+                              ? "status-pending"
+                              : order.status === "COOKING"
+                              ? "status-cooking"
+                              : order.status === "READY"
+                              ? "status-ready"
+                              : order.status === "COMPLETED"
+                              ? "status-completed"
+                              : order.status === "ARCHIVE"
+                              ? "status-archive"
+                              : "status-default"
+                          }`}
+                        >
+                          {getStatusText(order.status)}
+                        </span>
+                      </td>
+                      <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                      <td className="actions-column">
+                        {order.status !== "ARCHIVE" && (
+                          <>
+                            <button
+                              className="action-button edit"
+                              onClick={() => handleEdit(order)}
+                            >
+                              Tahrirlash
+                            </button>
+                            <button
+                              className="action-button delete"
+                              onClick={() => handleDelete(order.id)}
+                            >
+                              O'chirish
+                            </button>
+                          </>
+                        )}
+                        <button
+                          className="action-button view"
+                          onClick={() => handleView(order)}
+                        >
+                          Ko'rish
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -189,7 +198,7 @@ export default function AdminPanel() {
                 <p>
                   <b>Stol:</b> {tableMap[selectedOrder.tableId] || "N/A"}
                 </p>
-                <p>
+                <div>
                   <b>Taomlar:</b>
                   {selectedOrder.orderItems.map((item, index) => (
                     <div
@@ -215,12 +224,23 @@ export default function AdminPanel() {
                       </span>
                     </div>
                   ))}
-                </p>
+                </div>
                 <p>
                   <b>Status:</b> {getStatusText(selectedOrder.status)}
                 </p>
                 <p>
                   <b>Umumiy narxi:</b> {formatPrice(selectedOrder.totalPrice)}
+                </p>
+                <p>
+                  <b>Komissiya ({commissionRate}%):</b>{" "}
+                  {formatPrice(selectedOrder.totalPrice * (commissionRate / 100))}
+                </p>
+                <p>
+                  <b>Jami (komissiya bilan):</b>{" "}
+                  {formatPrice(
+                    selectedOrder.totalPrice +
+                    selectedOrder.totalPrice * (commissionRate / 100)
+                  )}
                 </p>
 
                 {modalType === "edit" && (

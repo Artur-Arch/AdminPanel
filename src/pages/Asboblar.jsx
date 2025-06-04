@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import "./styles/Asboblar.css";
 import axios from "axios";
 import { Line } from "react-chartjs-2";
@@ -29,10 +30,13 @@ export default function Asboblar() {
   const [dailyStats, setDailyStats] = useState({
     orderCount: 0,
     totalAmount: 0,
+    totalCommission: 0,
     averageCheck: 0,
   });
   const [weeklyStats, setWeeklyStats] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const commissionRate = useSelector((state) => state.commission.commissionRate);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -68,9 +72,10 @@ export default function Asboblar() {
             )
           );
         }, 0);
+        const totalCommission = totalAmount * (commissionRate / 100);
         const averageCheck = orderCount > 0 ? totalAmount / orderCount : 0;
 
-        setDailyStats({ orderCount, totalAmount, averageCheck });
+        setDailyStats({ orderCount, totalAmount, totalCommission, averageCheck });
 
         const oneWeekAgo = new Date();
         oneWeekAgo.setDate(today.getDate() - 6);
@@ -89,12 +94,27 @@ export default function Asboblar() {
               new Date(order.createdAt) <= dayEnd
           );
 
+          const dayTotalAmount = dayOrders.reduce((sum, order) => {
+            if (order.totalAmount) {
+              return sum + order.totalAmount;
+            }
+            return (
+              sum +
+              order.orderItems.reduce(
+                (itemSum, item) =>
+                  itemSum + (item.product?.price || 0) * item.count,
+                0
+              )
+            );
+          }, 0);
+
           weeklyData.push({
             date: day.toLocaleDateString("uz-UZ", {
               day: "2-digit",
               month: "2-digit",
             }),
             orderCount: dayOrders.length,
+            commission: dayTotalAmount * (commissionRate / 100),
           });
         }
 
@@ -107,7 +127,7 @@ export default function Asboblar() {
     };
 
     fetchData();
-  }, []);
+  }, [commissionRate]);
 
   const chartData = {
     labels: weeklyStats.map((stat) => stat.date),
@@ -115,8 +135,16 @@ export default function Asboblar() {
       {
         label: "Buyurtmalar soni",
         data: weeklyStats.map((stat) => stat.orderCount),
-        backgroundColor: "rgba(67, 97, 238, 0.2)", // Updated to match --color-primary
+        backgroundColor: "rgba(67, 97, 238, 0.2)",
         borderColor: "var(--color-primary)",
+        borderWidth: 2,
+        fill: true,
+      },
+      {
+        label: "Komissiya (so'm)",
+        data: weeklyStats.map((stat) => stat.commission),
+        backgroundColor: "rgba(255, 99, 132, 0.2)",
+        borderColor: "#ff6384",
         borderWidth: 2,
         fill: true,
       },
@@ -131,7 +159,7 @@ export default function Asboblar() {
         beginAtZero: true,
         title: {
           display: true,
-          text: "Buyurtmalar soni",
+          text: "Buyurtmalar soni / Komissiya",
           color: "var(--color-text-primary)",
           font: {
             size: 14,
@@ -217,6 +245,13 @@ export default function Asboblar() {
               <p className="stats-card-title">Umumiy summa</p>
               <h4 className="stats-card-value">
                 {dailyStats.totalAmount.toLocaleString("uz-UZ")}
+              </h4>
+              <span className="stats-card-unit">so'm</span>
+            </div>
+            <div className="stats-card card-hover fade-in">
+              <p className="stats-card-title">Komissiya</p>
+              <h4 className="stats-card-value">
+                {dailyStats.totalCommission.toLocaleString("uz-UZ")}
               </h4>
               <span className="stats-card-unit">so'm</span>
             </div>

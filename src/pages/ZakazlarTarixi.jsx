@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import "./styles/ZakazTarixi.css";
 import axios from "axios";
 import {
@@ -48,6 +49,8 @@ export default function ZakazTarixi() {
   const [endDate, setEndDate] = useState("");
   const [sortAscending, setSortAscending] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  const commissionRate = useSelector((state) => state.commission.commissionRate);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -178,49 +181,52 @@ export default function ZakazTarixi() {
                   <th>Turi</th>
                   <th>Taomlar</th>
                   <th>Narxi</th>
+                  <th>Komissiya</th>
+                  <th>Jami</th>
                   <th>Vaqti</th>
                   <th>Holati</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredHistory.map((order) => (
-                  <tr key={order.id}>
-                    <td>{order.id}</td>
-                    <td>{tableMap[order.tableId] || "N/A"}</td>
-                    <td>Zalda</td>
-                    <td className="food-items">
-                      {order.orderItems.map((item) => (
-                        <span
-                          key={item.id}
-                        >{`${item.product?.name} (${item.count})`}</span>
-                      ))}
-                    </td>
-                    <td>
-                      {order.orderItems
-                        .reduce(
-                          (total, item) =>
-                            total + (item.product?.price || 0) * item.count,
-                          0
-                        )
-                        .toLocaleString()}{" "}
-                      so'm
-                    </td>
-                    <td>{new Date(order.createdAt).toLocaleString()}</td>
-                    <td className={getStatusClass(order.status)}>
-                      {order.status === "PENDING"
-                        ? "Navbatda"
-                        : order.status === "COOKING"
-                        ? "Tayyorlanmoqda"
-                        : order.status === "READY"
-                        ? "Tayyor"
-                        : order.status === "COMPLETED"
-                        ? "Mijoz Oldida"
-                        : order.status === "ARCHIVE"
-                        ? "Tugallangan"
-                        : "Noma'lum"}
-                    </td>
-                  </tr>
-                ))}
+                {filteredHistory.map((order) => {
+                  const totalPrice = order.orderItems.reduce(
+                    (total, item) => total + (item.product?.price || 0) * item.count,
+                    0
+                  );
+                  const commission = totalPrice * (commissionRate / 100);
+                  const totalWithCommission = totalPrice + commission;
+                  return (
+                    <tr key={order.id}>
+                      <td>{order.id}</td>
+                      <td>{tableMap[order.tableId] || "N/A"}</td>
+                      <td>Zalda</td>
+                      <td className="food-items">
+                        {order.orderItems.map((item) => (
+                          <span
+                            key={item.id}
+                          >{`${item.product?.name} (${item.count})`}</span>
+                        ))}
+                      </td>
+                      <td>{totalPrice.toLocaleString("uz-UZ")} so'm</td>
+                      <td>{commission.toLocaleString("uz-UZ")} so'm</td>
+                      <td>{totalWithCommission.toLocaleString("uz-UZ")} so'm</td>
+                      <td>{new Date(order.createdAt).toLocaleString()}</td>
+                      <td className={getStatusClass(order.status)}>
+                        {order.status === "PENDING"
+                          ? "Navbatda"
+                          : order.status === "COOKING"
+                          ? "Tayyorlanmoqda"
+                          : order.status === "READY"
+                          ? "Tayyor"
+                          : order.status === "COMPLETED"
+                          ? "Mijoz Oldida"
+                          : order.status === "ARCHIVE"
+                          ? "Tugallangan"
+                          : "Noma'lum"}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
             {filteredHistory.length === 0 && (
