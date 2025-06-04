@@ -5,7 +5,6 @@ import Receipt from "../components/Receipt.jsx";
 import "./styles/Zakazlar.css";
 import axios from "axios";
 
-// API endpoints
 const API_BASE = "https://suddocs.uz";
 const API_ENDPOINTS = {
   orders: `${API_BASE}/order`,
@@ -14,7 +13,6 @@ const API_ENDPOINTS = {
   tables: `${API_BASE}/tables`,
 };
 
-// Status mapping
 const STATUS_LABELS = {
   PENDING: "Navbatda",
   COOKING: "Tayyorlanmoqda",

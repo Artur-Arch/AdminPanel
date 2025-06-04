@@ -166,10 +166,15 @@ export default function TaomlarSoz() {
     <div className="container">
       <header
         style={{
-          background: "var(--color-primary)",
+          backgroundColor: "var(--color-primary)",
           color: "var(--color-white)",
+          postion: "sticky",
+          top: 0,
+          zIndex: 1000,
+          left: 0,
+          right: 0,
+          marginTop: "var(--spacing-10)",
         }}
-        className="header"
       >
         <div className="header-container">
           <h1 className="header-title">Taomlar sozlamasi</h1>
@@ -203,8 +208,7 @@ export default function TaomlarSoz() {
         </nav>
 
         {loading ? (
-          <div className="spinner">
-          </div>
+          <div className="spinner"></div>
         ) : filteredMenu.length === 0 ? (
           <div className="empty-state">
             <div className="empty-state-icon">

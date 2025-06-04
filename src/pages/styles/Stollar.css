@@ -71,14 +71,9 @@ button {
 }
 
 .section-title1 {
-  background: var(--color-primary);
-  padding-top: 15px;
-  padding-bottom: 20px;
-  padding-left: 40px;
-  margin-top: -45px;
-  margin-left: -40px;
-  margin-right: -43.5px;
-  font-size: var(--font-size-2xl);
+  padding-bottom: 5px;
+  margin-left: 25px;
+  font-size: var(--font-size-4xl);
   font-weight: 600;
   margin-bottom: var(--spacing-md);
   color: #FFFFFF;
