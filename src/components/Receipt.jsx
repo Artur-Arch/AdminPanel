@@ -70,9 +70,9 @@ const Receipt = React.forwardRef(({ order }, ref) => {
           ))}
         </ul>
         <hr />
-        <p><strong>Jami:</strong> {formatPrice(order.totalPrice || 0)}</p>
-        <p><strong>Hizmat haqqi:</strong> {formatPrice(order.commission || 0)}</p>
-        <p><strong>Jami (komissiya bilan):</strong> {formatPrice(order.totalWithCommission || 0)}</p>
+        <p>Jami: <strong>{formatPrice(order.totalPrice || 0)}</strong></p>
+        <p>Hizmat haqqi: <strong>{formatPrice(order.commission || 0)}</strong></p>
+        <p>Jami (komissiya bilan): <strong style={{fontSize: "22px", marginBottom: "10px"}}>{formatPrice(order.totalWithCommission || 0)}</strong></p>
         <p className="thank">Rahmat, biz sizni yana kutamiz!</p>
       </div>
     </div>

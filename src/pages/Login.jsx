@@ -94,7 +94,6 @@ export default function Login() {
               <div className="spinner"></div>
         ) : (
           <div className="form-container">
-            {/* Error Message */}
             {error && (
               <div className="error-message">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

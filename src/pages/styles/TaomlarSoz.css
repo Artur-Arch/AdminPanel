@@ -98,21 +98,18 @@ img {
   display: flex;
   align-items: center;
   overflow-x: auto;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   padding: var(--spacing-4) 0;
   gap: var(--spacing-3);
   background-color: var(--color-card);
   margin-bottom: var(--spacing-6);
   padding-left: 30px;
   box-shadow: var(--shadow-sm);
-  position: sticky;
-  top: 60px;
-  z-index: 90;
 }
 
 .category-tabs::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  display: none;
 }
 
 .category-tab {
@@ -149,7 +146,6 @@ img {
 @media (min-width: 768px) {
   .category-tabs {
     gap: var(--spacing-6);
-    /* padding: var(--spacing-5) 0; */
   }
   
   .category-tab {

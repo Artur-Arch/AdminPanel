@@ -1,8 +1,6 @@
-/* Modern Admin Panel CSS - Reset and Base Styles */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Color System */
   --color-primary: #1E293B;
   --color-primary-light: #334155;
   --color-secondary: #3B82F6;
