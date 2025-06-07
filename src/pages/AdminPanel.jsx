@@ -97,7 +97,9 @@ export default function AdminPanel() {
       <header className="header1">
         <h1 style={{ color: '#ffffff' }}>Administrator paneli</h1>
       </header>
-      <div className="admin-panel">
+      <div style={{
+        marginTop: "5px"
+      }} className="admin-panel">
         <section className="orders-section">
           <h2>Barcha Zakazlar</h2>
           {orders.length === 0 ? (

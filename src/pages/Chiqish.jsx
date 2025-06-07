@@ -34,12 +34,15 @@ export default function Chiqish() {
       </h2>
       </div>
       <div style={{ padding: "20px" }}>
-        <p
+        <strong
             style={{
-              fontSize: "18px",
+              fontSize: "22px",
               marginBottom: "20px",
-              fontFamily: "Arial, sans-serif",
-            }}>Sessiyani yakunlash uchun quyidagi tugmani bosing:</p>
+              fontFamily: "",
+              fontWeight: "bold",
+            }}>Sessiyani yakunlash uchun quyidagi tugmani bosing:</strong>
+        <br />
+        <br />
         <button
           onClick={openModal}
           style={{

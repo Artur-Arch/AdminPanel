@@ -48,9 +48,9 @@ const CommissionInput = ({ orderAmount }) => {
         placeholder="Komissiya foizini kiriting"
       />
       <div className="commission-info">
-        <p>Namuna buyurtma summasi: {formatPrice(orderAmount.toFixed(2))} so'm</p>
-        <p>Komissiya ({commissionRate}%): {formatPrice((orderAmount * (commissionRate / 100)).toFixed(2))} so'm</p>
-        <p className="font-bold">Jami summa: {formatPrice(totalAmount.toFixed(2))} so'm</p>
+        <p>Namuna buyurtma summasi: {formatPrice(orderAmount.toFixed(2))}</p>
+        <p>Komissiya ({commissionRate}%): {formatPrice((orderAmount * (commissionRate / 100)).toFixed(2))}</p>
+        <p className="font-bold">Jami summa: {formatPrice(totalAmount.toFixed(2))}</p>
       </div>
     </div>
   );
