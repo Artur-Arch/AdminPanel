@@ -1,9 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 .admin-panel {
   flex: 1;
-  padding: var(--space-6) var(--space-8);
+  padding: var(--space-3) var(--space-4); /* Уменьшен с var(--space-4) var(--space-6) */
   margin: 0 auto;
   width: 100%;
+  /* max-width: 1440px; */
   animation: fadeIn 0.3s ease-out;
 }
 
@@ -14,16 +16,16 @@
   overflow: hidden;
   transition: transform var(--transition-normal), box-shadow var(--transition-normal);
   transform: translateY(0);
-  margin-top: -20px;
+  margin-top: -10px; /* Уменьшен с -15px */
 }
 
 .orders-section:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px); /* Уменьшен эффект hover */
   box-shadow: var(--shadow-xl);
 }
 
 .orders-section h2 {
-  padding: var(--space-6);
+  padding: var(--space-3); /* Уменьшен с var(--space-4) */
   background: linear-gradient(to right, var(--color-primary), white);
   border-bottom: 1px solid var(--color-neutral-200);
   margin-bottom: 0;
@@ -45,18 +47,18 @@
 
 @media (max-width: 768px) {
   .admin-panel {
-    padding: var(--space-4);
+    padding: var(--space-2); /* Уменьшен с var(--space-3) */
   }
   
   .orders-section h2 {
-    padding: var(--space-4);
+    padding: var(--space-2); /* Уменьшен с var(--space-3) */
   }
 }
 
 .action-button {
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-lg);
-  font-size: var(--font-size-xs);
+  padding: var(--space-1) var(--space-2); /* Уменьшен с var(--space-1) var(--space-3) */
+  border-radius: var(--radius-sm); /* Уменьшен с var(--radius-md) */
+  font-size: calc(var(--font-size-xs) - 0.1rem); /* Дополнительное уменьшение */
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -66,7 +68,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 85px;
+  min-width: 60px; /* Уменьшен с 70px */
   position: relative;
   overflow: hidden;
 }
@@ -99,8 +101,8 @@
 }
 
 .action-button:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 .action-button:hover::after {
@@ -109,13 +111,14 @@
 
 .action-button:active {
   transform: translateY(0);
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
 }
 
 @media (max-width: 768px) {
   .action-button {
-    padding: var(--space-1) var(--space-3);
-    min-width: 80px;
+    padding: var(--space-1) var(--space-1); /* Уменьшен с var(--space-1) var(--space-2) */
+    min-width: 50px; /* Уменьшен с 60px */
+    font-size: calc(var(--font-size-xs) - 0.15rem); /* Дополнительное уменьшение */
   }
 }
 
@@ -151,48 +154,47 @@
   --color-neutral-800: #1E293B;
   --color-neutral-900: #0F172A;
   
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-  --space-8: 32px;
-  --space-10: 40px;
-  --space-12: 48px;
-  --space-16: 64px;
+  --space-1: 2px; /* Уменьшен с 3px */
+  --space-2: 4px; /* Уменьшен с 6px */
+  --space-3: 6px; /* Уменьшен с 9px */
+  --space-4: 8px; /* Уменьшен с 12px */
+  --space-5: 10px; /* Уменьшен с 15px */
+  --space-6: 12px; /* Уменьшен с 18px */
+  --space-8: 16px; /* Уменьшен с 24px */
+  --space-10: 20px; /* Уменьшен с 30px */
+  --space-12: 24px; /* Уменьшен с 36px */
+  --space-16: 32px; /* Уменьшен с 48px */
   
   --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  --font-size-xs: 0.75rem;
-  --font-size-sm: 0.875rem;
-  --font-size-base: 1rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.5rem;
-  --font-size-3xl: 1.875rem;
-  --font-size-4xl: 2.25rem;
+  --font-size-xs: 0.6rem; /* Уменьшен с 0.7rem */
+  --font-size-sm: 0.7rem; /* Уменьшен с 0.8rem */
+  --font-size-base: 0.8rem; /* Уменьшен с 0.9rem */
+  --font-size-lg: 0.9rem; /* Уменьшен с 1rem */
+  --font-size-xl: 1rem; /* Уменьшен с 1.1rem */
+  --font-size-2xl: 1.1rem; /* Уменьшен с 1.3rem */
+  --font-size-3xl: 1.3rem; /* Уменьшен с 1.6rem */
+  --font-size-4xl: 1.5rem; /* Уменьшен с 1.9rem */
   
-  --line-height-tight: 1.25;
-  --line-height-normal: 1.5;
-  --line-height-relaxed: 1.75;
+  --line-height-tight: 1.1; /* Уменьшен с 1.2 */
+  --line-height-normal: 1.3; /* Уменьшен с 1.4 */
+  --line-height-relaxed: 1.5; /* Уменьшен с 1.6 */
   
-  --radius-sm: 0.25rem;
-  --radius-md: 0.375rem;
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.75rem;
-  --radius-2xl: 1rem;
+  --radius-sm: 0.15rem; /* Уменьшен с 0.2rem */
+  --radius-md: 0.25rem; /* Уменьшен с 0.3rem */
+  --radius-lg: 0.3rem; /* Уменьшен с 0.4rem */
+  --radius-xl: 0.5rem; /* Уменьшен с 0.6rem */
+  --radius-2xl: 0.7rem; /* Уменьшен с 0.8rem */
   --radius-full: 9999px;
   
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-sm: 0 0.5px 1px 0 rgb(0 0 0 / 0.05); /* Уменьшен эффект тени */
+  --shadow-md: 0 1px 2px -0.5px rgb(0 0 0 / 0.1), 0 0.5px 1px -0.5px rgb(0 0 0 / 0.1); /* Уменьшен эффект тени */
+  --shadow-lg: 0 3px 5px -1px rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1); /* Уменьшен эффект тени */
+  --shadow-xl: 0 5px 8px -2px rgb(0 0 0 / 0.1), 0 2px 3px -2px rgb(0 0 0 / 0.1); /* Уменьшен эффект тени */
   
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 200ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
-
 
 * {
   margin: 0;
@@ -220,7 +222,7 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   line-height: var(--line-height-tight);
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-2); /* Уменьшен с var(--space-3) */
   color: var(--color-neutral-900);
   letter-spacing: -0.025em;
 }
@@ -234,7 +236,7 @@ h2 {
 }
 
 p {
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-2); /* Уменьшен с var(--space-3) */
 }
 
 button {
@@ -244,7 +246,7 @@ button {
 
 @media (max-width: 768px) {
   :root {
-    --font-size-base: 0.875rem;
+    --font-size-base: 0.7rem; /* Уменьшен с 0.8rem */
   }
   
   h1 {
@@ -259,13 +261,13 @@ button {
 .header1 {
   background: var(--color-primary);
   color: white;
-  padding-top: 50px;
-  padding-left: 20px;
-  padding-bottom: 20px;
-  width: calc(100% - -30px);
-  margin-top: -18px;
+  padding-top: 40px;
+  padding-left: 15px;
+  padding-bottom: 15px;
+  width: calc(100% - -28px);
+  margin-top: -23px;
   margin-right: 5px;
-  margin-left: -10px;
+  margin-left: -8px;
 }
 
 .header h1 {
@@ -283,7 +285,7 @@ button {
 
 @media (max-width: 768px) {
   .header {
-    padding: var(--space-4) var(--space-4);
+    padding: var(--space-2) var(--space-2);
   }
 }
 
@@ -296,7 +298,7 @@ button {
 }
 
 .table-container::-webkit-scrollbar {
-  height: 8px;
+  height: 4px;
 }
 
 .table-container::-webkit-scrollbar-track {
@@ -311,6 +313,7 @@ button {
 
 .orders-table {
   width: 100%;
+  min-width: 900px; /* Уменьшен с 1000px */
   border-collapse: separate;
   border-spacing: 0;
   text-align: left;
@@ -326,7 +329,7 @@ button {
 }
 
 .orders-table th {
-  padding: var(--space-4) var(--space-4);
+  padding: var(--space-2) var(--space-2); /* Уменьшен с var(--space-3) */
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -349,45 +352,83 @@ button {
 
 .orders-table tbody tr:hover {
   background-color: var(--color-neutral-50);
-  transform: translateY(-1px);
+  transform: translateY(-0.5px); /* Уменьшен эффект hover */
   box-shadow: var(--shadow-sm);
 }
 
 .orders-table td {
-  padding: var(--space-4) var(--space-4);
+  padding: var(--space-2) var(--space-2); /* Уменьшен с var(--space-3) */
   vertical-align: middle;
 }
 
 .item-column {
-  max-width: 300px;
+  max-width: 180px; /* Уменьшен с 200px */
   white-space: normal;
-  line-height: 1.4;
+  line-height: 1.2; /* Уменьшен с 1.3 */
   color: var(--color-neutral-700);
+  word-break: break-word;
 }
 
 .actions-column {
   display: flex;
-  gap: var(--space-2);
+  gap: var(--space-1); /* Уменьшен с var(--space-1) */
   flex-wrap: wrap;
   justify-content: flex-start;
-  min-width: 280px;
-  padding: var(--space-3) var(--space-4);
+  min-width: 200px; /* Уменьшен с 240px */
+  padding: var(--space-1) var(--space-2); /* Уменьшен с var(--space-2) var(--space-3) */
+}
+
+@media (max-width: 1440px) {
+  .orders-table {
+    min-width: 800px; /* Уменьшен с 900px */
+  }
+
+  .item-column {
+    max-width: 160px; /* Уменьшен с 180px */
+  }
+
+  .actions-column {
+    min-width: 180px; /* Уменьшен с 220px */
+  }
 }
 
 @media (max-width: 1200px) {
   .orders-table {
-    min-width: 1000px;
+    min-width: 700px; /* Уменьшен с 800px */
+  }
+
+  .item-column {
+    max-width: 140px; /* Уменьшен с 160px */
+  }
+
+  .actions-column {
+    min-width: 160px; /* Уменьшен с 200px */
   }
 }
 
 @media (max-width: 768px) {
   .orders-table th,
   .orders-table td {
-    padding: var(--space-3) var(--space-3);
+    padding: var(--space-1) var(--space-1); /* Уменьшен с var(--space-2) */
   }
   
   .actions-column {
-    min-width: 260px;
+    min-width: 140px; /* Уменьшен с 160px */
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .item-column {
+    max-width: 120px; /* Уменьшен с 140px */
+  }
+
+  .orders-table {
+    min-width: 100%;
+    font-size: calc(var(--font-size-xs) - 0.1rem); /* Дополнительное уменьшение */
+  }
+
+  .orders-table th {
+    font-size: calc(var(--font-size-xs) - 0.1rem); /* Дополнительное уменьшение */
   }
 }
 
@@ -395,15 +436,15 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-1) var(--space-3);
+  padding: var(--space-1) var(--space-1); /* Уменьшен с var(--space-2) */
   border-radius: var(--radius-full);
-  font-size: var(--font-size-xs);
+  font-size: calc(var(--font-size-xs) - 0.1rem); /* Уменьшен */
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   white-space: nowrap;
   transition: all var(--transition-fast);
-  min-width: 80px;
+  min-width: 60px; /* Уменьшен с 70px */
 }
 
 .status-badge.status-ready {
@@ -421,7 +462,7 @@ button {
 .status-badge.status-cooking {
   background-color: #93c5fd;
   color: #1e3a8a;
- border: 1px solid var(--color-neutral-300);
+  border: 1px solid var(--color-neutral-300);
 }
 
 .status-badge.status-completed {
@@ -443,7 +484,7 @@ button {
 }
 
 .status-badge:hover {
-  transform: translateY(-1px);
+  transform: translateY(-0.5px); /* Уменьшен эффект hover */
   box-shadow: var(--shadow-sm);
   filter: brightness(1.05);
 }
@@ -465,9 +506,9 @@ button {
   background: var(--color-neutral-50);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-lg);
-  padding: var(--space-6);
-  max-width: 600px;
-  width: 100%;
+  padding: var(--space-3); /* Уменьшен с var(--space-4) */
+  max-width: 400px; /* Уменьшен с 500px */
+  width: 90%;
   max-height: 80vh;
   overflow-y: auto;
 }
@@ -475,21 +516,37 @@ button {
 .modal-content {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-2); /* Уменьшен с var(--space-3) */
 }
 
 .modal-input {
   font-family: var(--font-family);
-  font-size: var(--font-size-base);
+  font-size: calc(var(--font-size-sm) - 0.1rem); /* Уменьшен с var(--font-size-sm) */
   color: var(--color-neutral-800);
   border: 1px solid var(--color-neutral-300);
   border-radius: var(--radius-md);
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-1) var(--space-1); /* Уменьшен с var(--space-1) var(--space-2) */
   transition: all var(--transition-fast);
 }
 
 .modal-input:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-light);
+  box-shadow: 0 0 0 1px var(--color-primary-light); /* Уменьшен эффект */
+}
+
+@media (max-width: 768px) {
+  .modal {
+    width: 95%;
+    padding: var(--space-2); /* Уменьшен с var(--space-3) */
+  }
+
+  .modal-content {
+    gap: var(--space-1); /* Уменьшен с var(--space-2) */
+  }
+
+  .modal-input {
+    font-size: calc(var(--font-size-sm) - 0.15rem); /* Дополнительное уменьшение */
+    padding: var(--space-1) var(--space-1);
+  }
 }

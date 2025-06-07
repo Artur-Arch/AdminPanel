@@ -25,7 +25,7 @@ const filters = [
 const getStatusClass = (status) => {
   switch (status) {
     case "PENDING":
-      return "status yangi";
+      return "status navbatda";
     case "COOKING":
       return "status tayyorlanmoqda";
     case "READY":

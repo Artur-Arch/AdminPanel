@@ -81,6 +81,9 @@ export default function Zakazlar() {
     editingOrder: null,
     newItem: { productId: "", count: 1 },
     error: null,
+    showInitialDeleteConfirmModal: false, // Новое состояние для первого модального окна
+    showDeleteConfirmModal: false, // Состояние для второго модального окна
+    orderToDelete: null, // ID заказа для удаления
   });
 
   const commissionRate = useSelector((state) => state.commission.commissionRate);
@@ -211,14 +214,46 @@ export default function Zakazlar() {
 
   const handleDeleteOrder = useCallback(
     async (id) => {
-      if (!window.confirm("Bu buyurtmani o'chirishni xohlaysizmi?")) return;
-      const order = state.orders.find((o) => o.id === id);
-      const tableId = order?.tableId;
-      try {
-        await axios.delete(
-          `${API_ENDPOINTS.orders}/${id}`,
-          createApiRequest(token)
+      // Открываем первое модальное окно
+      updateState({ showInitialDeleteConfirmModal: true, orderToDelete: id });
+    },
+    []
+  );
+
+  const confirmInitialDelete = useCallback(() => {
+    updateState({
+      showInitialDeleteConfirmModal: false,
+      showDeleteConfirmModal: true, // Открываем второе модальное окно
+    });
+  }, []);
+
+  const cancelInitialDelete = useCallback(() => {
+    updateState({ showInitialDeleteConfirmModal: false, orderToDelete: null });
+  }, []);
+
+  const confirmDeleteOrder = useCallback(async () => {
+    const id = state.orderToDelete;
+    const order = state.orders.find((o) => o.id === id);
+    const tableId = order?.tableId;
+    try {
+      await axios.delete(
+        `${API_ENDPOINTS.orders}/${id}`,
+        createApiRequest(token)
+      );
+      const updatedOrders = state.orders.filter((o) => o.id !== id);
+      updateState({ orders: updatedOrders });
+      if (tableId) {
+        const hasOtherOrders = updatedOrders.some(
+          (o) => o.tableId === tableId && o.status !== "ARCHIVE"
         );
+        if (!hasOtherOrders) {
+          await updateTableStatus(tableId, "empty");
+        }
+      }
+      alert("Buyurtma muvaffaqiyatli o'chirildi!");
+    } catch (error) {
+      const status = handleApiError(error, "Buyurtmani o'chirishda xatolik.");
+      if (status === 404) {
         const updatedOrders = state.orders.filter((o) => o.id !== id);
         updateState({ orders: updatedOrders });
         if (tableId) {
@@ -229,25 +264,15 @@ export default function Zakazlar() {
             await updateTableStatus(tableId, "empty");
           }
         }
-        alert("Buyurtma muvaffaqiyatli o'chirildi!");
-      } catch (error) {
-        const status = handleApiError(error, "Buyurtmani o'chirishda xatolik.");
-        if (status === 404) {
-          const updatedOrders = state.orders.filter((o) => o.id !== id);
-          updateState({ orders: updatedOrders });
-          if (tableId) {
-            const hasOtherOrders = updatedOrders.some(
-              (o) => o.tableId === tableId && o.status !== "ARCHIVE"
-            );
-            if (!hasOtherOrders) {
-              await updateTableStatus(tableId, "empty");
-            }
-          }
-        }
       }
-    },
-    [state.orders, token, updateTableStatus]
-  );
+    } finally {
+      updateState({ showDeleteConfirmModal: false, orderToDelete: null });
+    }
+  }, [state.orders, state.orderToDelete, token, updateTableStatus]);
+
+  const cancelDeleteOrder = useCallback(() => {
+    updateState({ showDeleteConfirmModal: false, orderToDelete: null });
+  }, []);
 
   const handleEditOrder = useCallback((order) => {
     updateState({
@@ -343,7 +368,6 @@ export default function Zakazlar() {
         product,
       };
 
-      // Всегда добавляем новый элемент, даже если он уже существует
       const updatedOrderItems = [...state.editingOrder.orderItems, newOrderItem];
       const totalPrice = calculateTotalPrice(updatedOrderItems);
 
@@ -376,11 +400,10 @@ export default function Zakazlar() {
         });
         console.log("GET response after PUT:", updatedOrder.data);
 
-        // Проверка, что новый элемент добавлен
         const newOrderItemsFromServer = updatedOrder.data.orderItems;
         if (!newOrderItemsFromServer.some((item) => item.productId === newOrderItem.productId && item.count === newOrderItem.count)) {
           console.warn("Server did not add new item correctly. Forcing client-side update.");
-          updatedOrder.data.orderItems = updatedOrderItems; // Принудительное обновление
+          updatedOrder.data.orderItems = updatedOrderItems;
         }
 
         updateState({
@@ -699,6 +722,72 @@ export default function Zakazlar() {
                       (commissionRate / 100)
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Первое модальное окно для начального подтверждения */}
+      {state.showInitialDeleteConfirmModal && (
+        <div className="modal-overlay" onClick={cancelInitialDelete}>
+          <div className="modal1" onClick={(e) => e.stopPropagation()}>
+            <div className="modal__header">
+              <h2 className="modal__title">Ogohlantirish</h2>
+              <button className="modal__close-btn" onClick={cancelInitialDelete}>
+                <X size={24} />
+              </button>
+            </div>
+            <div className="modal__content">
+              <p>Bu buyurtmani o'chirishni xohlaysizmi?</p>
+            </div>
+            <div className="modal__footer">
+              <button
+                className="modal__cancel-btn"
+                onClick={confirmInitialDelete}
+                style={{ backgroundColor: "#EF4044", color: "#fff", padding: "8px 16px", border: "none", borderRadius: "4px", cursor: "pointer" }}
+              >
+                Ha
+              </button>
+              <button
+                className="modal__cancel-btn"
+                onClick={cancelInitialDelete}
+                style={{ backgroundColor: "#10B981", color: "#fff", padding: "8px 16px", border: "none", borderRadius: "4px", cursor: "pointer", marginLeft: "10px" }}
+              >
+                Yo'q
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Второе модальное окно для окончательного подтверждения */}
+      {state.showDeleteConfirmModal && (
+        <div className="modal-overlay" onClick={cancelDeleteOrder}>
+          <div className="modal1" onClick={(e) => e.stopPropagation()}>
+            <div className="modal__header">
+              <h2 className="modal__title">Zakaz ochirish</h2>
+              <button className="modal__close-btn" onClick={cancelDeleteOrder}>
+                <X size={24} />
+              </button>
+            </div>
+            <div className="modal__content">
+              <p>Rostdan ham ushbu buyurtmani o'chirishni xohlaysizmi? Bu amal qaytarib bo'lmaydi!</p>
+            </div>
+            <div className="modal__footer">
+              <button
+                className="modal__cancel-btn"
+                onClick={confirmDeleteOrder}
+                style={{ backgroundColor: "#EF4044", color: "#fff", padding: "8px 16px", border: "none", borderRadius: "4px", cursor: "pointer" }}
+              >
+                Ha
+              </button>
+              <button
+                className="modal__cancel-btn"
+                onClick={cancelDeleteOrder}
+                style={{ backgroundColor: "#10B981", color: "#fff", padding: "8px 16px", border: "none", borderRadius: "4px", cursor: "pointer", marginLeft: "10px" }}
+              >
+                Yo'q
+              </button>
             </div>
           </div>
         </div>

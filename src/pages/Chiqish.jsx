@@ -16,7 +16,10 @@ export default function Chiqish() {
 
   return (
     <>
-    <div className="header1">
+    <div style={{
+      marginLeft: "-10px",
+      paddingRight: "1115px",
+    }} className="header1">
       <h2
         style={{
           margin: "0",

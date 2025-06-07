@@ -20,38 +20,39 @@ const Receipt = React.forwardRef(({ order }, ref) => {
           max-width: 500px;
           margin: auto;
           background: white;
-          padding: 20px 25px;
-          border-radius: 8px;
+          padding: 10px 15px; /* Уменьшен с 20px 25px */
+          border-radius: 4px; /* Уменьшен с 8px */
         }
         .receipt h2 {
           text-align: center;
-          margin-bottom: 10px;
+          margin-bottom: 5px; /* Уменьшен с 10px */
           color: #333;
+          font-size: 12px; /* Уменьшен с 16px */
         }
         .receipt p {
-          margin: 5px 0;
-          font-size: 16px;
+          margin: 3px 0; /* Уменьшен с 5px */
+          font-size: 10px; /* Уменьшен с 16px */
         }
         .receipt hr {
           border: none;
           border-top: 1px solid #ddd;
-          margin: 15px 0;
+          margin: 10px 0; /* Уменьшен с 15px */
         }
         .items {
           list-style: none;
           padding-left: 0;
-          font-size: 15px;
+          font-size: 10px; /* Уменьшен с 15px */
         }
         .items li {
-          margin: 4px 0;
-          padding: 2px 0;
+          margin: 2px 0; /* Уменьшен с 4px */
+          padding: 1px 0; /* Уменьшен с 2px */
           border-bottom: 1px dashed #eee;
         }
         .thank {
           text-align: center;
-          margin-top: 20px;
+          margin-top: 10px; /* Уменьшен с 20px */
           font-weight: bold;
-          font-size: 16px;
+          font-size: 10px; /* Уменьшен с 16px */
         }
       `}</style>
       <div className="receipt" ref={ref}>
@@ -72,7 +73,7 @@ const Receipt = React.forwardRef(({ order }, ref) => {
         <hr />
         <p>Jami: <strong>{formatPrice(order.totalPrice || 0)}</strong></p>
         <p>Hizmat haqqi: <strong>{formatPrice(order.commission || 0)}</strong></p>
-        <p>Jami (komissiya bilan): <strong style={{fontSize: "22px", marginBottom: "10px"}}>{formatPrice(order.totalWithCommission || 0)}</strong></p>
+        <p>Jami (komissiya bilan): <strong style={{fontSize: "14px", marginBottom: "5px"}}>{formatPrice(order.totalWithCommission || 0)}</strong></p>
         <p className="thank">Rahmat, biz sizni yana kutamiz!</p>
       </div>
     </div>

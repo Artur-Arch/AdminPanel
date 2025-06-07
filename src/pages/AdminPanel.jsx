@@ -112,8 +112,7 @@ export default function AdminPanel() {
                     <th>Zakaz №</th>
                     <th>Stol</th>
                     <th>Taom</th>
-                    <th>To'lash turi</th>
-                    <th>Soliq</th>
+                    <th>Komissiya</th>
                     <th>Umumiy narxi</th>
                     <th>Komissiya</th>
                     <th>Jami</th>
@@ -135,7 +134,6 @@ export default function AdminPanel() {
                             .map((item) => `${item.product.name} (${item.count})`)
                             .join(", ")}
                         </td>
-                        <td>-</td>
                         <td>{formatPrice((order.totalPrice * 4) / 100)}</td>
                         <td>{formatPrice(order.totalPrice)}</td>
                         <td>{formatPrice(commission)}</td>
