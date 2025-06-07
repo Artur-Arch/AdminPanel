@@ -75,7 +75,12 @@ export default function Asboblar() {
         const totalCommission = totalAmount * (commissionRate / 100);
         const averageCheck = orderCount > 0 ? totalAmount / orderCount : 0;
 
-        setDailyStats({ orderCount, totalAmount, totalCommission, averageCheck });
+        setDailyStats({
+          orderCount,
+          totalAmount,
+          totalCommission,
+          averageCheck,
+        });
 
         const oneWeekAgo = new Date();
         oneWeekAgo.setDate(today.getDate() - 6);
@@ -129,7 +134,7 @@ export default function Asboblar() {
     fetchData();
   }, [commissionRate]);
 
-  const chartData = {
+  const orderChartData = {
     labels: weeklyStats.map((stat) => stat.date),
     datasets: [
       {
@@ -140,6 +145,12 @@ export default function Asboblar() {
         borderWidth: 2,
         fill: true,
       },
+    ],
+  };
+
+  const commissionChartData = {
+    labels: weeklyStats.map((stat) => stat.date),
+    datasets: [
       {
         label: "Komissiya (so'm)",
         data: weeklyStats.map((stat) => stat.commission),
@@ -157,9 +168,19 @@ export default function Asboblar() {
     scales: {
       y: {
         beginAtZero: true,
+        suggestedMax: (context) => {
+          const maxValue =
+            context.chart.canvas.id === "orderChart"
+              ? Math.max(...weeklyStats.map((stat) => stat.orderCount || 0)) * 1.1
+              : Math.max(...weeklyStats.map((stat) => stat.commission || 0)) * 1.1;
+          return maxValue > 0 ? maxValue : 10;
+        },
         title: {
           display: true,
-          text: "Buyurtmalar soni / Komissiya",
+          text: (context) =>
+            context.chart.canvas.id === "orderChart"
+              ? "Buyurtmalar soni"
+              : "Komissiya (so'm)",
           color: "var(--color-text-primary)",
           font: {
             size: 14,
@@ -168,6 +189,8 @@ export default function Asboblar() {
         },
         ticks: {
           color: "var(--color-text-secondary)",
+          precision: (context) =>
+            context.chart.canvas.id === "orderChart" ? 0 : 2,
         },
       },
       x: {
@@ -197,8 +220,8 @@ export default function Asboblar() {
       },
       tooltip: {
         backgroundColor: "var(--color-card-background)",
-        titleColor: "var(--color-text-primary)",
-        bodyColor: "var(--color-text-primary)",
+        titleColor: "#ffffff",
+        bodyColor: "#ffffff",
         borderColor: "var(--color-border)",
         borderWidth: 1,
       },
@@ -207,12 +230,12 @@ export default function Asboblar() {
 
   return (
     <div className="container">
-      <header className="header-asboblar">
+      <header style={{marginTop: "-23px"}} className="header-asboblar">
         <h1
           style={{
             color: "#ffffff",
             fontSize: "2.5rem",
-            marginLeft: "-5px",
+            marginLeft: "-5px"
           }}
           className="header-title fade-in"
         >
@@ -274,10 +297,32 @@ export default function Asboblar() {
         </h3>
         {loading ? (
           <div className="spinner"></div>
+        ) : weeklyStats.length === 0 ? (
+          <p style={{ textAlign: "center", marginTop: "var(--space-4)" }}>
+            Buyurtmalar yo'q
+          </p>
         ) : (
-          <div className="chart">
-            <Line data={chartData} options={chartOptions} />
-          </div>
+          <>
+            <div
+              className="chart"
+              style={{ height: "300px", marginBottom: "var(--space-4)" }}
+            >
+              <h4>Buyurtmalar soni</h4>
+              <Line
+                id="orderChart"
+                data={orderChartData}
+                options={chartOptions}
+              />
+            </div>
+            <div className="chart" style={{ height: "300px" }}>
+              <h4>Komissiya</h4>
+              <Line
+                id="commissionChart"
+                data={commissionChartData}
+                options={chartOptions}
+              />
+            </div>
+          </>
         )}
       </section>
     </div>

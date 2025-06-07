@@ -343,6 +343,7 @@ export default function Zakazlar() {
         product,
       };
 
+      // Всегда добавляем новый элемент, даже если он уже существует
       const updatedOrderItems = [...state.editingOrder.orderItems, newOrderItem];
       const totalPrice = calculateTotalPrice(updatedOrderItems);
 
@@ -374,6 +375,13 @@ export default function Zakazlar() {
           },
         });
         console.log("GET response after PUT:", updatedOrder.data);
+
+        // Проверка, что новый элемент добавлен
+        const newOrderItemsFromServer = updatedOrder.data.orderItems;
+        if (!newOrderItemsFromServer.some((item) => item.productId === newOrderItem.productId && item.count === newOrderItem.count)) {
+          console.warn("Server did not add new item correctly. Forcing client-side update.");
+          updatedOrder.data.orderItems = updatedOrderItems; // Принудительное обновление
+        }
 
         updateState({
           editingOrder: {
@@ -678,13 +686,17 @@ export default function Zakazlar() {
               </div>
               <div className="modal__total">
                 Komissiya ({commissionRate}%):{" "}
-                {formatPrice(calculateTotalPrice(state.editingOrder.orderItems) * (commissionRate / 100))}
+                {formatPrice(
+                  calculateTotalPrice(state.editingOrder.orderItems) *
+                    (commissionRate / 100)
+                )}
               </div>
               <div className="modal__total">
                 Jami (komissiya bilan):{" "}
                 {formatPrice(
                   calculateTotalPrice(state.editingOrder.orderItems) +
-                  calculateTotalPrice(state.editingOrder.orderItems) * (commissionRate / 100)
+                    calculateTotalPrice(state.editingOrder.orderItems) *
+                      (commissionRate / 100)
                 )}
               </div>
             </div>
@@ -699,9 +711,12 @@ export default function Zakazlar() {
             state.currentOrder
               ? {
                   ...state.currentOrder,
-                  tableNumber: state.currentOrder.table?.number || 'N/A',
-                  commission: state.currentOrder.totalPrice * (commissionRate / 100),
-                  totalWithCommission: state.currentOrder.totalPrice + state.currentOrder.totalPrice * (commissionRate / 100),
+                  tableNumber: state.currentOrder.table?.number || "N/A",
+                  commission:
+                    state.currentOrder.totalPrice * (commissionRate / 100),
+                  totalWithCommission:
+                    state.currentOrder.totalPrice +
+                    state.currentOrder.totalPrice * (commissionRate / 100),
                 }
               : {
                   id: null,

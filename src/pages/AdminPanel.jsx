@@ -100,91 +100,97 @@ export default function AdminPanel() {
       <div className="admin-panel">
         <section className="orders-section">
           <h2>Barcha Zakazlar</h2>
-          <div className="table-container">
-            <table className="orders-table">
-              <thead>
-                <tr>
-                  <th>Zakaz №</th>
-                  <th>Stol</th>
-                  <th>Taom</th>
-                  <th>To'lash turi</th>
-                  <th>Soliq</th>
-                  <th>Umumiy narxi</th>
-                  <th>Komissiya</th>
-                  <th>Jami</th>
-                  <th>Holat</th>
-                  <th>Sana</th>
-                  <th>Bajariladigan ishi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {orders.map((order, index) => {
-                  const commission = order.totalPrice * (commissionRate / 100);
-                  const totalWithCommission = order.totalPrice + commission;
-                  return (
-                    <tr key={`${order.id}-${index}`}>
-                      <td>№ {order.id}</td>
-                      <td>{tableMap[order.tableId] || "N/A"}</td>
-                      <td className="item-column">
-                        {order.orderItems
-                          .map((item) => `${item.product.name} (${item.count})`)
-                          .join(", ")}
-                      </td>
-                      <td>-</td>
-                      <td>{formatPrice((order.totalPrice * 4) / 100)}</td>
-                      <td>{formatPrice(order.totalPrice)}</td>
-                      <td>{formatPrice(commission)}</td>
-                      <td>{formatPrice(totalWithCommission)}</td>
-                      <td>
-                        <span
-                          className={`status-badge ${
-                            order.status === "PENDING"
-                              ? "status-pending"
-                              : order.status === "COOKING"
-                              ? "status-cooking"
-                              : order.status === "READY"
-                              ? "status-ready"
-                              : order.status === "COMPLETED"
-                              ? "status-completed"
-                              : order.status === "ARCHIVE"
-                              ? "status-archive"
-                              : "status-default"
-                          }`}
-                        >
-                          {getStatusText(order.status)}
-                        </span>
-                      </td>
-                      <td>{new Date(order.createdAt).toLocaleDateString()}</td>
-                      <td className="actions-column">
-                        {order.status !== "ARCHIVE" && (
-                          <>
-                            <button
-                              className="action-button edit"
-                              onClick={() => handleEdit(order)}
-                            >
-                              Tahrirlash
-                            </button>
-                            <button
-                              className="action-button delete"
-                              onClick={() => handleDelete(order.id)}
-                            >
-                              O'chirish
-                            </button>
-                          </>
-                        )}
-                        <button
-                          className="action-button view"
-                          onClick={() => handleView(order)}
-                        >
-                          Ko'rish
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          {orders.length === 0 ? (
+            <p style={{ textAlign: "center", marginTop: "var(--space-4)" }}>
+              Buyurtmalar yo'q
+            </p>
+          ) : (
+            <div className="table-container">
+              <table className="orders-table">
+                <thead>
+                  <tr>
+                    <th>Zakaz №</th>
+                    <th>Stol</th>
+                    <th>Taom</th>
+                    <th>To'lash turi</th>
+                    <th>Soliq</th>
+                    <th>Umumiy narxi</th>
+                    <th>Komissiya</th>
+                    <th>Jami</th>
+                    <th>Holat</th>
+                    <th>Sana</th>
+                    <th>Bajariladigan ishi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orders.map((order, index) => {
+                    const commission = order.totalPrice * (commissionRate / 100);
+                    const totalWithCommission = order.totalPrice + commission;
+                    return (
+                      <tr key={`${order.id}-${index}`}>
+                        <td>№ {order.id}</td>
+                        <td>{tableMap[order.tableId] || "N/A"}</td>
+                        <td className="item-column">
+                          {order.orderItems
+                            .map((item) => `${item.product.name} (${item.count})`)
+                            .join(", ")}
+                        </td>
+                        <td>-</td>
+                        <td>{formatPrice((order.totalPrice * 4) / 100)}</td>
+                        <td>{formatPrice(order.totalPrice)}</td>
+                        <td>{formatPrice(commission)}</td>
+                        <td>{formatPrice(totalWithCommission)}</td>
+                        <td>
+                          <span
+                            className={`status-badge ${
+                              order.status === "PENDING"
+                                ? "status-pending"
+                                : order.status === "COOKING"
+                                ? "status-cooking"
+                                : order.status === "READY"
+                                ? "status-ready"
+                                : order.status === "COMPLETED"
+                                ? "status-completed"
+                                : order.status === "ARCHIVE"
+                                ? "status-archive"
+                                : "status-default"
+                            }`}
+                          >
+                            {getStatusText(order.status)}
+                          </span>
+                        </td>
+                        <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                        <td className="actions-column">
+                          {order.status !== "ARCHIVE" && (
+                            <>
+                              <button
+                                className="action-button edit"
+                                onClick={() => handleEdit(order)}
+                              >
+                                Tahrirlash
+                              </button>
+                              <button
+                                className="action-button delete"
+                                onClick={() => handleDelete(order.id)}
+                              >
+                                O'chirish
+                              </button>
+                            </>
+                          )}
+                          <button
+                            className="action-button view"
+                            onClick={() => handleView(order)}
+                          >
+                            Ko'rish
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </section>
 
         {selectedOrder && (

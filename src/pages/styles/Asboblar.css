@@ -1,6 +1,4 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-/* @import './variables.css';
-@import './animations.css'; */
 
 
 @keyframes fadeIn {
@@ -229,7 +227,7 @@ body {
   opacity: 0;
   animation: fadeIn 0.6s ease-out forwards;
   animation-delay: 0.4s;
-  height: 300px;
+  height: auto;
   overflow: hidden;
 }
 
@@ -239,7 +237,6 @@ body {
   object-fit: contain;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .stats-cards {
     grid-template-columns: 1fr;
@@ -259,7 +256,6 @@ body {
 }
 
 :root {
-  /* Colors */
   --color-primary: #4361ee;
   --color-primary-light: #4895ef;
   --color-secondary: #3f37c9;
@@ -312,4 +308,28 @@ body {
   --transition-fast: 150ms ease;
   --transition-normal: 250ms ease;
   --transition-slow: 350ms ease;
+}
+
+.chart-container {
+  width: 100%;
+  max-width: 100%;
+  overflow: visible;
+}
+
+.chart {
+  width: 100%;
+  min-height: 300px; /* Минимальная высота для графиков */
+  position: relative;
+}
+
+/* Убедитесь, что родительский контейнер не обрезает содержимое */
+.section {
+  overflow: visible;
+}
+
+/* Адаптивность для маленьких экранов */
+@media (max-width: 768px) {
+  .chart {
+    height: 250px; /* Уменьшенная высота для мобильных устройств */
+  }
 }
