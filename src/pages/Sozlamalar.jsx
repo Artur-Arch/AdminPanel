@@ -1,26 +1,31 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { Plus, Edit, Trash, Phone, Loader2 } from "lucide-react";
-import CommissionInput from "../components/CommissionInput";
-import "./styles/Sozlamalar.css";
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import axios from 'axios';
+import { Plus, Edit, Trash, Phone, Loader2 } from 'lucide-react';
+import { setRestaurantName } from '../store/actions/restaurantSlice'; // Исправленный импорт
+import CommissionInput from '../components/CommissionInput';
+import './styles/Sozlamalar.css';
 
 const roleOptions = [
-  { id: 1, value: "KITCHEN", label: "Oshpaz" },
-  { id: 2, value: "CASHIER", label: "Ofitsiant" },
-  { id: 3, value: "CUSTOMER", label: "Boshqaruvchi" },
-  { id: 4, value: "BIGADMIN", label: "Direktor" },
+  { id: 1, value: 'KITCHEN', label: 'Oshpaz' }, // Повар
+  { id: 2, value: 'CASHIER', label: 'Ofitsiant' }, // Официант
+  { id: 3, value: 'CUSTOMER', label: 'Menejer' }, // Менеджер
+  { id: 4, value: 'BIGADMIN', label: 'Direktor' }, // Директор
 ];
 
 export default function Sozlamalar() {
+  const dispatch = useDispatch();
+  const restaurantName = useSelector((state) => state.restaurant.restaurantName);
+  const [tempRestaurantName, setTempRestaurantName] = useState(restaurantName);
   const [staff, setStaff] = useState([]);
   const [editingStaff, setEditingStaff] = useState(null);
   const [newStaff, setNewStaff] = useState({
-    name: "",
-    surname: "",
-    username: "",
-    phone: "",
-    password: "",
-    role: "KITCHEN",
+    name: '',
+    surname: '',
+    username: '',
+    phone: '',
+    password: '',
+    role: 'KITCHEN',
   });
   const [showAddModal, setShowAddModal] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -30,31 +35,67 @@ export default function Sozlamalar() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("https://suddocs.uz/user", {
-          headers: {
-            "Content-Type": "application/json",
-          },
+        const response = await axios.get('https://suddocs.uz/user', {
+          headers: { 'Content-Type': 'application/json' },
         });
         const users = response.data.map((user) => ({
           id: user.id,
-          role: user.role || "KITCHEN",
-          name: user.name || "",
-          surname: user.surname || "",
-          phone: user.phone || "",
-          username: user.username || "",
-          password: "",
+          role: user.role || 'KITCHEN',
+          name: user.name || '',
+          surname: user.surname || '',
+          phone: user.phone || '',
+          username: user.username || '',
+          password: '',
         }));
         setStaff(users);
+
+        // Choyxona nomini yuklash (API bo'lmasa, bu qismni olib tashlang)
+        try {
+          const restaurantResponse = await axios.get('https://suddocs.uz/restaurant', {
+            headers: {
+              'Content-Type': 'application/json',
+              ...(localStorage.getItem('token') && { Authorization: `Bearer ${localStorage.getItem('token')}` }),
+            },
+          });
+          dispatch(setRestaurantName(restaurantResponse.data.name || 'Navruz Choyxonasi'));
+          setTempRestaurantName(restaurantResponse.data.name || 'Navruz Choyxonasi');
+        } catch (err) {
+          dispatch(setRestaurantName('Navruz Choyxonasi'));
+          setTempRestaurantName('Navruz Choyxonasi');
+        }
       } catch (err) {
-        console.error("Xodimlarni yuklashda xatolik:", err.message, err.response?.data);
-        setError("Xodimlarni yuklashda xatolik yuz berdi.");
+        setError("Ma'lumotlarni yuklashda xatolik yuz berdi.");
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
-  }, []);
+  }, [dispatch]);
+
+  const handleRestaurantNameSave = async () => {
+    if (!tempRestaurantName.trim()) {
+      alert("Choyxona nomi bo'sh bo'lishi mumkin emas.");
+      return;
+    }
+    try {
+      // Serverga saqlash (API bo'lmasa, bu qismni olib tashlang)
+      await axios.put(
+        'https://suddocs.uz/restaurant',
+        { name: tempRestaurantName },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            ...(localStorage.getItem('token') && { Authorization: `Bearer ${localStorage.getItem('token')}` }),
+          },
+        }
+      );
+      dispatch(setRestaurantName(tempRestaurantName));
+      alert('Nomi saqlandi.');
+    } catch (err) {
+      dispatch(setRestaurantName(tempRestaurantName)); // API bo'lmasa, faqat Redux'ga saqlaymiz
+      alert("Nomi mahalliy ravishda saqlandi.");
+    }
+  };
 
   const handleStaffSave = async () => {
     try {
@@ -66,8 +107,8 @@ export default function Sozlamalar() {
       };
       await axios.put(`https://suddocs.uz/user/${editingStaff.id}`, staffData, {
         headers: {
-          "Content-Type": "application/json",
-          ...(localStorage.getItem("token") && { Authorization: `Bearer ${localStorage.getItem("token")}` }),
+          'Content-Type': 'application/json',
+          ...(localStorage.getItem('token') && { Authorization: `Bearer ${localStorage.getItem('token')}` }),
         },
       });
       setStaff((prev) =>
@@ -75,14 +116,13 @@ export default function Sozlamalar() {
       );
       setEditingStaff(null);
     } catch (err) {
-      console.error("Xodimni saqlashda xatolik:", err);
-      alert("Xodimni saqlashda xatolik yuz berdi. Qayta urinib ko'ring.");
+      alert("Xodim ma'lumotlarini saqlashda xatolik yuz berdi.");
     }
   };
 
   const handleAddStaff = async () => {
     if (!newStaff.name || !newStaff.phone || !newStaff.username || !newStaff.password) {
-      alert("Iltimos, barcha majburiy maydonlarni to'ldiring (Ism, Telefon, Login, Parol).");
+      alert("Barcha majburiy maydonlarni to'ldiring.");
       return;
     }
     try {
@@ -94,28 +134,49 @@ export default function Sozlamalar() {
         password: newStaff.password,
         role: newStaff.role,
       };
-      const response = await axios.post("https://suddocs.uz/user", staffData, {
+      const response = await axios.post('https://suddocs.uz/user', staffData, {
         headers: {
-          "Content-Type": "application/json",
-          ...(localStorage.getItem("token") && { Authorization: `Bearer ${localStorage.getItem("token")}` }),
+          'Content-Type': 'application/json',
+          ...(localStorage.getItem('token') && { Authorization: `Bearer ${localStorage.getItem('token')}` }),
         },
       });
       setStaff([...staff, { id: response.data.id, ...staffData }]);
-      setNewStaff({ name: "", surname: "", username: "", phone: "", password: "", role: "KITCHEN" });
+      setNewStaff({ name: '', surname: '', username: '', phone: '', password: '', role: 'KITCHEN' });
       setShowAddModal(false);
     } catch (err) {
-      console.error("Yangi xodim qo'shishda xatolik:", err.response?.data || err.message);
-      alert("Yangi xodim qo'shishda xatolik yuz berdi.");
+      alert("Xodim qo'shishda xatolik yuz berdi.");
     }
   };
 
   return (
     <div className="container">
       <header className="app-header">
-        <h1 style={{ color: "#ffffff" }} className="app-title">
+        <h1 style={{ color: '#ffffff' }} className="app-title">
           Sozlamalar
         </h1>
       </header>
+      <section className="restaurant-name-section">
+        <label style={{
+          marginBottom: "5px"
+        }} className="section-title">Choyxona nomi</label>
+        <div className="form-group">
+          <input
+            style={{
+              width: "300px"
+            }}
+            type="text"
+            className="form-control"
+            placeholder="Choyxona nomini kiriting"
+            value={tempRestaurantName}
+            onChange={(e) => setTempRestaurantName(e.target.value)}
+          />
+          <button style={{
+            marginTop: "10px"
+          }} className="btn btn-success" onClick={handleRestaurantNameSave}>
+            Saqlash
+          </button>
+        </div>
+      </section>
       <section className="add-employee-section">
         <h2 className="section-title">Xodimlar</h2>
         {loading ? (
@@ -131,32 +192,31 @@ export default function Sozlamalar() {
               onClick={() => setShowAddModal(true)}
             >
               <Plus size={16} />
-              Yangi Xodim Qo'shish
+              Xodim qo'shish
             </button>
-
             <div className="employees-grid">
               {staff.map((person) => (
                 <div
                   key={person.id}
                   className="employee-card"
                   data-position={
-                    person.role === "KITCHEN"
-                      ? "Oshpaz"
-                      : person.role === "CASHIER"
-                      ? "Ofitsiant"
-                      : person.role === "CUSTOMER"
-                      ? "Boshqaruvchi"
-                      : "Direktor"
+                    person.role === 'KITCHEN'
+                      ? 'Oshpaz'
+                      : person.role === 'CASHIER'
+                      ? 'Ofitsiant'
+                      : person.role === 'CUSTOMER'
+                      ? 'Menejer'
+                      : 'Direktor'
                   }
                 >
                   <div className="employee-position">
-                    {person.role === "KITCHEN"
-                      ? "Oshpaz"
-                      : person.role === "CASHIER"
-                      ? "Ofitsiant"
-                      : person.role === "CUSTOMER"
-                      ? "Boshqaruvchi"
-                      : "Direktor"}
+                    {person.role === 'KITCHEN'
+                      ? 'Oshpaz'
+                      : person.role === 'CASHIER'
+                      ? 'Ofitsiant'
+                      : person.role === 'CUSTOMER'
+                      ? 'Menejer'
+                      : 'Direktor'}
                   </div>
                   <h3 className="employee-name">
                     {person.name} {person.surname}
@@ -171,29 +231,29 @@ export default function Sozlamalar() {
                       onClick={() => setEditingStaff(person)}
                     >
                       <Edit size={16} />
-                      O'zgartirish
+                      Tahrirlash
                     </button>
                     <button
                       className="btn btn-danger employee-action-btn btn-with-icon"
                       onClick={() => {
                         const confirmDelete = window.confirm(
-                          `Rostdan ham "${person.name} ${person.surname}" (${
-                            person.role === "KITCHEN"
-                              ? "Oshpaz"
-                              : person.role === "CASHIER"
-                              ? "Ofitsiant"
-                              : person.role === "CUSTOMER"
-                              ? "Boshqaruvchi"
-                              : "Direktor"
-                          }) xodimini o'chirmoqchimisiz?`
+                          `"${person.name} ${person.surname}" (${
+                            person.role === 'KITCHEN'
+                              ? 'Oshpaz'
+                              : person.role === 'CASHIER'
+                              ? 'Ofitsiant'
+                              : person.role === 'CUSTOMER'
+                              ? 'Menejer'
+                              : 'Direktor'
+                          }) haqiqatdan o'chirilsinmi?`
                         );
                         if (confirmDelete) {
                           axios
                             .delete(`https://suddocs.uz/user/${person.id}`, {
                               headers: {
-                                "Content-Type": "application/json",
-                                ...(localStorage.getItem("token") && {
-                                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                                'Content-Type': 'application/json',
+                                ...(localStorage.getItem('token') && {
+                                  Authorization: `Bearer ${localStorage.getItem('token')}`,
                                 }),
                               },
                             })
@@ -201,7 +261,6 @@ export default function Sozlamalar() {
                               setStaff(staff.filter((s) => s.id !== person.id));
                             })
                             .catch((err) => {
-                              console.error("Xodimni o'chirishda xatolik:", err);
                               alert("Xodimni o'chirishda xatolik yuz berdi.");
                             });
                         }
@@ -217,20 +276,18 @@ export default function Sozlamalar() {
           </>
         )}
       </section>
-
       <section className="commission-section">
-        <h2 className="section-title">Xizmat haqi</h2>
+        <h2 className="section-title">Komissiya</h2>
         <CommissionInput orderAmount={100000} />
       </section>
-
       {showAddModal && (
         <div
-          className={`modal-backdrop ${showAddModal ? "active" : ""}`}
+          className={`modal-backdrop ${showAddModal ? 'active' : ''}`}
           onClick={() => setShowAddModal(false)}
         >
           <div className="modal fade-in" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 className="modal-title">Yangi Xodim Qo'shish</h3>
+              <h3 className="modal-title">Xodim qo'shish</h3>
             </div>
             <div className="modal-body1">
               <div className="form-group">
@@ -248,21 +305,21 @@ export default function Sozlamalar() {
                 </select>
               </div>
               <div className="form-group">
-                <label className="form-label">Ismi</label>
+                <label className="form-label">Ism</label>
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="Ismi"
+                  placeholder="Ism"
                   value={newStaff.name}
                   onChange={(e) => setNewStaff({ ...newStaff, name: e.target.value })}
                 />
               </div>
               <div className="form-group">
-                <label className="form-label">Familiyasi</label>
+                <label className="form-label">Familiya</label>
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="Familiyasi"
+                  placeholder="Familiya"
                   value={newStaff.surname}
                   onChange={(e) => setNewStaff({ ...newStaff, surname: e.target.value })}
                 />
@@ -309,15 +366,14 @@ export default function Sozlamalar() {
           </div>
         </div>
       )}
-
       {editingStaff && (
         <div
-          className={`modal-backdrop ${editingStaff ? "active" : ""}`}
+          className={`modal-backdrop ${editingStaff ? 'active' : ''}`}
           onClick={() => setEditingStaff(null)}
         >
           <div className="modal fade-in" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 className="modal-title">Xodimni Tahrirlash</h3>
+              <h3 className="modal-title">Xodimni tahrirlash</h3>
             </div>
             <div className="modal-body1">
               <div className="form-group">
@@ -349,11 +405,11 @@ export default function Sozlamalar() {
                 />
               </div>
               <div className="form-group">
-                <label className="form-label">Yangi Parol (agar kerak bo'lsa)</label>
+                <label className="form-label">Yangi parol (agar kerak bo'lsa)</label>
                 <input
                   type="password"
                   className="form-control"
-                  placeholder="Yangi Parol (agar kerak bo'lsa)"
+                  placeholder="Yangi parol (agar kerak bo'lsa)"
                   value={editingStaff.password}
                   onChange={(e) =>
                     setEditingStaff({ ...editingStaff, password: e.target.value })
