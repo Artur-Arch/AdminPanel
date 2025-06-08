@@ -36,7 +36,9 @@ export default function Asboblar() {
   const [weeklyStats, setWeeklyStats] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const commissionRate = useSelector((state) => state.commission.commissionRate);
+  const commissionRate = useSelector(
+    (state) => state.commission.commissionRate
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -171,8 +173,10 @@ export default function Asboblar() {
         suggestedMax: (context) => {
           const maxValue =
             context.chart.canvas.id === "orderChart"
-              ? Math.max(...weeklyStats.map((stat) => stat.orderCount || 0)) * 1.1
-              : Math.max(...weeklyStats.map((stat) => stat.commission || 0)) * 1.1;
+              ? Math.max(...weeklyStats.map((stat) => stat.orderCount || 0)) *
+                1.1
+              : Math.max(...weeklyStats.map((stat) => stat.commission || 0)) *
+                1.1;
           return maxValue > 0 ? maxValue : 10;
         },
         title: {
@@ -230,18 +234,27 @@ export default function Asboblar() {
 
   return (
     <div className="container">
-      <header style={{marginTop: "-23px"}} className="header-asboblar">
+      <header
+        style={{ marginTop: "-23px", paddingBottom: "-5px" }}
+        className="header-asboblar"
+      >
         <h1
           style={{
             color: "#ffffff",
             fontSize: "2.5rem",
-            marginLeft: "-5px"
+            marginLeft: "-30px",
           }}
           className="header-title fade-in"
         >
           Asboblar
         </h1>
-        <h2 className="header-subtitle fade-in">
+        <h2
+          style={{
+            marginBottom: "0px",
+            marginLeft: "-25px",
+          }}
+          className="header-subtitle fade-in"
+        >
           <svg>
             <use xlinkHref="#stats-icon" />
           </svg>

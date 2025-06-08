@@ -95,7 +95,12 @@ export default function AdminPanel() {
   return (
     <div className="app">
       <header className="header1">
-        <h1 style={{ color: '#ffffff' }}>Administrator paneli</h1>
+        <h1 style={{
+           color: '#ffffff',
+           marginTop: "-30px",
+           marginLeft: "10px",
+           fontSize: "40px"
+           }}>Administrator paneli</h1>
       </header>
       <div style={{
         marginTop: "5px"
