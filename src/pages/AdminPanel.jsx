@@ -11,27 +11,42 @@ export default function AdminPanel() {
 
   const commissionRate = useSelector((state) => state.commission.commissionRate);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [ordersRes, tablesRes] = await Promise.all([
-          axios.get("https://suddocs.uz/order"),
-          axios.get("https://suddocs.uz/tables"),
-        ]);
+  const fetchData = async () => {
+    try {
+      const [ordersRes, tablesRes] = await Promise.all([
+        axios.get("https://suddocs.uz/order"),
+        axios.get("https://suddocs.uz/tables"),
+      ]);
 
-        const sanitizedOrders = ordersRes.data.map((order) => ({
+      const sanitizedOrders = ordersRes.data
+        .map((order) => ({
           ...order,
           orderItems: Array.isArray(order.orderItems) ? order.orderItems : [],
-        }));
+        }))
+        .sort((a, b) => {
+          if (a.status === "ARCHIVE" && b.status !== "ARCHIVE") return 1;
+          if (a.status !== "ARCHIVE" && b.status === "ARCHIVE") return -1;
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
 
-        setOrders(sanitizedOrders);
-        setTables(tablesRes.data.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+      console.log("Tartiblangan zakazlar:", sanitizedOrders.map(o => ({ id: o.id, createdAt: o.createdAt, status: o.status })));
 
+      setOrders((prevOrders) => {
+        if (JSON.stringify(prevOrders) !== JSON.stringify(sanitizedOrders)) {
+          return sanitizedOrders;
+        }
+        return prevOrders;
+      });
+      setTables(tablesRes.data.data);
+    } catch (error) {
+      console.error("Ma'lumotlarni olishda xatolik:", error);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
+    const interval = setInterval(fetchData, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const tableMap = tables.reduce((map, table) => {
@@ -62,49 +77,36 @@ export default function AdminPanel() {
     try {
       await axios.delete(`https://suddocs.uz/order/${orderId}`);
       alert("Zakaz o'chirildi");
-      const res = await axios.get("https://suddocs.uz/order");
-      setOrders(res.data);
-
+      await fetchData();
       if (selectedOrder?.id === orderId) {
         setSelectedOrder(null);
         setModalType("");
       }
     } catch (error) {
       alert("O'chirishda xatolik yuz berdi");
-      console.error("Delete error:", error);
+      console.error("O'chirish xatosi:", error);
     }
   };
 
   const getStatusText = (status) => {
     switch (status) {
-      case "PENDING":
-        return "Navbatda";
-      case "COOKING":
-        return "Tayyorlanmoqda";
-      case "READY":
-        return "Tayyor";
-      case "COMPLETED":
-        return "Mijoz oldida";
-      case "ARCHIVE":
-        return "Tugallangan";
-      default:
-        return status;
+      case "PENDING": return "Navbatda";
+      case "COOKING": return "Tayyorlanmoqda";
+      case "READY": return "Tayyor";
+      case "COMPLETED": return "Mijoz oldida";
+      case "ARCHIVE": return "Tugallangan";
+      default: return status;
     }
   };
 
   return (
     <div className="app">
       <header className="header1">
-        <h1 style={{
-           color: '#ffffff',
-           marginTop: "-30px",
-           marginLeft: "10px",
-           fontSize: "40px"
-           }}>Administrator paneli</h1>
+        <h1 style={{ color: '#ffffff', marginTop: "-30px", marginLeft: "10px", fontSize: "40px" }}>
+          Administrator paneli
+        </h1>
       </header>
-      <div style={{
-        marginTop: "5px"
-      }} className="admin-panel">
+      <div style={{ marginTop: "5px" }} className="admin-panel">
         <section className="orders-section">
           <h2>Barcha Zakazlar</h2>
           {orders.length === 0 ? (
@@ -119,11 +121,11 @@ export default function AdminPanel() {
                     <th>Zakaz №</th>
                     <th>Stol</th>
                     <th>Taom</th>
-                    <th>Komissiya</th>
+                    <th>Komissiya (4%)</th>
                     <th>Umumiy narxi</th>
                     <th>Komissiya</th>
                     <th>Jami</th>
-                    <th>Holat</th>
+                    <th>Holati</th>
                     <th>Sana</th>
                     <th>Bajariladigan ishi</th>
                   </tr>
@@ -137,9 +139,7 @@ export default function AdminPanel() {
                         <td>№ {order.id}</td>
                         <td>{tableMap[order.tableId] || "N/A"}</td>
                         <td className="item-column">
-                          {order.orderItems
-                            .map((item) => `${item.product.name} (${item.count})`)
-                            .join(", ")}
+                          {order.orderItems.map((item) => `${item.product.name} (${item.count})`).join(", ")}
                         </td>
                         <td>{formatPrice((order.totalPrice * 4) / 100)}</td>
                         <td>{formatPrice(order.totalPrice)}</td>
@@ -148,17 +148,12 @@ export default function AdminPanel() {
                         <td>
                           <span
                             className={`status-badge ${
-                              order.status === "PENDING"
-                                ? "status-pending"
-                                : order.status === "COOKING"
-                                ? "status-cooking"
-                                : order.status === "READY"
-                                ? "status-ready"
-                                : order.status === "COMPLETED"
-                                ? "status-completed"
-                                : order.status === "ARCHIVE"
-                                ? "status-archive"
-                                : "status-default"
+                              order.status === "PENDING" ? "status-pending" :
+                              order.status === "COOKING" ? "status-cooking" :
+                              order.status === "READY" ? "status-ready" :
+                              order.status === "COMPLETED" ? "status-completed" :
+                              order.status === "ARCHIVE" ? "status-archive" :
+                              "status-default"
                             }`}
                           >
                             {getStatusText(order.status)}
@@ -168,24 +163,15 @@ export default function AdminPanel() {
                         <td className="actions-column">
                           {order.status !== "ARCHIVE" && (
                             <>
-                              <button
-                                className="action-button edit"
-                                onClick={() => handleEdit(order)}
-                              >
+                              <button className="action-button edit" onClick={() => handleEdit(order)}>
                                 Tahrirlash
                               </button>
-                              <button
-                                className="action-button delete"
-                                onClick={() => handleDelete(order.id)}
-                              >
+                              <button className="action-button delete" onClick={() => handleDelete(order.id)}>
                                 O'chirish
                               </button>
                             </>
                           )}
-                          <button
-                            className="action-button view"
-                            onClick={() => handleView(order)}
-                          >
+                          <button className="action-button view" onClick={() => handleView(order)}>
                             Ko'rish
                           </button>
                         </td>
@@ -203,56 +189,28 @@ export default function AdminPanel() {
             <div className="modal">
               <div className="modal-content">
                 <h3>{modalType === "view" ? "Zakaz haqida" : "Zakazni tahrirlash"}</h3>
-                <p>
-                  <b>Zakaz №</b> {selectedOrder.id}
-                </p>
-                <p>
-                  <b>Stol:</b> {tableMap[selectedOrder.tableId] || "N/A"}
-                </p>
+                <p><b>Zakaz №</b> {selectedOrder.id}</p>
+                <p><b>Stol:</b> {tableMap[selectedOrder.tableId] || "N/A"}</p>
                 <div>
                   <b>Taomlar:</b>
                   {selectedOrder.orderItems.map((item, index) => (
                     <div
                       key={index}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        marginBottom: "var(--space-2)",
-                      }}
+                      style={{ display: "flex", alignItems: "center", marginBottom: "var(--space-2)" }}
                     >
                       <img
                         src={`https://suddocs.uz${item.product?.image}`}
                         alt={item.product?.name}
-                        style={{
-                          width: "50px",
-                          height: "50px",
-                          borderRadius: "var(--radius-md)",
-                          marginRight: "var(--space-3)",
-                        }}
+                        style={{ width: "50px", height: "50px", borderRadius: "var(--radius-md)", marginRight: "var(--space-3)" }}
                       />
-                      <span>
-                        {item.product.name} ({item.count})
-                      </span>
+                      <span>{item.product.name} ({item.count})</span>
                     </div>
                   ))}
                 </div>
-                <p>
-                  <b>Status:</b> {getStatusText(selectedOrder.status)}
-                </p>
-                <p>
-                  <b>Umumiy narxi:</b> {formatPrice(selectedOrder.totalPrice)}
-                </p>
-                <p>
-                  <b>Komissiya ({commissionRate}%):</b>{" "}
-                  {formatPrice(selectedOrder.totalPrice * (commissionRate / 100))}
-                </p>
-                <p>
-                  <b>Jami (komissiya bilan):</b>{" "}
-                  {formatPrice(
-                    selectedOrder.totalPrice +
-                    selectedOrder.totalPrice * (commissionRate / 100)
-                  )}
-                </p>
+                <p><b>Holati:</b> {getStatusText(selectedOrder.status)}</p>
+                <p><b>Umumiy narxi:</b> {formatPrice(selectedOrder.totalPrice)}</p>
+                <p><b>Komissiya ({commissionRate}%):</b> {formatPrice(selectedOrder.totalPrice * (commissionRate / 100))}</p>
+                <p><b>Jami (komissiya bilan):</b> {formatPrice(selectedOrder.totalPrice + selectedOrder.totalPrice * (commissionRate / 100))}</p>
 
                 {modalType === "edit" && (
                   <div style={{ marginBottom: "var(--space-4)" }}>
@@ -260,12 +218,7 @@ export default function AdminPanel() {
                     <select
                       className="modal-input"
                       value={selectedOrder.status}
-                      onChange={(e) =>
-                        setSelectedOrder({
-                          ...selectedOrder,
-                          status: e.target.value,
-                        })
-                      }
+                      onChange={(e) => setSelectedOrder({ ...selectedOrder, status: e.target.value })}
                       style={{
                         width: "100%",
                         padding: "var(--space-2)",
@@ -284,14 +237,11 @@ export default function AdminPanel() {
                       className="action-button edit"
                       onClick={async () => {
                         try {
-                          await axios.put(`https://suddocs.uz/order/${selectedOrder.id}`, {
-                            status: selectedOrder.status,
-                          });
+                          await axios.put(`https://suddocs.uz/order/${selectedOrder.id}`, { status: selectedOrder.status });
                           alert("Zakaz yangilandi");
                           setSelectedOrder(null);
                           setModalType("");
-                          const res = await axios.get("https://suddocs.uz/order");
-                          setOrders(res.data);
+                          await fetchData();
                         } catch (err) {
                           alert("Xatolik yuz berdi");
                           console.error(err);
@@ -304,10 +254,7 @@ export default function AdminPanel() {
                   </div>
                 )}
 
-                <button
-                  className="action-button delete"
-                  onClick={() => setSelectedOrder(null)}
-                >
+                <button className="action-button delete" onClick={() => setSelectedOrder(null)}>
                   Yopish
                 </button>
               </div>

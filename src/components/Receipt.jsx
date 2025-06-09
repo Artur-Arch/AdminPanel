@@ -10,7 +10,7 @@ const Receipt = React.forwardRef(({ order }, ref) => {
     return price
       .toString()
       .replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
-      .trim() + ' сум';
+      .trim() + ' so\'m';
   };
 
   return (
@@ -23,14 +23,14 @@ const Receipt = React.forwardRef(({ order }, ref) => {
           max-width: 500px;
           margin: auto;
           background: white;
-          padding: 10px 15px;
+          padding: 30px 15px;
           border-radius: 4px;
         }
         .receipt h2 {
           text-align: center;
           margin-bottom: 5px;
           color: #333;
-          font-size: 12px;
+          font-size: 20px;
         }
         .receipt p {
           margin: 3px 0;
@@ -54,30 +54,32 @@ const Receipt = React.forwardRef(({ order }, ref) => {
         .thank {
           text-align: center;
           margin-top: 10px;
+          margin-bottom: 50px
           font-weight: bold;
           font-size: 10px;
         }
       `}</style>
       <div className="receipt" ref={ref}>
         <h2>{restaurantName}</h2>
-        <p><strong>Номер заказа:</strong> {order.id}</p>
-        <p><strong>Стол:</strong> {order.tableNumber || 'N/A'}</p>
-        <p><strong>Дата:</strong> {new Date(order.createdAt || Date.now()).toLocaleString('ru-RU', {
+        <p><strong>Buyurtma raqami:</strong> {order.id}</p>
+        <p><strong>Stol:</strong> {order.tableNumber || 'N/A'}</p>
+        <p><strong>Sana:</strong> {new Date(order.createdAt || Date.now()).toLocaleString('uz-UZ', {
           timeZone: 'Asia/Tashkent',
         })}</p>
         <hr />
         <ul className="items">
           {order.orderItems?.map((item, index) => (
             <li key={index}>
-              {item.product?.name || 'Неизвестное блюдо'} x {item.count} — {formatPrice((item.product?.price || 0) * item.count)}
+              {item.product?.name || "Noma'lum taom"} x {item.count} — {formatPrice((item.product?.price || 0) * item.count)}
             </li>
           ))}
         </ul>
         <hr />
-        <p>Итого: <strong>{formatPrice(order.totalPrice || 0)}</strong></p>
-        <p>Комиссия: <strong>{formatPrice(order.commission || 0)}</strong></p>
-        <p>Итого (с комиссией): <strong style={{ fontSize: '14px', marginBottom: '5px' }}>{formatPrice(order.totalWithCommission || 0)}</strong></p>
-        <p className="thank">Спасибо, ждем вас снова!</p>
+        <p>Jami: <strong>{formatPrice(order.totalPrice || 0)}</strong></p>
+        <p>Komissiya: <strong>{formatPrice(order.commission || 0)}</strong></p>
+        <p>Umumiy tolov: <strong style={{ fontSize: '12px', marginBottom: '5px' }}>{formatPrice(order.totalWithCommission || 0)}</strong></p>
+        <p className="thank">Rahmat, yana kutamiz!</p>
+        <p>.</p>
       </div>
     </div>
   );

@@ -16,7 +16,7 @@ export default function Login() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("http://109.172.37.41:4000/user", {
+        const response = await axios.get("https://suddocs.uz/user", {
           headers: {
             "Content-Type": "application/json",
             ...(localStorage.getItem("token") && {
@@ -171,7 +171,7 @@ export default function Login() {
         )}
 
         <div className="login-footer">
-          <p>© 2024 Admin Panel. Barcha huquqlar himoyalangan.</p>
+          <p>© 2025 Admin Panel. Barcha huquqlar himoyalangan.</p>
         </div>
       </div>
     </div>

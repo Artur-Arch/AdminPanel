@@ -81,9 +81,9 @@ export default function Zakazlar() {
     editingOrder: null,
     newItem: { productId: "", count: 1 },
     error: null,
-    showInitialDeleteConfirmModal: false, // Новое состояние для первого модального окна
-    showDeleteConfirmModal: false, // Состояние для второго модального окна
-    orderToDelete: null, // ID заказа для удаления
+    showInitialDeleteConfirmModal: false,
+    showDeleteConfirmModal: false,
+    orderToDelete: null,
   });
 
   const commissionRate = useSelector((state) => state.commission.commissionRate);
@@ -214,7 +214,6 @@ export default function Zakazlar() {
 
   const handleDeleteOrder = useCallback(
     async (id) => {
-      // Открываем первое модальное окно
       updateState({ showInitialDeleteConfirmModal: true, orderToDelete: id });
     },
     []
@@ -223,7 +222,7 @@ export default function Zakazlar() {
   const confirmInitialDelete = useCallback(() => {
     updateState({
       showInitialDeleteConfirmModal: false,
-      showDeleteConfirmModal: true, // Открываем второе модальное окно
+      showDeleteConfirmModal: true,
     });
   }, []);
 
@@ -726,8 +725,6 @@ export default function Zakazlar() {
           </div>
         </div>
       )}
-
-      {/* Первое модальное окно для начального подтверждения */}
       {state.showInitialDeleteConfirmModal && (
         <div className="modal-overlay" onClick={cancelInitialDelete}>
           <div className="modal1" onClick={(e) => e.stopPropagation()}>
@@ -760,10 +757,11 @@ export default function Zakazlar() {
         </div>
       )}
 
-      {/* Второе модальное окно для окончательного подтверждения */}
       {state.showDeleteConfirmModal && (
         <div className="modal-overlay" onClick={cancelDeleteOrder}>
-          <div className="modal1" onClick={(e) => e.stopPropagation()}>
+          <div className="modal1" style={{
+            backgroundColor: "rgb(172, 172, 172)"
+          }} onClick={(e) => e.stopPropagation()}>
             <div className="modal__header">
               <h2 className="modal__title">Zakaz ochirish</h2>
               <button className="modal__close-btn" onClick={cancelDeleteOrder}>

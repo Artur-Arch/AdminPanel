@@ -57,11 +57,11 @@ export default function Sozlamalar() {
               ...(localStorage.getItem('token') && { Authorization: `Bearer ${localStorage.getItem('token')}` }),
             },
           });
-          dispatch(setRestaurantName(restaurantResponse.data.name || 'Navruz Choyxonasi'));
-          setTempRestaurantName(restaurantResponse.data.name || 'Navruz Choyxonasi');
+          dispatch(setRestaurantName(restaurantResponse.data.name || 'Otabek cafe'));
+          setTempRestaurantName(restaurantResponse.data.name || 'Otabek cafe');
         } catch (err) {
-          dispatch(setRestaurantName('Navruz Choyxonasi'));
-          setTempRestaurantName('Navruz Choyxonasi');
+          dispatch(setRestaurantName('Otabek cafe'));
+          setTempRestaurantName('Otabek cafe');
         }
       } catch (err) {
         setError("Ma'lumotlarni yuklashda xatolik yuz berdi.");

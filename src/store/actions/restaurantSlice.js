@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const restaurantSlice = createSlice({
   name: 'restaurant',
   initialState: {
-    restaurantName: 'Чайхона Навруз',
+    restaurantName: 'Otabek cafe',
   },
   reducers: {
     setRestaurantName: (state, action) => {
