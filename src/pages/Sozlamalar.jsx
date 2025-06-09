@@ -9,7 +9,7 @@ import './styles/Sozlamalar.css';
 const roleOptions = [
   { id: 1, value: 'KITCHEN', label: 'Oshpaz' }, // Повар
   { id: 2, value: 'CASHIER', label: 'Ofitsiant' }, // Официант
-  { id: 3, value: 'CUSTOMER', label: 'Menejer' }, // Менеджер
+  { id: 3, value: 'CUSTOMER', label: 'Admin' }, // Менеджер
   { id: 4, value: 'BIGADMIN', label: 'Direktor' }, // Директор
 ];
 
@@ -57,11 +57,11 @@ export default function Sozlamalar() {
               ...(localStorage.getItem('token') && { Authorization: `Bearer ${localStorage.getItem('token')}` }),
             },
           });
-          dispatch(setRestaurantName(restaurantResponse.data.name || 'Otabek cafe'));
-          setTempRestaurantName(restaurantResponse.data.name || 'Otabek cafe');
+          dispatch(setRestaurantName(restaurantResponse.data.name || 'Otabek kafe'));
+          setTempRestaurantName(restaurantResponse.data.name || 'Otabek kafe');
         } catch (err) {
-          dispatch(setRestaurantName('Otabek cafe'));
-          setTempRestaurantName('Otabek cafe');
+          dispatch(setRestaurantName('Otabek kafe'));
+          setTempRestaurantName('Otabek kafe');
         }
       } catch (err) {
         setError("Ma'lumotlarni yuklashda xatolik yuz berdi.");
@@ -215,7 +215,7 @@ export default function Sozlamalar() {
                       : person.role === 'CASHIER'
                       ? 'Ofitsiant'
                       : person.role === 'CUSTOMER'
-                      ? 'Menejer'
+                      ? 'Admin'
                       : 'Direktor'}
                   </div>
                   <h3 className="employee-name">
@@ -243,7 +243,7 @@ export default function Sozlamalar() {
                               : person.role === 'CASHIER'
                               ? 'Ofitsiant'
                               : person.role === 'CUSTOMER'
-                              ? 'Menejer'
+                              ? 'Admin'
                               : 'Direktor'
                           }) haqiqatdan o'chirilsinmi?`
                         );

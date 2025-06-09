@@ -106,10 +106,12 @@ img {
   margin-bottom: var(--spacing-6);
   padding-left: 30px;
   box-shadow: var(--shadow-sm);
+  height: auto;
 }
 
 .category-tabs::-webkit-scrollbar {
   display: none;
+  height: auto;
 }
 
 .category-tab {
@@ -365,3 +367,7 @@ img {
   }
 }
 
+.category-tabs-container{
+  display: flex;
+  align-items: center;
+}

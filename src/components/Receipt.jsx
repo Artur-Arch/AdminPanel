@@ -1,3 +1,4 @@
+import { X } from 'lucide-react';
 import React from 'react';
 import { useSelector } from 'react-redux';
 
@@ -23,7 +24,7 @@ const Receipt = React.forwardRef(({ order }, ref) => {
           max-width: 500px;
           margin: auto;
           background: white;
-          padding: 30px 15px;
+          padding: 10px 12px;
           border-radius: 4px;
         }
         .receipt h2 {
@@ -69,8 +70,17 @@ const Receipt = React.forwardRef(({ order }, ref) => {
         <hr />
         <ul className="items">
           {order.orderItems?.map((item, index) => (
-            <li key={index}>
-              {item.product?.name || "Noma'lum taom"} x {item.count} — {formatPrice((item.product?.price || 0) * item.count)}
+            <li style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              borderBottom: "1px dashed #666666"
+            }} key={index}>
+              <p>{item.product?.name || "Noma'lum taom"}</p>
+              <p style={{
+                display: "flex",
+                alignItems: "center"
+              }}><X size={8} />{item.count} — {formatPrice((item.product?.price || 0) * item.count)}</p>
             </li>
           ))}
         </ul>

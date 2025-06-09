@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import { Plus, Edit, Trash, Loader2, Clock } from "lucide-react";
+import { Plus, Edit, Trash, Loader2, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import "./styles/TaomlarSoz.css";
 
 export default function TaomlarSoz() {
@@ -20,6 +20,7 @@ export default function TaomlarSoz() {
   });
   const [categoryList, setCategoryList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const scrollRef = useRef(null);
 
   const fetchMenu = () => {
     setLoading(true);
@@ -151,6 +152,18 @@ export default function TaomlarSoz() {
     setShowModal(true);
   };
 
+  const scrollLeft = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: -150, behavior: "smooth" });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: 150, behavior: "smooth" });
+    }
+  };
+
   const filteredMenu =
     newCategory === "Hammasi"
       ? menu
@@ -168,7 +181,7 @@ export default function TaomlarSoz() {
         style={{
           backgroundColor: "var(--color-primary)",
           color: "var(--color-white)",
-          postion: "sticky",
+          position: "sticky",
           top: 0,
           zIndex: 1000,
           left: 0,
@@ -181,31 +194,45 @@ export default function TaomlarSoz() {
         </div>
       </header>
       <section>
-        <nav className="category-tabs">
-          {["Hammasi", ...categoryList.map((cat) => cat.name)].map((cat) => {
-            const realCat = categoryList.find((c) => c.name === cat);
-            return (
-              <div key={cat} style={{ display: "flex", alignItems: "center" }}>
-                <button
-                  className={`category-tab ${
-                    newCategory === cat ? "active" : ""
-                  }`}
-                  onClick={() => setNewCategory(cat)}
-                >
-                  {cat}
-                </button>
-                {cat !== "Hammasi" && (
+        <div className="category-tabs-container">
+          <button style={{
+            marginBottom: "20px",
+            marginRight: "10px"
+          }} className="scroll-arrow left" onClick={scrollLeft}>
+            <ChevronLeft size={30} />
+          </button>
+          <nav className="category-tabs" ref={scrollRef}>
+            {["Hammasi", ...categoryList.map((cat) => cat.name)].map((cat) => {
+              const realCat = categoryList.find((c) => c.name === cat);
+              return (
+                <div key={cat} style={{ display: "flex", alignItems: "center" }}>
                   <button
-                    className="food-card-button delete"
-                    onClick={() => handleDeleteCategory(realCat?.id)}
+                    className={`category-tab ${
+                      newCategory === cat ? "active" : ""
+                    }`}
+                    onClick={() => setNewCategory(cat)}
                   >
-                    <Trash size={16} />
+                    {cat}
                   </button>
-                )}
-              </div>
-            );
-          })}
-        </nav>
+                  {cat !== "Hammasi" && (
+                    <button
+                      className="food-card-button delete"
+                      onClick={() => handleDeleteCategory(realCat?.id)}
+                    >
+                      <Trash size={16} />
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </nav>
+          <button style={{
+            marginBottom: "20px",
+            marginLeft: "10px"
+          }} className="scroll-arrow right" onClick={scrollRight}>
+            <ChevronRight size={30} />
+          </button>
+        </div>
 
         {loading ? (
           <div className="spinner"></div>
