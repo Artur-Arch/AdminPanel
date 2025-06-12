@@ -35,7 +35,7 @@ export default function Sozlamalar() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('https://suddocs.uz/user', {
+        const response = await axios.get('https://alikafecrm.uz/user', {
           headers: { 'Content-Type': 'application/json' },
         });
         const users = response.data.map((user) => ({
@@ -49,9 +49,8 @@ export default function Sozlamalar() {
         }));
         setStaff(users);
 
-        // Choyxona nomini yuklash (API bo'lmasa, bu qismni olib tashlang)
         try {
-          const restaurantResponse = await axios.get('https://suddocs.uz/restaurant', {
+          const restaurantResponse = await axios.get('https://alikafecrm.uz/', {
             headers: {
               'Content-Type': 'application/json',
               ...(localStorage.getItem('token') && { Authorization: `Bearer ${localStorage.getItem('token')}` }),
@@ -78,9 +77,8 @@ export default function Sozlamalar() {
       return;
     }
     try {
-      // Serverga saqlash (API bo'lmasa, bu qismni olib tashlang)
       await axios.put(
-        'https://suddocs.uz/restaurant',
+        'https://alikafecrm.uz',
         { name: tempRestaurantName },
         {
           headers: {
@@ -92,7 +90,7 @@ export default function Sozlamalar() {
       dispatch(setRestaurantName(tempRestaurantName));
       alert('Nomi saqlandi.');
     } catch (err) {
-      dispatch(setRestaurantName(tempRestaurantName)); // API bo'lmasa, faqat Redux'ga saqlaymiz
+      dispatch(setRestaurantName(tempRestaurantName));
       alert("Nomi mahalliy ravishda saqlandi.");
     }
   };
@@ -105,7 +103,7 @@ export default function Sozlamalar() {
         phone: editingStaff.phone,
         role: editingStaff.role,
       };
-      await axios.put(`https://suddocs.uz/user/${editingStaff.id}`, staffData, {
+      await axios.put(`https://alikafecrm.uz/user/${editingStaff.id}`, staffData, {
         headers: {
           'Content-Type': 'application/json',
           ...(localStorage.getItem('token') && { Authorization: `Bearer ${localStorage.getItem('token')}` }),
@@ -134,7 +132,7 @@ export default function Sozlamalar() {
         password: newStaff.password,
         role: newStaff.role,
       };
-      const response = await axios.post('https://suddocs.uz/user', staffData, {
+      const response = await axios.post('https://alikafecrm.uz/user', staffData, {
         headers: {
           'Content-Type': 'application/json',
           ...(localStorage.getItem('token') && { Authorization: `Bearer ${localStorage.getItem('token')}` }),
@@ -249,7 +247,7 @@ export default function Sozlamalar() {
                         );
                         if (confirmDelete) {
                           axios
-                            .delete(`https://suddocs.uz/user/${person.id}`, {
+                            .delete(`https://alikafecrm.uz/user/${person.id}`, {
                               headers: {
                                 'Content-Type': 'application/json',
                                 ...(localStorage.getItem('token') && {

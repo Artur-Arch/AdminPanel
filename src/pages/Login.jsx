@@ -16,7 +16,7 @@ export default function Login() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("https://suddocs.uz/user", {
+        const response = await axios.get("https://alikafecrm.uz/user", {
           headers: {
             "Content-Type": "application/json",
             ...(localStorage.getItem("token") && {

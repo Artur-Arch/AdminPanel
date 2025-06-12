@@ -19,7 +19,7 @@ export default function Header() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const ordersResponse = await axios.get("https://suddocs.uz/order");
+        const ordersResponse = await axios.get("https://alikafecrm.uz/order");
         const orders = ordersResponse.data.map((order) => ({
           ...order,
           orderItems: Array.isArray(order.orderItems) ? order.orderItems : [],
@@ -27,7 +27,7 @@ export default function Header() {
 
         let usersData = [{ email: "AdminInfo@gmail.com", role: "CUSTOMER" }];
         try {
-          const usersResponse = await axios.get("https://suddocs.uz/user");
+          const usersResponse = await axios.get("https://alikafecrm.uz/user");
           usersData = usersResponse.data;
         } catch (userError) {
           console.warn("Foydalanuvchilar API'dan olishda xatolik:", userError);

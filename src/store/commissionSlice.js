@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const commissionSlice = createSlice({
   name: 'commission',
   initialState: {
-    commissionRate: 5,
+    commissionRate: 4,
   },
   reducers: {
     setCommissionRate(state, action) {

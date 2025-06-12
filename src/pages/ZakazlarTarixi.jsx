@@ -57,9 +57,9 @@ export default function ZakazTarixi() {
       try {
         const [ordersResponse, categoriesResponse, tablesResponse] =
           await Promise.all([
-            axios.get("https://suddocs.uz/order"),
-            axios.get("https://suddocs.uz/category"),
-            axios.get("https://suddocs.uz/tables"),
+            axios.get("https://alikafecrm.uz/order"),
+            axios.get("https://alikafecrm.uz/category"),
+            axios.get("https://alikafecrm.uz/tables"),
           ]);
 
         const sanitizedOrders = ordersResponse.data.map((order) => ({

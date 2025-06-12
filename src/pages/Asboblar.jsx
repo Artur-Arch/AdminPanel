@@ -43,7 +43,7 @@ export default function Asboblar() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const ordersResponse = await axios.get("https://suddocs.uz/order");
+        const ordersResponse = await axios.get("https://alikafecrm.uz/order");
         const orders = ordersResponse.data.map((order) => ({
           ...order,
           orderItems: Array.isArray(order.orderItems) ? order.orderItems : [],

@@ -55,7 +55,6 @@ export default function ModalBasket({
         tables,
       };
 
-      console.log("Отправляемые данные:", orderData);
       onConfirm(orderData);
       onClose();
     } else if (orderType === "delivery") {
@@ -76,8 +75,6 @@ export default function ModalBasket({
         })),
         tables,
       };
-
-      console.log("Отправляемые данные:", orderData);
       onConfirm(orderData);
       onClose();
     }

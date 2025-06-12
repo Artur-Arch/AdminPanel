@@ -16,9 +16,8 @@ export default function Taomlar() {
 
   useEffect(() => {
     axios
-      .get("https://suddocs.uz/tables")
+      .get("https://alikafecrm.uz/tables")
       .then((res) => {
-        console.log("Данные столов:", res.data);
         setTables(res.data.data);
       })
       .catch((err) => console.error("Ошибка загрузки столов:", err));
@@ -27,7 +26,7 @@ export default function Taomlar() {
   const fetchTaomlar = () => {
     setLoading(true);
     axios
-      .get("https://suddocs.uz/product")
+      .get("https://alikafecrm.uz/product")
       .then((res) => {
         setTaomlar(res.data);
         setLoading(false);
@@ -111,7 +110,7 @@ export default function Taomlar() {
               <div key={taom.id} className="menu-card">
                 <div className="menu-image">
                   <img
-                    src={`https://suddocs.uz${taom.image}`}
+                    src={`https://alikafecrm.uz${taom.image}`}
                     alt={taom.name}
                   />
                 </div>
@@ -138,7 +137,7 @@ export default function Taomlar() {
               <div key={taom.id} className="menu-card">
                 <div className="menu-image">
                   <img
-                    src={`https://suddocs.uz${taom.image}`}
+                    src={`https://alikafecrm.uz${taom.image}`}
                     alt={taom.name}
                   />
                 </div>
@@ -297,25 +296,18 @@ export default function Taomlar() {
               return;
             }
 
-            console.log(
-              "Yuborilayotgan buyurtma:",
-              JSON.stringify(body, null, 2)
-            );
-
             axios
-              .post("https://suddocs.uz/order", body)
+              .post("https://alikafecrm.uz/order", body)
               .then((res) => {
-                console.log("Buyurtma yuborildi:", res.data);
                 setCart([]);
                 setSuccessMsg("Buyurtma muvaffaqiyatli yuborildi!");
 
                 if (orderData.orderType === "table" && tableId) {
                   axios
-                    .patch(`https://suddocs.uz/tables/${tableId}`, {
+                    .patch(`https://alikafecrm.uz/tables/${tableId}`, {
                       status: "busy",
                     })
                     .then((res) => {
-                      console.log("Статус стола обновлен:", res.data);
                       setTables((prev) =>
                         prev.map((table) =>
                           table.id === tableId

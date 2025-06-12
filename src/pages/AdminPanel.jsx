@@ -14,8 +14,8 @@ export default function AdminPanel() {
   const fetchData = async () => {
     try {
       const [ordersRes, tablesRes] = await Promise.all([
-        axios.get("https://suddocs.uz/order"),
-        axios.get("https://suddocs.uz/tables"),
+        axios.get("https://alikafecrm.uz/order"),
+        axios.get("https://alikafecrm.uz/tables"),
       ]);
 
       const sanitizedOrders = ordersRes.data
@@ -28,8 +28,6 @@ export default function AdminPanel() {
           if (a.status !== "ARCHIVE" && b.status === "ARCHIVE") return -1;
           return new Date(b.createdAt) - new Date(a.createdAt);
         });
-
-      console.log("Tartiblangan zakazlar:", sanitizedOrders.map(o => ({ id: o.id, createdAt: o.createdAt, status: o.status })));
 
       setOrders((prevOrders) => {
         if (JSON.stringify(prevOrders) !== JSON.stringify(sanitizedOrders)) {
@@ -75,7 +73,7 @@ export default function AdminPanel() {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`https://suddocs.uz/order/${orderId}`);
+      await axios.delete(`https://alikafecrm.uz/order/${orderId}`);
       alert("Zakaz o'chirildi");
       await fetchData();
       if (selectedOrder?.id === orderId) {
@@ -199,7 +197,7 @@ export default function AdminPanel() {
                       style={{ display: "flex", alignItems: "center", marginBottom: "var(--space-2)" }}
                     >
                       <img
-                        src={`https://suddocs.uz${item.product?.image}`}
+                        src={`https://alikafecrm.uz${item.product?.image}`}
                         alt={item.product?.name}
                         style={{ width: "50px", height: "50px", borderRadius: "var(--radius-md)", marginRight: "var(--space-3)" }}
                       />
@@ -237,7 +235,7 @@ export default function AdminPanel() {
                       className="action-button edit"
                       onClick={async () => {
                         try {
-                          await axios.put(`https://suddocs.uz/order/${selectedOrder.id}`, { status: selectedOrder.status });
+                          await axios.put(`https://alikafecrm.uz/order/${selectedOrder.id}`, { status: selectedOrder.status });
                           alert("Zakaz yangilandi");
                           setSelectedOrder(null);
                           setModalType("");

@@ -24,7 +24,7 @@ export default function TaomlarSoz() {
 
   const fetchMenu = () => {
     setLoading(true);
-    axios("https://suddocs.uz/product")
+    axios("https://alikafecrm.uz/product")
       .then((res) => setMenu(res.data))
       .catch((err) => console.error("Menyuştlashda xatolik:", err))
       .finally(() => setLoading(false));
@@ -36,7 +36,7 @@ export default function TaomlarSoz() {
 
   useEffect(() => {
     setLoading(true);
-    axios("https://suddocs.uz/category")
+    axios("https://alikafecrm.uz/category")
       .then((res) => setCategoryList(res.data))
       .catch((err) => console.error("Kategoriya olishda xatolik:", err))
       .finally(() => setLoading(false));
@@ -77,7 +77,7 @@ export default function TaomlarSoz() {
       }
 
       axios
-        .put(`https://suddocs.uz/product/${dishes.id}`, formdata)
+        .put(`https://alikafecrm.uz/product/${dishes.id}`, formdata)
         .then(() => {
           fetchMenu();
           setShowModal(false);
@@ -100,7 +100,7 @@ export default function TaomlarSoz() {
       }
       formdata.append("categoryId", catId);
 
-      axios.post("https://suddocs.uz/product", formdata).then(() => {
+      axios.post("https://alikafecrm.uz/product", formdata).then(() => {
         fetchMenu();
         setShowModal(false);
         setEditing(false);
@@ -112,7 +112,7 @@ export default function TaomlarSoz() {
   const handleDelete = (id) => {
     if (window.confirm("Taomni o'chirishni istaysizmi?")) {
       axios
-        .delete(`https://suddocs.uz/product/${id}`)
+        .delete(`https://alikafecrm.uz/product/${id}`)
         .then(() => fetchMenu())
         .catch((err) => {
           alert("Bu taom o'chirib bo'lmaydi. Balki u zakazga bog'langan.");
@@ -124,9 +124,9 @@ export default function TaomlarSoz() {
   const handleDeleteCategory = (id) => {
     if (window.confirm("Kategoriyani o'chirishni istaysizmi?")) {
       axios
-        .delete(`https://suddocs.uz/category/${id}`)
+        .delete(`https://alikafecrm.uz/category/${id}`)
         .then(() => {
-          axios("https://suddocs.uz/category").then((res) =>
+          axios("https://alikafecrm.uz/category").then((res) =>
             setCategoryList(res.data)
           );
           setNewCategory("Hammasi");
@@ -263,7 +263,7 @@ export default function TaomlarSoz() {
                 <div className="food-card-image-container">
                   <img
                     className="food-card-image"
-                    src={`https://suddocs.uz${i.image}`}
+                    src={`https://alikafecrm.uz${i.image}`}
                     alt={i.name}
                   />
                 </div>
@@ -313,7 +313,7 @@ export default function TaomlarSoz() {
               <div className="modal-body1">
                 {editing && typeof dishes.image === "string" && (
                   <img
-                    src={`https://suddocs.uz${dishes.image}`}
+                    src={`https://alikafecrm.uz${dishes.image}`}
                     alt="Current"
                     style={{
                       width: "100px",
@@ -415,7 +415,7 @@ export default function TaomlarSoz() {
                         return;
                       }
                       axios
-                        .post("https://suddocs.uz/category", {
+                        .post("https://alikafecrm.uz/category", {
                           name: newCategory.trim(),
                         })
                         .then((res) => {

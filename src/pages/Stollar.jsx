@@ -17,7 +17,7 @@ export default function Stollar() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const API_URL = "https://suddocs.uz/tables";
+  const API_URL = "https://alikafecrm.uz/tables";
 
   const statusMapToBackend = { "Bo'sh": "empty", Band: "busy" };
   const statusMapToFrontend = { empty: "Bo'sh", busy: "Band" };
@@ -408,8 +408,8 @@ export default function Stollar() {
                               <img
                                 src={
                                   item.product?.image
-                                    ? `https://suddocs.uz${item.product.image}`
-                                    : "https://suddocs.uz/placeholder.png"
+                                    ? `https://alikafecrm.uz${item.product.image}`
+                                    : "https://alikafecrm.uz/placeholder.png"
                                 }
                                 alt={item.product?.name || "Product"}
                                 style={{
