@@ -189,10 +189,7 @@ export default function ZakazTarixi() {
               </thead>
               <tbody>
                 {filteredHistory.map((order) => {
-                  const totalPrice = order.orderItems.reduce(
-                    (total, item) => total + (item.product?.price || 0) * item.count,
-                    0
-                  );
+                  const totalPrice = order.totalPrice || 0; // Используем totalPrice из заказа
                   const commission = totalPrice * (commissionRate / 100);
                   const totalWithCommission = totalPrice + commission;
                   return (
