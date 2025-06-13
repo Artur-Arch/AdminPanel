@@ -22,6 +22,13 @@ export default function Stollar() {
   const statusMapToBackend = { "Bo'sh": "empty", Band: "busy" };
   const statusMapToFrontend = { empty: "Bo'sh", busy: "Band" };
 
+  const calculateTotalPrice = (orderItems) => {
+    return orderItems.reduce(
+      (sum, item) => sum + parseFloat(item.product?.price || 0) * item.count,
+      0
+    );
+  };
+
   useEffect(() => {
     const fetchStollar = async () => {
       try {
@@ -196,10 +203,9 @@ export default function Stollar() {
       <div className="main-content">
         <div style={{
           marginTop: "-45px",
-          
         }} className="main-content-table">
-        <h1 className="section-title1">Stollar</h1>
-        {error && <div className="text-danger">{error}</div>}
+          <h1 className="section-title1">Stollar</h1>
+          {error && <div className="text-danger">{error}</div>}
         </div>
         {loading ? (
           <div className="spinner">
@@ -386,67 +392,67 @@ export default function Stollar() {
                   getOrdersForTable(selectedTable.id).map((order) => (
                     <div key={order.id} className="order-item">
                       <div className="order-items-list">
-                      <p style={{
-                        marginTop: "-15px",
-                        marginBottom: "0px"
-                      }} className="info-label">
-                        <strong>Buyurtma №{order.id}</strong>
-                      </p>
+                        <p style={{
+                          marginTop: "-15px",
+                          marginBottom: "0px"
+                        }} className="info-label">
+                          <strong>Buyurtma №{order.id}</strong>
+                        </p>
                         <span className="info-label">Taomlar:</span>
                         <div style={{
                           display: "flex",
                           flexDirection: "column",
                           gap: "20px",
-                          }}>
-                        {order.orderItems.length > 0 ? (
-                          order.orderItems.map((item, index) => (
-                            <div key={index} style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "15px"
-                            }} className="order-item-detail">
-                              <img
-                                src={
-                                  item.product?.image
-                                    ? `https://alikafecrm.uz${item.product.image}`
-                                    : "https://alikafecrm.uz/placeholder.png"
-                                }
-                                alt={item.product?.name || "Product"}
-                                style={{
-                                  width: "80px",
-                                  height: "80px",
-                                  objectFit: "cover",
-                                  borderRadius: "4px",
-                                }}
-                              />
-                              <span style={{
-                                fontSize: "22px",
-                              }} className="info-value">
-                                 {item.product?.name || "Nomalum taom"} ({item.count})
-                              </span>
-                            </div>
-                          ))
-                        ) : (
-                          <span className="text-secondary">Buyurtmada taomlar yo'q</span>
-                        )}
+                        }}>
+                          {order.orderItems.length > 0 ? (
+                            order.orderItems.map((item, index) => (
+                              <div key={index} style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "15px"
+                              }} className="order-item-detail">
+                                <img
+                                  src={
+                                    item.product?.image
+                                      ? `https://alikafecrm.uz${item.product.image}`
+                                      : "https://alikafecrm.uz/placeholder.png"
+                                  }
+                                  alt={item.product?.name || "Product"}
+                                  style={{
+                                    width: "80px",
+                                    height: "80px",
+                                    objectFit: "cover",
+                                    borderRadius: "4px",
+                                  }}
+                                />
+                                <span style={{
+                                  fontSize: "22px",
+                                }} className="info-value">
+                                  {item.product?.name || "Nomalum taom"} ({item.count})
+                                </span>
+                              </div>
+                            ))
+                          ) : (
+                            <span className="text-secondary">Buyurtmada taomlar yo'q</span>
+                          )}
                         </div>
-                      <p style={{
-                        borderTop: "0.5px solid var(--gray-200)",
-                        width: "230px",
-                        paddingLeft: "5px",
-                        paddingRight: "5px",
-                        paddingTop: "8px",
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "end",
-                        gap: "10px",
-                        marginTop: "20px",
-                        marginBottom: "-20px",
-                        fontSize: "20px",
-                      }} className="info-row">
-                        <span className="info-label">Narxi:</span>
-                        <span className="info-value">{formatPrice(order.totalPrice)}</span>
-                      </p>
+                        <p style={{
+                          borderTop: "0.5px solid var(--gray-200)",
+                          width: "230px",
+                          paddingLeft: "5px",
+                          paddingRight: "5px",
+                          paddingTop: "8px",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "end",
+                          gap: "10px",
+                          marginTop: "20px",
+                          marginBottom: "-20px",
+                          fontSize: "20px",
+                        }} className="info-row">
+                          <span className="info-label">Narxi:</span>
+                          <span className="info-value">{formatPrice(calculateTotalPrice(order.orderItems))}</span>
+                        </p>
                       </div>
                     </div>
                   ))

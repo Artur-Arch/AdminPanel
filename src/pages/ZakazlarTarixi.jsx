@@ -52,6 +52,13 @@ export default function ZakazTarixi() {
 
   const commissionRate = useSelector((state) => state.commission.commissionRate);
 
+  const calculateTotalPrice = (orderItems) => {
+    return orderItems.reduce(
+      (sum, item) => sum + parseFloat(item.product?.price || 0) * item.count,
+      0
+    );
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -189,7 +196,7 @@ export default function ZakazTarixi() {
               </thead>
               <tbody>
                 {filteredHistory.map((order) => {
-                  const totalPrice = order.totalPrice || 0; // Используем totalPrice из заказа
+                  const totalPrice = calculateTotalPrice(order.orderItems);
                   const commission = totalPrice * (commissionRate / 100);
                   const totalWithCommission = totalPrice + commission;
                   return (

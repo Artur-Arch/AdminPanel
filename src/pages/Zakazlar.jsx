@@ -352,14 +352,11 @@ export default function Zakazlar() {
 
       try {
         updateState({ isSaving: true, error: "" });
-
-        // Send DELETE request to remove the item
         await axios.delete(
           `${API_ENDPOINTS.orders}/orderItem/${itemId}`,
           createApiRequest(token)
         );
 
-        // Fetch updated order from server
         const response = await axios.get(
           `${API_ENDPOINTS.orders}/${state.editingOrder.id}`,
           createApiRequest(token)
@@ -372,7 +369,6 @@ export default function Zakazlar() {
           socket.emit("orderUpdated", updatedOrder);
         }
 
-        // Update local state with server response
         updateState({
           orders: state.orders.map((o) =>
             o.id === updatedOrder.id ? { ...updatedOrder, totalPrice } : o
@@ -425,17 +421,12 @@ export default function Zakazlar() {
     try {
       updateState({ isSaving: true, error: "" });
 
-      // Prepare payload with only the new item
       const payload = {
         products: [{ productId: Number(productId), count: Number(count) }],
         tableId: state.editingOrder.tableId,
         userId: state.editingOrder.userId,
         status: state.editingOrder.status,
       };
-
-      console.log("Sending payload for add item:", payload);
-
-      // Send PUT request to update order
       const response = await axios.put(
         `${API_ENDPOINTS.orders}/${state.editingOrder.id}`,
         payload,
@@ -449,7 +440,6 @@ export default function Zakazlar() {
         socket.emit("orderUpdated", updatedOrder);
       }
 
-      // Update local state with server response
       updateState({
         orders: state.orders.map((o) =>
           o.id === updatedOrder.id ? { ...updatedOrder, totalPrice } : o
@@ -693,8 +683,9 @@ export default function Zakazlar() {
                 </div>
               ) : (
                 filteredOrders.map((order) => {
-                  const commission = order.totalPrice * (commissionRate / 100);
-                  const totalWithCommission = order.totalPrice + commission;
+                  const calculatedTotal = calculateTotalPrice(order.orderItems);
+                  const commission = calculatedTotal * (commissionRate / 100);
+                  const totalWithCommission = calculatedTotal + commission;
                   return (
                     <div className="order-card" key={`order-${order.id}`}>
                       <div className="order-card__header">
@@ -769,7 +760,7 @@ export default function Zakazlar() {
                           <p className="order-card__total">
                             Umumiy narx:{" "}
                             <strong>
-                              {formatPrice(order.totalPrice || 0)}
+                              {formatPrice(calculatedTotal)}
                             </strong>
                           </p>
                           <p className="order-card__total">
@@ -1083,12 +1074,12 @@ export default function Zakazlar() {
                   id: state.currentOrder.id || null,
                   orderItems: state.currentOrder.orderItems || [],
                   tableNumber: state.currentOrder.table?.number || "",
-                  totalPrice: state.currentOrder.totalPrice || 0,
+                  totalPrice: calculateTotalPrice(state.currentOrder.orderItems),
                   commission:
-                    state.currentOrder.totalPrice * (commissionRate / 100),
+                    calculateTotalPrice(state.currentOrder.orderItems) * (commissionRate / 100),
                   totalWithCommission:
-                    state.currentOrder.totalPrice +
-                    state.currentOrder.totalPrice * (commissionRate / 100),
+                    calculateTotalPrice(state.currentOrder.orderItems) +
+                    calculateTotalPrice(state.currentOrder.orderItems) * (commissionRate / 100),
                   createdAt: state.currentOrder.createdAt || null,
                 })
               : {

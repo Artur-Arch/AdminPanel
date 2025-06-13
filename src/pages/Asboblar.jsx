@@ -278,7 +278,24 @@ export default function Asboblar() {
               <span className="stats-card-unit">ta</span>
             </div>
             <div className="stats-card card-hover fade-in">
-              <p className="stats-card-title">Umumiy summa</p>
+              <div
+                style={{
+                  display: "flex",
+                  // alignItems: "center",
+                  gap: "3px",
+                }}
+              >
+                <p className="stats-card-title">Umumiy summa</p>
+                <p
+                  style={{
+                    fontSize: "10px",
+                  }}
+                  className="stats-card-title"
+                >
+                  ( Komissiyasiz )
+                </p>
+              </div>
+
               <h4 className="stats-card-value">
                 {dailyStats.totalAmount.toLocaleString("uz-UZ")}
               </h4>
@@ -292,7 +309,23 @@ export default function Asboblar() {
               <span className="stats-card-unit">so'm</span>
             </div>
             <div className="stats-card card-hover fade-in">
-              <p className="stats-card-title">O'rtacha buyurtma miqdori</p>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <p className="stats-card-title">O'rtacha buyurtma miqdori</p>
+                <p
+                  style={{
+                    fontSize: "10px",
+                    marginTop: "-10px"
+                  }}
+                  className="stats-card-title"
+                >
+                  ( Komissiyasiz )
+                </p>
+              </div>
               <h4 className="stats-card-value">
                 {Math.round(dailyStats.averageCheck).toLocaleString("uz-UZ")}
               </h4>

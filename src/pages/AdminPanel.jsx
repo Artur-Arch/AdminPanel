@@ -11,6 +11,13 @@ export default function AdminPanel() {
 
   const commissionRate = useSelector((state) => state.commission.commissionRate);
 
+  const calculateTotalPrice = (orderItems) => {
+    return orderItems.reduce(
+      (sum, item) => sum + parseFloat(item.product?.price || 0) * item.count,
+      0
+    );
+  };
+
   const fetchData = async () => {
     try {
       const [ordersRes, tablesRes] = await Promise.all([
@@ -130,8 +137,9 @@ export default function AdminPanel() {
                 </thead>
                 <tbody>
                   {orders.map((order, index) => {
-                    const commission = order.totalPrice * (commissionRate / 100);
-                    const totalWithCommission = order.totalPrice + commission;
+                    const totalPrice = calculateTotalPrice(order.orderItems);
+                    const commission = totalPrice * (commissionRate / 100);
+                    const totalWithCommission = totalPrice + commission;
                     return (
                       <tr key={`${order.id}-${index}`}>
                         <td>№ {order.id}</td>
@@ -139,8 +147,8 @@ export default function AdminPanel() {
                         <td className="item-column">
                           {order.orderItems.map((item) => `${item.product.name} (${item.count})`).join(", ")}
                         </td>
-                        <td>{formatPrice((order.totalPrice * 4) / 100)}</td>
-                        <td>{formatPrice(order.totalPrice)}</td>
+                        <td>{formatPrice((totalPrice * 4) / 100)}</td>
+                        <td>{formatPrice(totalPrice)}</td>
                         <td>{formatPrice(commission)}</td>
                         <td>{formatPrice(totalWithCommission)}</td>
                         <td>
@@ -206,9 +214,9 @@ export default function AdminPanel() {
                   ))}
                 </div>
                 <p><b>Holati:</b> {getStatusText(selectedOrder.status)}</p>
-                <p><b>Umumiy narxi:</b> {formatPrice(selectedOrder.totalPrice)}</p>
-                <p><b>Komissiya ({commissionRate}%):</b> {formatPrice(selectedOrder.totalPrice * (commissionRate / 100))}</p>
-                <p><b>Jami (komissiya bilan):</b> {formatPrice(selectedOrder.totalPrice + selectedOrder.totalPrice * (commissionRate / 100))}</p>
+                <p><b>Umumiy narxi:</b> {formatPrice(calculateTotalPrice(selectedOrder.orderItems))}</p>
+                <p><b>Komissiya ({commissionRate}%):</b> {formatPrice(calculateTotalPrice(selectedOrder.orderItems) * (commissionRate / 100))}</p>
+                <p><b>Jami (komissiya bilan):</b> {formatPrice(calculateTotalPrice(selectedOrder.orderItems) + calculateTotalPrice(selectedOrder.orderItems) * (commissionRate / 100))}</p>
 
                 {modalType === "edit" && (
                   <div style={{ marginBottom: "var(--space-4)" }}>
