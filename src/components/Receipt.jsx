@@ -1,17 +1,21 @@
-import { X } from 'lucide-react';
-import React from 'react';
-import { useSelector } from 'react-redux';
+import { X } from "lucide-react";
+import React from "react";
+import { useSelector } from "react-redux";
 
 const Receipt = React.forwardRef(({ order }, ref) => {
-  const restaurantName = useSelector((state) => state.restaurant.restaurantName);
+  const restaurantName = useSelector(
+    (state) => state.restaurant.restaurantName
+  );
 
   if (!order) return null;
 
   const formatPrice = (price) => {
-    return price
-      .toString()
-      .replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
-      .trim() + ' so\'m';
+    return (
+      price
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
+        .trim() + " so'm"
+    );
   };
 
   return (
@@ -21,74 +25,96 @@ const Receipt = React.forwardRef(({ order }, ref) => {
           font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         }
         .receipt {
-          max-width: 500px;
+          max-width: 200px; 
           margin: auto;
           background: white;
-          padding: 10px 12px;
+          padding: 5px 6px; /* Reduced padding */
           border-radius: 4px;
         }
         .receipt h2 {
           text-align: center;
-          margin-bottom: 5px;
+          margin-bottom: 3px;
           color: #333;
-          font-size: 20px;
+          font-size: 8px;
         }
         .receipt p {
-          margin: 3px 0;
-          font-size: 10px;
-        }
-        .receipt hr {
-          border: none;
-          border-top: 1px solid #ddd;
-          margin: 10px 0;
-        }
-        .items {
-          list-style: none;
-          padding-left: 0;
-          font-size: 10px;
-        }
-        .items li {
           margin: 2px 0;
-          padding: 1px 0;
-          border-bottom: 1px dashed #eee;
+          font-size: 6px; /* Reduced font size for compactness */
+        }
+        .items table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 6px; /* Reduced font size */
+          border: 1px solid #000;
+        }
+        .items table td, .items table th {
+          border: 1px solid #000;
+          padding: 1px;
+          text-align: center;
+        }
+        .items table tr:last-child td {
+          border-bottom: none;
         }
         .thank {
           text-align: center;
-          margin-top: 10px;
-          margin-bottom: 50px
+          margin-top: 5px;
+          margin-bottom: 20px; /* Reduced margin */
           font-weight: bold;
-          font-size: 10px;
+          font-size: 6px; /* Reduced font size */
         }
       `}</style>
       <div className="receipt" ref={ref}>
-        <h2>{restaurantName}</h2>
-        <p><strong>Buyurtma raqami:</strong> {order.id}</p>
-        <p><strong>Stol:</strong> {order.tableNumber || 'N/A'}</p>
-        <p><strong>Sana:</strong> {new Date(order.createdAt || Date.now()).toLocaleString('uz-UZ', {
-          timeZone: 'Asia/Tashkent',
-        })}</p>
-        <hr />
-        <ul className="items">
-          {order.orderItems?.map((item, index) => (
-            <li style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              borderBottom: "1px dashed #666666"
-            }} key={index}>
-              <p>{item.product?.name || "Noma'lum taom"}</p>
-              <p style={{
-                display: "flex",
-                alignItems: "center"
-              }}><X size={8} />{item.count} — {formatPrice((item.product?.price || 0) * item.count)}</p>
-            </li>
-          ))}
-        </ul>
-        <hr />
-        <p>Jami: <strong>{formatPrice(order.totalPrice || 0)}</strong></p>
-        <p>Komissiya: <strong>{formatPrice(order.commission || 0)}</strong></p>
-        <p>Umumiy tolov: <strong style={{ fontSize: '12px', marginBottom: '5px' }}>{formatPrice(order.totalWithCommission || 0)}</strong></p>
-        <p className="thank">Rahmat, yana kutamiz!</p>
+        <h2 style={{fontSize: "20px"}}>{restaurantName}</h2>
+        <p style={{fontSize: "12px"}}>
+          <strong>Buyurtma raqami:</strong> {order.id}
+        </p>
+        <p style={{fontSize: "12px"}}>
+          <strong>Stol:</strong> {order.tableNumber || "N/A"}
+        </p>
+        <p style={{fontSize: "12px"}}>
+          <strong>Sana:</strong>{" "}
+          {new Date(order.createdAt || Date.now()).toLocaleString("uz-UZ", {
+            timeZone: "Asia/Tashkent",
+          })}
+        </p>
+        <div className="items">
+          <table>
+            <thead>
+              <tr>
+                <th style={{ width: "10%", fontSize: "10px" }}>№</th>
+                <th style={{ width: "40%", fontSize: "10px" }}>Taom</th>
+                <th style={{ width: "20%", fontSize: "10px" }}>Soni</th>
+                <th style={{ width: "30%", fontSize: "10px" }}>Jami</th>
+              </tr>
+            </thead>
+            <tbody>
+              {order.orderItems?.map((item, index) => (
+                <tr key={index}>
+                  <td style={{fontSize: "10px"}}>{index + 1}</td>
+                  <td style={{fontSize: "10px"}}>{item.product?.name || "Noma'lum taom"}</td>
+                  <td style={{fontSize: "10px"}}>
+                    <X size={6} />
+                    {item.count}
+                  </td>
+                  <td style={{fontSize: "10px"}}>{formatPrice((item.product?.price || 0) * item.count)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p style={{fontSize: "10px"}}>
+          Jami: <strong>{formatPrice(order.totalPrice || 0)}</strong>
+        </p>
+        <p style={{fontSize: "10px"}}>
+          Komissiya: <strong>{formatPrice(order.commission || 0)}</strong>
+        </p>
+        <p style={{fontSize: "10px"}}>
+          Umumiy tolov:{" "}
+          <strong style={{ fontSize: "10px", marginBottom: "3px" }}>
+            {formatPrice(order.totalWithCommission || 0)}
+          </strong>
+        </p>
+        <p  style={{fontSize: "10px"}} className="thank">Rahmat, yana kutamiz!</p>
         <p>.</p>
       </div>
     </div>
