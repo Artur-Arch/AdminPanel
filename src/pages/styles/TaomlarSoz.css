@@ -384,4 +384,5 @@ img {
 
 .scroll-arrow:hover {
   background-color: var(--color-secondary);
+  cursor: pointer;
 }
